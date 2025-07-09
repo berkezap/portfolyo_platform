@@ -1,9 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
-import { Github, Star, GitFork, Calendar, Globe, Upload, FileText, Check, RefreshCw, LogOut } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import { useGitHubRepos } from '@/hooks/useGitHubRepos'
+import { usePortfolioGenerator } from '@/hooks/usePortfolioGenerator'
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
+import { ProgressSteps } from '@/components/dashboard/ProgressSteps'
+import { RepositorySelection } from '@/components/dashboard/steps/RepositorySelection'
+import { TemplateSelection } from '@/components/dashboard/steps/TemplateSelection'
+import { CVUpload } from '@/components/dashboard/steps/CVUpload'
+import { GenerateStep } from '@/components/dashboard/steps/GenerateStep'
+import { CompletedStep } from '@/components/dashboard/steps/CompletedStep'
+import { StepType, PortfolioTemplate } from '@/types/dashboard'
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -87,7 +95,7 @@ const mockRepos = [
   }
 ]
 
-const portfolioTemplates = [
+const portfolioTemplates: PortfolioTemplate[] = [
   {
     id: 1,
     name: 'Modern Developer',
@@ -164,6 +172,7 @@ const portfolioTemplates = [
 export default function DashboardPage() {
   const { data: session } = useSession()
   const { repos: realRepos, loading: reposLoading, error: reposError, refetch } = useGitHubRepos()
+  const { generatePortfolio, result: portfolioResult, loading: portfolioLoading, error: portfolioError, clearResult } = usePortfolioGenerator()
   
   // Demo mode kontrolü
   const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
@@ -171,10 +180,17 @@ export default function DashboardPage() {
   // Mock veriler veya gerçek veriler
   const repos = demoMode ? mockRepos : realRepos
   
+  // Template ID'lerini şablon isimlerine çevir
+  const templateIdToName = {
+    1: 'modern-developer',
+    2: 'creative-portfolio',
+    3: 'professional-tech'
+  }
+  
   const [selectedRepos, setSelectedRepos] = useState<number[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1)
   const [cvFile, setCvFile] = useState<File | null>(null)
-  const [step, setStep] = useState<'repos' | 'template' | 'cv' | 'generate' | 'completed'>('repos')
+  const [step, setStep] = useState<StepType>('repos')
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({ isOpen: false, templateId: null })
 
   const toggleRepo = (repoId: number) => {
@@ -192,495 +208,169 @@ export default function DashboardPage() {
     }
   }
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    console.log('🎬 handleGenerate çağrıldı! Demo mode:', demoMode)
+    if (demoMode) {
+      console.log('🎭 Demo modunda çalışıyor, gerçek API çağrılmayacak')
+      // Demo modunda eski simulasyon davranışını koru
+      setStep('generate')
+      setTimeout(() => {
+        setStep('completed')
+      }, 3000)
+      return
+    }
+
+    console.log('🔥 Gerçek portfolyo oluşturma başlıyor...')
+    // Gerçek portfolyo oluşturma
     setStep('generate')
-    // Bu kısım gerçek uygulamada portfolyo oluşturma işlemini yapacak
-    setTimeout(() => {
+    clearResult()
+    
+    try {
+      const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName]
+      console.log('📋 Seçilen template:', templateName)
+      
+      // Selected repo ID'lerini isimlere çevir
+      const selectedRepoNames = selectedRepos
+        .map(repoId => repos.find(repo => repo.id === repoId)?.name)
+        .filter(Boolean) as string[]
+      
+      console.log('📋 Seçilen repo ID\'leri:', selectedRepos)
+      console.log('📋 Seçilen repo isimleri:', selectedRepoNames)
+      
+      // CV URL'i oluştur (gelecekte file upload implementasyonu için)
+      const cvUrl = cvFile ? URL.createObjectURL(cvFile) : undefined
+      
+      await generatePortfolio(templateName, selectedRepoNames, cvUrl)
+      
+      // Portfolyo başarıyla oluşturulduysa completed adımına geç
       setStep('completed')
-    }, 3000)
+    } catch (error) {
+      console.error('Portfolio generation failed:', error)
+      // Hata durumunda geri dön
+      setStep('cv')
+    }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
-  }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="bg-blue-600 rounded-lg p-2">
-                <Github className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-gray-900">PortfolYO</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              {demoMode ? (
-                <>
-                  <span className="text-sm text-gray-600">Mock User (Demo Mode)</span>
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">MU</span>
-                  </div>
-                  <a
-                    href="/"
-                    className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Ana Sayfa
-                  </a>
-                </>
-              ) : (
-                <>
-                  <span className="text-sm text-gray-600">{session?.user?.name || 'GitHub User'}</span>
-                  {session?.user?.image ? (
-                    <img 
-                      src={session.user.image} 
-                      alt="User avatar" 
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                      <Github className="h-4 w-4 text-white" />
-                    </div>
-                  )}
-                  <button
-                    onClick={() => signOut({ callbackUrl: '/' })}
-                    className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4 mr-1" />
-                    Çıkış
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader demoMode={demoMode} />
 
       <div className="container mx-auto px-4 py-8">
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center space-x-2 md:space-x-4 overflow-x-auto px-4">
-            <div className={`flex items-center space-x-2 ${step === 'repos' ? 'text-blue-600' : step === 'template' || step === 'cv' || step === 'generate' || step === 'completed' ? 'text-green-600' : 'text-gray-400'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'repos' ? 'border-blue-600 bg-blue-50' : step === 'template' || step === 'cv' || step === 'generate' || step === 'completed' ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
-                {step === 'template' || step === 'cv' || step === 'generate' || step === 'completed' ? <Check className="h-5 w-5" /> : '1'}
-              </div>
-              <span className="font-medium text-sm md:text-base">Repo Seçimi</span>
-            </div>
-            
-            <div className="w-16 h-px bg-gray-300"></div>
-            
-                         <div className={`flex items-center space-x-2 ${step === 'template' ? 'text-blue-600' : step === 'cv' || step === 'generate' || step === 'completed' ? 'text-green-600' : 'text-gray-400'}`}>
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'template' ? 'border-blue-600 bg-blue-50' : step === 'cv' || step === 'generate' || step === 'completed' ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
-                 {step === 'cv' || step === 'generate' || step === 'completed' ? <Check className="h-5 w-5" /> : '2'}
-              </div>
-              <span className="font-medium text-sm md:text-base">Şablon</span>
-            </div>
-            
-            <div className="w-16 h-px bg-gray-300"></div>
-            
-                         <div className={`flex items-center space-x-2 ${step === 'cv' ? 'text-blue-600' : step === 'generate' || step === 'completed' ? 'text-green-600' : 'text-gray-400'}`}>
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'cv' ? 'border-blue-600 bg-blue-50' : step === 'generate' || step === 'completed' ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
-                 {step === 'generate' || step === 'completed' ? <Check className="h-5 w-5" /> : '3'}
-              </div>
-              <span className="font-medium text-sm md:text-base">CV Yükleme</span>
-            </div>
-            
-            <div className="w-16 h-px bg-gray-300"></div>
-            
-                         <div className={`flex items-center space-x-2 ${step === 'generate' ? 'text-blue-600' : step === 'completed' ? 'text-green-600' : 'text-gray-400'}`}>
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${step === 'generate' ? 'border-blue-600 bg-blue-50' : step === 'completed' ? 'border-green-600 bg-green-50' : 'border-gray-300'}`}>
-                 {step === 'completed' ? <Check className="h-5 w-5" /> : '4'}
-              </div>
-              <span className="font-medium text-sm md:text-base">Oluştur</span>
-            </div>
-          </div>
-        </div>
+        <ProgressSteps currentStep={step} />
 
         {/* Step 1: Repository Selection */}
         {step === 'repos' && (
-          <div>
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Projelerinizi Seçin
-              </h1>
-              <p className="text-gray-600 mb-4">
-                Portfolyonuzda göstermek istediğiniz 4-6 projeyi seçin. En iyi projelerinizi seçmenizi öneririz.
-              </p>
-              
-              {!demoMode && (
-                <div className="flex items-center justify-center space-x-4">
-                  {reposLoading && (
-                    <div className="flex items-center text-blue-600">
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      GitHub'dan projeler yükleniyor...
-                    </div>
-                  )}
-                  {reposError && (
-                    <div className="text-red-600 text-sm">
-                      Hata: {reposError} 
-                      <button 
-                        onClick={refetch}
-                        className="ml-2 text-blue-600 hover:text-blue-700 underline"
-                      >
-                        Tekrar Dene
-                      </button>
-                    </div>
-                  )}
-                  {!reposLoading && !reposError && repos.length === 0 && (
-                    <div className="text-gray-500 text-sm">
-                      Hiç public repository bulunamadı
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {reposLoading && !demoMode ? (
-                // Loading skeleton
-                Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="bg-white rounded-lg border-2 border-gray-200 p-6 animate-pulse">
-                    <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                ))
-              ) : (
-                repos.map((repo) => (
-                <div
-                  key={repo.id}
-                  className={`bg-white rounded-lg border-2 p-6 cursor-pointer transition-all hover:shadow-md ${
-                    selectedRepos.includes(repo.id)
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => toggleRepo(repo.id)}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-gray-900 truncate">{repo.name}</h3>
-                    <input
-                      type="checkbox"
-                      checked={selectedRepos.includes(repo.id)}
-                      onChange={() => {}}
-                      className="h-5 w-5 text-blue-600 rounded"
-                    />
-                  </div>
-                  
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                    {repo.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                    <span className="flex items-center">
-                      <div className={`w-3 h-3 rounded-full mr-2 ${
-                        repo.language === 'TypeScript' ? 'bg-blue-500' :
-                        repo.language === 'JavaScript' ? 'bg-yellow-500' :
-                        repo.language === 'Python' ? 'bg-green-500' : 'bg-gray-500'
-                      }`}></div>
-                      {repo.language}
-                    </span>
-                    <span className="flex items-center">
-                      <Star className="h-4 w-4 mr-1" />
-                      {repo.stargazers_count}
-                    </span>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-1">
-                    {repo.topics.slice(0, 3).map((topic) => (
-                      <span
-                        key={topic}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                      >
-                        {topic}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                ))
-              )}
-            </div>
-
-            <div className="text-center">
-              <button
-                onClick={() => setStep('template')}
-                disabled={selectedRepos.length === 0}
-                className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                Devam Et ({selectedRepos.length} proje seçildi)
-              </button>
-            </div>
-          </div>
+          <RepositorySelection
+            repos={repos}
+            selectedRepos={selectedRepos}
+            onToggleRepo={toggleRepo}
+            onNext={() => setStep('template')}
+            demoMode={demoMode}
+            loading={reposLoading}
+            error={reposError}
+            onRefetch={refetch}
+          />
         )}
 
         {/* Step 2: Template Selection */}
         {step === 'template' && (
-          <div>
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Şablonunuzu Seçin
-              </h1>
-              <p className="text-gray-600">
-                Portfolyonuz için modern ve profesyonel şablonlardan birini seçin.
-              </p>
-            </div>
+          <TemplateSelection
+            templates={portfolioTemplates}
+            selectedTemplate={selectedTemplate}
+            onSelectTemplate={setSelectedTemplate}
+            onNext={() => setStep('cv')}
+            onBack={() => setStep('repos')}
+            onPreview={(templateId) => setPreviewModal({ isOpen: true, templateId })}
+          />
+        )}
 
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              {portfolioTemplates.map((template) => (
-                <div
-                  key={template.id}
-                  className={`bg-white rounded-lg border-2 p-6 cursor-pointer transition-all hover:shadow-md ${
-                    selectedTemplate === template.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => setSelectedTemplate(template.id)}
+        {/* Template Preview Modal */}
+        {previewModal.isOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="text-lg font-semibold">
+                  {portfolioTemplates.find(t => t.id === previewModal.templateId)?.name} - Önizleme
+                </h3>
+                <button
+                  onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  <div className="aspect-video bg-white rounded-lg mb-4 border overflow-hidden">
-                    <iframe
-                      srcDoc={template.previewHtml}
-                      className="w-full h-full border-0"
-                      title={`${template.name} Preview`}
-                    />
-                  </div>
-                  
-                  <h3 className="font-semibold text-gray-900 mb-2">{template.name}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{template.description}</p>
-                  
-                  <div className="space-y-1 mb-4">
-                    {template.features.map((feature) => (
-                      <div key={feature} className="flex items-center text-sm text-gray-600">
-                        <Check className="h-4 w-4 text-green-500 mr-2" />
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setPreviewModal({ isOpen: true, templateId: template.id })
-                    }}
-                    className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <Globe className="h-4 w-4 mr-1 inline" />
-                    Büyük Önizleme
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <button
-                onClick={() => setStep('cv')}
-                className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Devam Et
-              </button>
-            </div>
-
-            {/* Template Preview Modal */}
-            {previewModal.isOpen && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
-                  <div className="flex items-center justify-between p-4 border-b">
-                    <h3 className="text-lg font-semibold">
-                      {portfolioTemplates.find(t => t.id === previewModal.templateId)?.name} - Önizleme
-                    </h3>
-                    <button
-                      onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="flex-1 p-4">
-                    <iframe
-                      srcDoc={portfolioTemplates.find(t => t.id === previewModal.templateId)?.previewHtml}
-                      className="w-full h-full border border-gray-200 rounded-lg"
-                      title="Template Preview"
-                    />
-                  </div>
-                  <div className="p-4 border-t flex justify-between">
-                    <button
-                      onClick={() => {
-                        if (previewModal.templateId) {
-                          setSelectedTemplate(previewModal.templateId)
-                        }
-                        setPreviewModal({ isOpen: false, templateId: null })
-                      }}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Bu Şablonu Seç
-                    </button>
-                    <button
-                      onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
-                      className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      Kapat
-                    </button>
-                  </div>
-                </div>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-            )}
+              <div className="flex-1 p-4">
+                <iframe
+                  srcDoc={portfolioTemplates.find(t => t.id === previewModal.templateId)?.previewHtml}
+                  className="w-full h-full border border-gray-200 rounded-lg"
+                  title="Template Preview"
+                />
+              </div>
+              <div className="p-4 border-t flex justify-between">
+                <button
+                  onClick={() => {
+                    if (previewModal.templateId) {
+                      setSelectedTemplate(previewModal.templateId)
+                    }
+                    setPreviewModal({ isOpen: false, templateId: null })
+                  }}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Bu Şablonu Seç
+                </button>
+                <button
+                  onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Kapat
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Step 3: CV Upload */}
         {step === 'cv' && (
-          <div>
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                CV'nizi Yükleyin (Opsiyonel)
-              </h1>
-              <p className="text-gray-600">
-                Portfolio sitenizde CV'nizi de göstermek istiyorsanız PDF formatında yükleyebilirsiniz.
-              </p>
-            </div>
-
-            <div className="max-w-md mx-auto">
-              <div className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                cvFile ? 'border-green-500 bg-green-50' : 'border-gray-300 hover:border-gray-400'
-              }`}>
-                {cvFile ? (
-                  <div>
-                    <FileText className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                    <p className="text-green-700 font-medium mb-2">{cvFile.name}</p>
-                    <p className="text-sm text-green-600">CV başarıyla yüklendi!</p>
-                    <button
-                      onClick={() => setCvFile(null)}
-                      className="mt-2 text-sm text-green-600 hover:text-green-700 underline"
-                    >
-                      Değiştir
-                    </button>
-                  </div>
-                ) : (
-                  <div>
-                    <Upload className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-2">CV'nizi buraya sürükleyin</p>
-                    <p className="text-sm text-gray-500 mb-4">veya dosya seçmek için tıklayın</p>
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      onChange={handleCvUpload}
-                      className="hidden"
-                      id="cv-upload"
-                    />
-                    <label
-                      htmlFor="cv-upload"
-                      className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      PDF Seç
-                    </label>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="text-center mt-8 space-x-4">
-              <button
-                onClick={handleGenerate}
-                className="px-8 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                CV Olmadan Devam Et
-              </button>
-              <button
-                onClick={handleGenerate}
-                className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Portfolyomu Oluştur
-              </button>
-            </div>
-          </div>
+          <CVUpload
+            cvFile={cvFile}
+            onFileUpload={handleCvUpload}
+            onClearFile={() => setCvFile(null)}
+            onNext={handleGenerate}
+            onBack={() => setStep('template')}
+          />
         )}
 
-                 {/* Step 4: Generate */}
+         {/* Step 4: Generate */}
          {step === 'generate' && (
-           <div className="text-center">
-             <div className="max-w-md mx-auto">
-               <div className="bg-white rounded-lg p-8 shadow-lg">
-                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
-                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                   Portfolyonuz Oluşturuluyor...
-                 </h2>
-                 <p className="text-gray-600 mb-6">
-                   Seçtiğiniz {selectedRepos.length} proje ve şablon kullanılarak portfolyo sitesi hazırlanıyor.
-                 </p>
-                 <div className="space-y-2 text-sm text-gray-500">
-                   <p>✅ GitHub verileriniz çekiliyor...</p>
-                   <p>✅ Şablon uygulanıyor...</p>
-                   <p>⏳ Statik site oluşturuluyor...</p>
-                   <p>⏳ Canlıya alınıyor...</p>
-                 </div>
-               </div>
-             </div>
-           </div>
+           <GenerateStep
+             selectedReposCount={selectedRepos.length}
+             demoMode={demoMode}
+             portfolioLoading={portfolioLoading}
+             portfolioResult={portfolioResult}
+             portfolioError={portfolioError}
+             onBack={() => setStep('cv')}
+           />
          )}
 
          {/* Step 5: Completed */}
          {step === 'completed' && (
-           <div className="text-center">
-             <div className="max-w-lg mx-auto">
-               <div className="bg-white rounded-lg p-8 shadow-lg">
-                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                   <Check className="h-10 w-10 text-green-600" />
-                 </div>
-                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                   🎉 Portfolyonuz Hazır!
-                 </h2>
-                 <p className="text-gray-600 mb-6">
-                   Tebrikler! Portfolyo siteniz başarıyla oluşturuldu ve canlıya alındı.
-                 </p>
-                 
-                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                   <p className="text-sm text-gray-600 mb-2">Portfolio siteniz:</p>
-                   <p className="font-mono text-blue-600 font-medium break-all">
-                     https://mockuser.portfolyo.dev
-                   </p>
-                 </div>
-
-                 <div className="space-y-4">
-                   <button
-                     onClick={() => window.open('https://portfolyo.dev/templates/modern-demo', '_blank')}
-                     className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                   >
-                     <Globe className="inline-block mr-2 h-5 w-5" />
-                     Portfolyonu Görüntüle
-                   </button>
-                   
-                   <div className="grid grid-cols-2 gap-3">
-                     <button
-                       onClick={() => window.open('https://twitter.com/intent/tweet?text=PortfolYO ile 5 dakikada portfolyo oluşturdum! 🚀', '_blank')}
-                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                     >
-                       📢 Paylaş
-                     </button>
-                     <button
-                       onClick={() => setStep('repos')}
-                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                     >
-                       🔄 Yeni Portfolyo
-                     </button>
-                   </div>
-                 </div>
-
-                 <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-                   <p className="text-sm text-blue-800">
-                     <strong>Demo Modu:</strong> Bu portfolyo gerçek değildir. Gerçek portfolyo oluşturmak için GitHub OAuth'u kurmanız gerekir.
-                   </p>
-                 </div>
-               </div>
-             </div>
-           </div>
+           <CompletedStep
+             demoMode={demoMode}
+             portfolioResult={portfolioResult}
+             portfolioError={portfolioError}
+             userName={session?.user?.name || undefined}
+             onNewPortfolio={() => {
+               setStep('repos')
+               clearResult()
+               setSelectedRepos([])
+               setSelectedTemplate(1)
+               setCvFile(null)
+             }}
+           />
          )}
       </div>
     </div>

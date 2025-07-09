@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{USER_NAME}} - Yaratıcı Geliştirici</title>
+    <meta name="description" content="{{USER_NAME}} - {{USER_BIO}}">
+    
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            /* animation: gradientBG 30s ease infinite; KAPALI - Performance için */
+            background: linear-gradient(-45deg, #23a6d5, #23d5ab); /* Sabit gradient */
+            color: #333;
+            overflow-x: hidden;
+        }
+
+                 @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+         }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Floating elements kaldırıldı - performance için */
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 0;
+            background: rgba(255, 255, 255, 0.2);
+            /* backdrop-filter: blur(10px); -- Devre dışı performans için */
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            margin-top: 80px;
+            border-radius: 2rem 2rem 0 0;
+            overflow: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Hero pattern kaldırıldı - performance için */
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            animation: slideInUp 1s ease;
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: slideInUp 1s ease 0.2s both;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideInUp 1s ease 0.4s both;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 3rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sections */
+        .section {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .section:nth-child(even) {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .profile-container {
+            position: relative;
+            text-align: center;
+        }
+
+        .profile-img {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid;
+            border-image: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1) 1;
+            /* animation: pulse 2s infinite; -- Devre dışı performans için */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        /* @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        } */
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 1rem;
+            min-width: 120px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Projects Section */
+        .projects {
+            background: #fff;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            transition: left 0.3s ease;
+        }
+
+        .project-card:hover::before {
+            left: 0;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .project-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .project-links a:hover {
+            opacity: 0.8;
+        }
+
+        .project-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tech-tag {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 1rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .project-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Skills Section */
+        .skills {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .skill-category {
+            background: rgba(255, 255, 255, 0.2);
+            /* backdrop-filter: blur(10px); -- Devre dışı performans için */
+            border-radius: 2rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .skill-category:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .skill-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            /* animation: bounce 2s infinite; -- Devre dışı performans için */
+        }
+
+        /* @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        } */
+
+        .skill-category h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-category p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 3rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .contact-link i {
+            font-size: 1.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .stats {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .floating-circle {
+                display: none;
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Elements kaldırıldı - performance için -->
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">{{USER_NAME}}</div>
+            <ul class="nav-links">
+                <li><a href="#about">Hakkımda</a></li>
+                <li><a href="#projects">Projeler</a></li>
+                <li><a href="#skills">Yetenekler</a></li>
+                <li><a href="#contact">İletişim</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>{{USER_NAME}}</h1>
+                    <p class="subtitle">{{USER_BIO}}</p>
+                    <div class="cta-buttons">
+                        <a href="#projects" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> Projelerimi Keşfet
+                        </a>
+                        <a href="{{CV_URL}}" class="btn btn-secondary" download>
+                            <i class="fas fa-download"></i> CV İndir
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section about" id="about">
+            <div class="container">
+                <h2 class="section-title fade-in">Benim Hikayem</h2>
+                <div class="about-content fade-in">
+                    <div class="profile-container">
+                        <img src="{{USER_AVATAR}}" alt="{{USER_NAME}}" class="profile-img">
+                    </div>
+                    <div>
+                        <div class="about-text">
+                            <p>{{USER_BIO}}</p>
+                            <p>Yaratıcı çözümler üreten, kullanıcı deneyimi odaklı ve modern teknolojileri takip eden bir yazılım geliştiricisiyim. Her projede öğrenmeyi ve gelişmeyi hedefliyorum.</p>
+                        </div>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-number">{{TOTAL_REPOS}}</span>
+                                <span class="stat-label">Proje</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{TOTAL_STARS}}</span>
+                                <span class="stat-label">Yıldız</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{YEARS_EXPERIENCE}}+</span>
+                                <span class="stat-label">Yıl Deneyim</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section projects" id="projects">
+            <div class="container">
+                <h2 class="section-title fade-in">Yaratıcı Projelerim</h2>
+                <div class="projects-grid">
+                    {{PROJECTS_START}}
+                    <div class="project-card fade-in">
+                        <div class="project-header">
+                            <h3 class="project-title">{{PROJECT_NAME}}</h3>
+                            <div class="project-links">
+                                <a href="{{PROJECT_URL}}" target="_blank"><i class="fab fa-github"></i></a>
+                                {{#PROJECT_DEMO}}<a href="{{PROJECT_DEMO}}" target="_blank"><i class="fas fa-external-link-alt"></i></a>{{/PROJECT_DEMO}}
+                            </div>
+                        </div>
+                        <p class="project-description">{{PROJECT_DESCRIPTION}}</p>
+                        <div class="project-tech">
+                            {{TECH_TAGS_START}}
+                            <span class="tech-tag">{{TECH_NAME}}</span>
+                            {{TECH_TAGS_END}}
+                        </div>
+                        <div class="project-stats">
+                            <span><i class="fas fa-star"></i> {{PROJECT_STARS}}</span>
+                            <span><i class="fas fa-code-branch"></i> {{PROJECT_FORKS}}</span>
+                            <span><i class="fas fa-circle"></i> {{PROJECT_LANGUAGE}}</span>
+                        </div>
+                    </div>
+                    {{PROJECTS_END}}
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="section skills" id="skills">
+            <div class="container">
+                <h2 class="section-title fade-in">Süper Güçlerim</h2>
+                <div class="skills-grid">
+                    <div class="skill-category fade-in">
+                        <div class="skill-icon">
+                            <i class="fab fa-react"></i>
+                        </div>
+                        <h3>Frontend Büyücüsü</h3>
+                        <p>React, Vue.js, TypeScript ile etkileyici kullanıcı arayüzleri yaratıyorum. Modern CSS teknikleri ve animasyonlarla deneyimleri hayata geçiriyorum.</p>
+                    </div>
+                    <div class="skill-category fade-in">
+                        <div class="skill-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h3>Backend Mimarı</h3>
+                        <p>Node.js, Python ile scalable backend sistemleri inşa ediyorum. API tasarımı, veritabanı optimizasyonu ve cloud teknolojileri benim uzmanlık alanım.</p>
+                    </div>
+                    <div class="skill-category fade-in">
+                        <div class="skill-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h3>DevOps Sihirbazı</h3>
+                        <p>Docker, CI/CD, monitoring ve deployment süreçlerini otomatize ediyorum. Kodun güvenli ve hızlı bir şekilde production'a çıkmasını sağlıyorum.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="section contact" id="contact">
+            <div class="container">
+                <div class="contact-content fade-in">
+                    <h2 class="section-title">Harika Projeler Yapalım!</h2>
+                    <p>Kafamızda aynı fikirler var mı? Projene katkı sağlayabilirim. Bana ulaş, beraber harika şeyler yapalım!</p>
+                    <div class="contact-links">
+                        <a href="mailto:{{USER_EMAIL}}" class="contact-link">
+                            <i class="fas fa-envelope"></i>
+                            <span>Merhaba De</span>
+                        </a>
+                        <a href="{{GITHUB_URL}}" target="_blank" class="contact-link">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="{{LINKEDIN_URL}}" target="_blank" class="contact-link">
+                            <i class="fab fa-linkedin"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 {{USER_NAME}} - Yaratıcılık ve teknolojinin buluştuğu yer ✨</p>
+            <p>Bu portfolyo ❤️ ile PortfolYO kullanılarak oluşturuldu</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Header scroll effect
+        let lastScrollY = 0;
+        const header = document.querySelector('.header');
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            
+            if (currentScrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(20px)';
+                header.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+            } else {
+                header.style.background = 'rgba(255, 255, 255, 0.1)';
+                header.style.backdropFilter = 'blur(10px)';
+                header.style.boxShadow = 'none';
+            }
+        });
+
+        // Add random colors to floating circles
+        document.querySelectorAll('.floating-circle').forEach(circle => {
+            const colors = ['rgba(255, 107, 107, 0.3)', 'rgba(78, 205, 196, 0.3)', 'rgba(69, 183, 209, 0.3)'];
+            circle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        });
+    </script>
+</body>
+</html> 
