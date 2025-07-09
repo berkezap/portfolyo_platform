@@ -26,9 +26,6 @@ export function usePortfolioGenerator(): UsePortfolioGeneratorReturn {
   const [error, setError] = useState<string | null>(null)
 
   const generatePortfolio = async (templateName: string, selectedRepos?: string[], cvUrl?: string) => {
-    console.log('🎯 generatePortfolio çağrıldı, template:', templateName)
-    console.log('🎯 selectedRepos:', selectedRepos)
-    console.log('🎯 cvUrl:', cvUrl)
     setLoading(true)
     setError(null)
     setResult(null)

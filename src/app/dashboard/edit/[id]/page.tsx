@@ -203,77 +203,94 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
           <div className="lg:col-span-2 space-y-8">
             
             {/* Template Selection */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">Template Seçimi</h2>
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900" style={{color: '#1f2937'}}>Template Seçimi</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[1, 2, 3].map((templateId) => (
                   <div
                     key={templateId}
-                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    className={`border-2 rounded-lg p-6 cursor-pointer transition-all hover:shadow-md ${
                       selectedTemplate === templateId
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+              }`}
                     onClick={() => setSelectedTemplate(templateId)}
                   >
-                    <div className="text-center">
-                      <div className="text-2xl mb-2">
+                    <div className="text-center space-y-3">
+                      <div className="text-3xl mb-3">
                         {templateId === 1 && '🎯'}
                         {templateId === 2 && '🎨'}
                         {templateId === 3 && '🏢'}
                       </div>
-                      <h3 className="font-semibold">{templateDisplayNames[templateId as keyof typeof templateDisplayNames]}</h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {templateId === 1 && 'Modern ve minimalist'}
-                        {templateId === 2 && 'Yaratıcı ve renkli'}
-                        {templateId === 3 && 'Profesyonel ve kurumsal'}
+                      <h3 className="font-bold text-lg text-gray-900" style={{color: '#111827'}}>
+                        {templateDisplayNames[templateId as keyof typeof templateDisplayNames]}
+                      </h3>
+                      <p className="text-sm text-gray-600 break-words" style={{color: '#4b5563'}}>
+                        {templateId === 1 && 'Modern ve minimalist tasarım'}
+                        {templateId === 2 && 'Yaratıcı ve renkli tasarım'}
+                        {templateId === 3 && 'Profesyonel ve kurumsal tasarım'}
                       </p>
+                      {selectedTemplate === templateId && (
+                        <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-600 text-white" style={{backgroundColor: '#2563eb', color: '#ffffff'}}>
+                          ✓ Seçili
+                        </div>
+                  )}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
+            
             {/* Repository Selection */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900" style={{color: '#1f2937'}}>
                 Proje Seçimi ({selectedRepos.length} seçili)
               </h2>
               
               {reposLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-600">Projeler yükleniyor...</p>
+                  <p className="mt-2 text-gray-600" style={{color: '#4b5563'}}>Projeler yükleniyor...</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
                   {allRepos.map((repo) => (
                     <div
                       key={repo.id}
-                      className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      className={`border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
                         selectedRepos.includes(repo.id)
-                          ? 'border-blue-500 bg-blue-50'
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                       onClick={() => toggleRepo(repo.id)}
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 text-sm break-words flex-1 mr-2">{repo.name}</h3>
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="font-bold text-gray-900 text-sm break-words flex-1 mr-2 leading-tight" style={{color: '#111827'}}>
+                          {repo.name}
+                        </h3>
                         <input
                           type="checkbox"
                           checked={selectedRepos.includes(repo.id)}
                           onChange={() => {}}
-                          className="h-4 w-4 text-blue-600 rounded flex-shrink-0"
+                          className="h-5 w-5 text-blue-600 rounded flex-shrink-0 mt-1"
                         />
                       </div>
-                      <p className="text-xs text-gray-600 mb-2 line-clamp-3 break-words">
+                      <p className="text-xs text-gray-600 mb-3 break-words leading-relaxed min-h-[3rem]" style={{color: '#4b5563'}}>
                         {repo.description || 'No description available'}
                       </p>
                       <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span className="truncate mr-2">{repo.language || 'Unknown'}</span>
-                        <div className="flex items-center space-x-2 flex-shrink-0">
-                          <span>⭐ {repo.stargazers_count}</span>
-                          <span>🍴 {repo.forks_count}</span>
+                        <span className="truncate mr-2 font-medium bg-gray-100 px-2 py-1 rounded" style={{color: '#374151', backgroundColor: '#f3f4f6'}}>
+                          {repo.language || 'Unknown'}
+                        </span>
+                        <div className="flex items-center space-x-3 flex-shrink-0">
+                          <span className="flex items-center" style={{color: '#6b7280'}}>
+                            <span className="text-yellow-500 mr-1">⭐</span>
+                            {repo.stargazers_count}
+                          </span>
+                          <span className="flex items-center" style={{color: '#6b7280'}}>
+                            <span className="text-blue-500 mr-1">🍴</span>
+                            {repo.forks_count}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -286,37 +303,42 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
           {/* Right Column - Actions */}
           <div className="space-y-6">
             {/* Current Portfolio Info */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Mevcut Portfolio</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex flex-col space-y-1">
-                  <span className="text-gray-600 font-medium">Template:</span>
-                  <span className="text-gray-900 break-words">{templateDisplayNames[templateNameToId[portfolio.template as keyof typeof templateNameToId] as keyof typeof templateDisplayNames]}</span>
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900" style={{color: '#1f2937'}}>Mevcut Portfolio</h3>
+              <div className="space-y-4 text-sm">
+                <div className="flex flex-col space-y-2">
+                  <span className="text-gray-600 font-medium text-xs uppercase tracking-wide" style={{color: '#4b5563'}}>Template:</span>
+                  <span className="text-gray-900 font-semibold break-words whitespace-normal" style={{color: '#111827'}}>
+                    {templateDisplayNames[templateNameToId[portfolio.template as keyof typeof templateNameToId] as keyof typeof templateDisplayNames]}
+                  </span>
                 </div>
-                <div className="flex flex-col space-y-1">
-                  <span className="text-gray-600 font-medium">Proje Sayısı:</span>
-                  <span className="text-gray-900">{portfolio.selectedRepos.length}</span>
+                <div className="flex flex-col space-y-2">
+                  <span className="text-gray-600 font-medium text-xs uppercase tracking-wide" style={{color: '#4b5563'}}>Proje Sayısı:</span>
+                  <span className="text-gray-900 font-semibold text-lg" style={{color: '#111827'}}>{portfolio.selectedRepos.length}</span>
                 </div>
-                <div className="flex flex-col space-y-1">
-                  <span className="text-gray-600 font-medium">Son Güncelleme:</span>
-                  <span className="text-gray-900 break-words">
+                <div className="flex flex-col space-y-2">
+                  <span className="text-gray-600 font-medium text-xs uppercase tracking-wide" style={{color: '#4b5563'}}>Son Güncelleme:</span>
+                  <span className="text-gray-900 break-words whitespace-normal text-sm" style={{color: '#111827'}}>
                     {new Date(portfolio.updatedAt).toLocaleDateString('tr-TR', {
                       year: 'numeric',
                       month: 'long', 
-                      day: 'numeric'
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
                     })}
                   </span>
                 </div>
               </div>
-            </div>
+          </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">İşlemler</h3>
-              <div className="space-y-3">
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900" style={{color: '#1f2937'}}>İşlemler</h3>
+              <div className="space-y-4">
                 <button
                   onClick={handleViewPortfolio}
-                  className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm"
+                  style={{backgroundColor: '#16a34a', color: '#ffffff'}}
                 >
                   👁️ Portfolyoyu Görüntüle
                 </button>
@@ -324,13 +346,17 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                 <button
                   onClick={handleSave}
                   disabled={saving || selectedRepos.length === 0}
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed font-medium text-sm"
+                  style={{
+                    backgroundColor: saving || selectedRepos.length === 0 ? '#9ca3af' : '#2563eb',
+                    color: '#ffffff'
+                  }}
                 >
                   {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white inline-block mr-2"></div>
+                    <span className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Kaydediliyor...
-                    </>
+                    </span>
                   ) : (
                     '💾 Değişiklikleri Kaydet'
                   )}
@@ -338,16 +364,19 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                 
                 <button
                   onClick={() => router.push('/my-portfolios')}
-                  className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+                  className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm"
+                  style={{backgroundColor: '#4b5563', color: '#ffffff'}}
                 >
                   ← Geri Dön
                 </button>
               </div>
               
               {selectedRepos.length === 0 && (
-                <p className="text-red-600 text-sm mt-3">
-                  ⚠️ En az bir proje seçmelisiniz
-                </p>
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm font-medium" style={{color: '#dc2626'}}>
+                    ⚠️ En az bir proje seçmelisiniz
+                  </p>
+                </div>
               )}
             </div>
           </div>

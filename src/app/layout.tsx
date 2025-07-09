@@ -1,19 +1,23 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "@/components/auth-provider";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { AuthProvider } from '@/components/auth-provider'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "PortfolYO - GitHub İle 5 Dakikada Profesyonel Portfolyo",
-  description: "GitHub projelerinizden 5 dakika içinde kod yazmadan profesyonel portfolyo sitesi oluşturun.",
-  keywords: ["portfolyo", "github", "developer", "portfolio", "yazılımcı"],
-  icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+  title: 'PortfolYO - GitHub Portfolio Oluşturucu',
+  description: 'GitHub projelerinizden otomatik portfolio website\'i oluşturun',
+  keywords: ['portfolio', 'github', 'developer', 'website', 'projects'],
+  authors: [{ name: 'PortfolYO Team' }],
+  openGraph: {
+    title: 'PortfolYO - GitHub Portfolio Oluşturucu',
+    description: 'GitHub projelerinizden otomatik portfolio website\'i oluşturun',
+    type: 'website',
+    locale: 'tr_TR',
   },
-};
+}
 
 export default function RootLayout({
   children,
@@ -23,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

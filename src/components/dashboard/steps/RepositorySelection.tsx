@@ -1,8 +1,8 @@
-import { Star, RefreshCw } from 'lucide-react'
-import { GitHubRepo } from '@/types/dashboard'
+import { RefreshCw, Github, Lock, BookOpen, AlertCircle } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface RepositorySelectionProps {
-  repos: GitHubRepo[]
+  repos: any[]
   selectedRepos: number[]
   onToggleRepo: (repoId: number) => void
   onNext: () => void
@@ -22,117 +22,265 @@ export function RepositorySelection({
   error,
   onRefetch
 }: RepositorySelectionProps) {
+  
+  // Simplified state management
+  const [renderKey, setRenderKey] = useState(0)
+  const [hasShownRepos, setHasShownRepos] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  
+  // Mark component as mounted
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  // Optimized repos update effect - LOG ONLY ONCE
+  useEffect(() => {
+    if (repos.length > 0 && !hasShownRepos) {
+      setRenderKey(prev => prev + 1)
+      setHasShownRepos(true)
+      // Only log the important change
+      console.log('✅ Repos loaded:', repos.length)
+    }
+  }, [repos.length, hasShownRepos])
+  
+  // Auto-refetch fallback (only once)
+  useEffect(() => {
+    if (mounted && !loading && repos.length === 0 && !error && !hasShownRepos) {
+      const timer = setTimeout(() => {
+        console.log('🔄 Auto refetch')
+        onRefetch()
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [mounted, loading, repos.length, error, hasShownRepos, onRefetch])
+  
+  // Simple & Fast
+  const hasRepos = repos.length > 0
+  const isLoading = loading || (!hasRepos && !error && !hasShownRepos)
+
+  // Show repos immediately if we have them
+  if (hasRepos) {
+    return (
+      <div className="max-w-6xl mx-auto" key={`repos-${renderKey}`}>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Projelerinizi Seçin ({selectedRepos.length} seçili)
+          </h1>
+          <p className="text-gray-600">
+            Portfolio sitenizde gösterilecek GitHub projelerini seçin
+          </p>
+          {demoMode && (
+            <div className="mt-4 inline-flex items-center px-4 py-2 bg-purple-100 text-purple-800 rounded-lg text-sm">
+              🎭 Demo Mode: Örnek projeler gösteriliyor
+            </div>
+          )}
+        </div>
+
+        {/* Repository Grid */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          {repos.map((repo) => (
+            <div
+              key={repo.id}
+              className={`border-2 rounded-lg p-6 cursor-pointer transition-all hover:shadow-md ${
+                selectedRepos.includes(repo.id)
+                  ? 'border-blue-500 bg-blue-50 shadow-md'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+              onClick={() => onToggleRepo(repo.id)}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-gray-900 text-lg mb-2 break-words leading-tight">
+                    {repo.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 break-words leading-relaxed min-h-[3rem]">
+                    {repo.description || 'No description available'}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={selectedRepos.includes(repo.id)}
+                  onChange={() => {}}
+                  className="h-5 w-5 text-blue-600 rounded ml-4 mt-1 flex-shrink-0"
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full font-medium">
+                  {repo.language || 'Unknown'}
+                </span>
+                <div className="flex items-center space-x-4 text-gray-500">
+                  <span className="flex items-center">
+                    <span className="text-yellow-500 mr-1">⭐</span>
+                    {repo.stargazers_count}
+                  </span>
+                  <span className="flex items-center">
+                    <span className="text-blue-500 mr-1">🍴</span>
+                    {repo.forks_count}
+                  </span>
+                </div>
+              </div>
+
+              {selectedRepos.includes(repo.id) && (
+                <div className="mt-4 flex items-center justify-center">
+                  <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium">
+                    ✓ Seçili
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Selection Summary and Actions */}
+        <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Seçim Özeti
+              </h3>
+              <p className="text-gray-600">
+                {selectedRepos.length} proje seçildi
+              </p>
+            </div>
+            {selectedRepos.length > 0 && (
+              <div className="text-right">
+                <p className="text-sm text-green-600 font-medium">
+                  ✓ Portfolyo oluşturmaya hazır
+                </p>
+              </div>
+            )}
+          </div>
+
+          {selectedRepos.length === 0 && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                <p className="text-yellow-800 text-sm">
+                  En az bir proje seçmelisiniz
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-center">
+            <button
+              onClick={onNext}
+              disabled={selectedRepos.length === 0}
+              className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              Devam Et ({selectedRepos.length} proje)
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Loading State
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Projelerinizi Seçin
+          </h1>
+          <p className="text-gray-600">
+            Portfolio sitenizde gösterilecek GitHub projelerini seçin
+          </p>
+        </div>
+        
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">GitHub projeleriniz yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error State
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Projelerinizi Seçin
+          </h1>
+          <p className="text-gray-600">
+            Portfolio sitenizde gösterilecek GitHub projelerini seçin
+          </p>
+        </div>
+
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+          <div className="flex items-center mb-4">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+              <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-red-800">GitHub Bağlantı Hatası</h3>
+              <p className="text-red-600">{error}</p>
+            </div>
+          </div>
+          <button
+            onClick={onRefetch}
+            disabled={loading}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Yeniden Deniyor...' : 'Tekrar Dene'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Empty State
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Projelerinizi Seçin
         </h1>
-        <p className="text-gray-600 mb-4">
-          Portfolyonuzda göstermek istediğiniz 4-6 projeyi seçin. En iyi projelerinizi seçmenizi öneririz.
+        <p className="text-gray-600">
+          Portfolio sitenizde gösterilecek GitHub projelerini seçin
         </p>
-        
-        {!demoMode && (
-          <div className="flex items-center justify-center space-x-4">
-            {loading && (
-              <div className="flex items-center text-blue-600">
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                GitHub'dan projeler yükleniyor...
-              </div>
-            )}
-            {error && (
-              <div className="text-red-600 text-sm">
-                Hata: {error} 
-                <button 
-                  onClick={onRefetch}
-                  className="ml-2 text-blue-600 hover:text-blue-700 underline"
-                >
-                  Tekrar Dene
-                </button>
-              </div>
-            )}
-            {!loading && !error && repos.length === 0 && (
-              <div className="text-gray-500 text-sm">
-                Hiç public repository bulunamadı
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {loading && !demoMode ? (
-          // Loading skeleton
-          Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-lg border-2 border-gray-200 p-6 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded mb-3"></div>
-              <div className="h-3 bg-gray-200 rounded mb-4"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-            </div>
-          ))
-        ) : (
-          repos.map((repo) => (
-          <div
-            key={repo.id}
-            className={`bg-white rounded-lg border-2 p-6 cursor-pointer transition-all hover:shadow-md ${
-              selectedRepos.includes(repo.id)
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => onToggleRepo(repo.id)}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900 truncate">{repo.name}</h3>
-              <input
-                type="checkbox"
-                checked={selectedRepos.includes(repo.id)}
-                onChange={() => {}}
-                className="h-5 w-5 text-blue-600 rounded"
-              />
-            </div>
-            
-            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-              {repo.description}
-            </p>
-            
-            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-              <span className="flex items-center">
-                <div className={`w-3 h-3 rounded-full mr-2 ${
-                  repo.language === 'TypeScript' ? 'bg-blue-500' :
-                  repo.language === 'JavaScript' ? 'bg-yellow-500' :
-                  repo.language === 'Python' ? 'bg-green-500' : 'bg-gray-500'
-                }`}></div>
-                {repo.language}
-              </span>
-              <span className="flex items-center">
-                <Star className="h-4 w-4 mr-1" />
-                {repo.stargazers_count}
-              </span>
-            </div>
-            
-            <div className="flex flex-wrap gap-1">
-              {repo.topics.slice(0, 3).map((topic) => (
-                <span
-                  key={topic}
-                  className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                >
-                  {topic}
+      <div className="bg-white rounded-lg shadow-md p-8 border border-orange-200">
+        <div className="text-center max-w-md mx-auto">
+          <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Github className="h-10 w-10 text-orange-600" />
+          </div>
+          
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Henüz Public Projeniz Yok
+          </h2>
+          
+          <p className="text-gray-600 mb-6">
+            Portfolio oluşturmak için en az bir public GitHub projeniz olması gerekiyor.
+          </p>
+
+          <div className="space-y-3">
+            <button
+              onClick={onRefetch}
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Yeniden Kontrol Ediliyor...
                 </span>
-              ))}
-            </div>
+              ) : (
+                <span className="flex items-center justify-center">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Projeleri Yeniden Yükle
+                </span>
+              )}
+            </button>
           </div>
-          ))
-        )}
-      </div>
-
-      <div className="text-center">
-        <button
-          onClick={onNext}
-          disabled={selectedRepos.length === 0}
-          className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          Devam Et ({selectedRepos.length} proje seçildi)
-        </button>
+        </div>
       </div>
     </div>
   )

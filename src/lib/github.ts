@@ -18,6 +18,7 @@ export class GitHubService {
   private octokit: Octokit
 
   constructor(accessToken: string) {
+    console.log('🔑 GitHub Service initialized with token:', accessToken?.slice(0, 8) + '...')
     this.octokit = new Octokit({
       auth: accessToken
     })
@@ -25,13 +26,25 @@ export class GitHubService {
 
   async getUserRepos(): Promise<GitHubRepo[]> {
     try {
+      console.log('📡 Calling GitHub API to fetch user repositories...')
+      
       const { data } = await this.octokit.repos.listForAuthenticatedUser({
         visibility: 'public',
         sort: 'updated',
         per_page: 100
       })
 
-      return data.map(repo => ({
+      console.log('✅ GitHub API raw response:', {
+        totalRepos: data.length,
+        firstRepoName: data[0]?.name || 'none',
+        sampleRepos: data.slice(0, 3).map(repo => ({
+          name: repo.name,
+          visibility: repo.private ? 'private' : 'public',
+          language: repo.language
+        }))
+      })
+
+      const formattedRepos = data.map(repo => ({
         id: repo.id,
         name: repo.name,
         description: repo.description,
@@ -44,15 +57,62 @@ export class GitHubService {
         topics: repo.topics || [],
         homepage: repo.homepage
       }))
+
+      console.log('🔄 Formatted repos:', {
+        count: formattedRepos.length,
+        sample: formattedRepos.slice(0, 2)
+      })
+
+      return formattedRepos
+      
     } catch (error) {
-      console.error('Error fetching repositories:', error)
-      throw new Error('Failed to fetch repositories')
+      console.error('💥 Error fetching repositories from GitHub:', error)
+      
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack?.split('\n').slice(0, 3)
+        })
+      }
+      
+      // Check if it's an Octokit error
+      if (error && typeof error === 'object' && 'status' in error) {
+        const octokitError = error as any
+        console.error('Octokit error details:', {
+          status: octokitError.status,
+          message: octokitError.message,
+          response: octokitError.response?.data
+        })
+        
+        switch (octokitError.status) {
+          case 401:
+            throw new Error('GitHub authentication failed. Please sign out and sign in again.')
+          case 403:
+            throw new Error('GitHub API rate limit exceeded or insufficient permissions.')
+          case 404:
+            throw new Error('GitHub user not found or no access to repositories.')
+          default:
+            throw new Error(`GitHub API error (${octokitError.status}): ${octokitError.message}`)
+        }
+      }
+      
+      throw new Error('Failed to fetch repositories from GitHub')
     }
   }
 
   async getUserData() {
     try {
+      console.log('👤 Fetching GitHub user data...')
+      
       const { data } = await this.octokit.users.getAuthenticated()
+      
+      console.log('✅ GitHub user data fetched:', {
+        login: data.login,
+        name: data.name,
+        publicRepos: data.public_repos
+      })
+      
       return {
         login: data.login,
         name: data.name,
@@ -67,8 +127,21 @@ export class GitHubService {
         following: data.following
       }
     } catch (error) {
-      console.error('Error fetching user data:', error)
-      throw new Error('Failed to fetch user data')
+      console.error('💥 Error fetching user data from GitHub:', error)
+      
+      if (error && typeof error === 'object' && 'status' in error) {
+        const octokitError = error as any
+        switch (octokitError.status) {
+          case 401:
+            throw new Error('GitHub authentication failed. Please sign out and sign in again.')
+          case 403:
+            throw new Error('GitHub API rate limit exceeded.')
+          default:
+            throw new Error(`GitHub API error (${octokitError.status}): ${octokitError.message}`)
+        }
+      }
+      
+      throw new Error('Failed to fetch user data from GitHub')
     }
   }
 } 

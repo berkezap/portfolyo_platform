@@ -3,191 +3,177 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { PortfolioService } from '@/lib/portfolioService'
 
-interface RouteParams {
-  params: Promise<{
-    id: string
-  }>
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+// GET - Portfolio detayını getir (public access)
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const resolvedParams = await params
-    const portfolioId = resolvedParams.id
+    console.log('🔍 Portfolio detayı getiriliyor:', params.id)
     
-    console.log('📋 Portfolio GET API çağrıldı! ID:', portfolioId)
+    const portfolio = await PortfolioService.getPortfolio(params.id)
     
-    // Session kontrolü
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    
-    // Portfolio verisini getir
-    const portfolio = await PortfolioService.getPortfolio(portfolioId)
     if (!portfolio) {
-      return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 })
+      console.log('❌ Portfolio bulunamadı:', params.id)
+      return NextResponse.json(
+        { success: false, error: 'Portfolio not found' },
+        { status: 404 }
+      )
     }
-    
-    // Kullanıcı kontrolü - sadece portfolio sahibi erişebilir
-    if (portfolio.user_id !== session.user.email) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
-    }
-    
-    // Portfolio verisini formatla
-    const formattedPortfolio = {
-      id: portfolio.id,
-      template: portfolio.selected_template,
-      selectedRepos: portfolio.selected_repos || [],
-      cvUrl: portfolio.cv_url,
-      url: portfolio.generated_url,
-      createdAt: portfolio.created_at,
-      updatedAt: portfolio.updated_at,
-      metadata: portfolio.metadata || {}
-    }
-    
-    console.log('✅ Portfolio başarıyla alındı:', portfolioId)
+
+    console.log('✅ Portfolio bulundu:', portfolio.id)
     
     return NextResponse.json({
       success: true,
-      portfolio: formattedPortfolio
+      portfolio: {
+        id: portfolio.id,
+        template: portfolio.selected_template,
+        selectedRepos: portfolio.selected_repos,
+        cvUrl: portfolio.cv_url,
+        generatedHtml: portfolio.generated_url, // This should contain the HTML content
+        metadata: portfolio.metadata,
+        createdAt: portfolio.created_at,
+        updatedAt: portfolio.updated_at
+      }
     })
-    
+
   } catch (error) {
-    console.error('❌ Portfolio GET hatası:', error)
+    console.error('💥 Portfolio getirme hatası:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch portfolio' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+// PATCH - Portfolio güncelle (requires authentication and ownership)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const resolvedParams = await params
-    const portfolioId = resolvedParams.id
-    
-    console.log('🔄 Portfolio PATCH API çağrıldı! ID:', portfolioId)
+    console.log('🔄 Portfolio güncelleniyor:', params.id)
     
     // Session kontrolü
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.log('❌ Unauthorized - session yok')
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
-    
-    // Mevcut portfolio'yu kontrol et
-    const existingPortfolio = await PortfolioService.getPortfolio(portfolioId)
+
+    // Portfolio'nun varlığını ve sahipliğini kontrol et
+    const existingPortfolio = await PortfolioService.getPortfolio(params.id)
     if (!existingPortfolio) {
-      return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 })
+      console.log('❌ Portfolio bulunamadı:', params.id)
+      return NextResponse.json(
+        { success: false, error: 'Portfolio not found' },
+        { status: 404 }
+      )
     }
-    
-    // Kullanıcı kontrolü - sadece portfolio sahibi güncelleyebilir
+
+    // Ownership kontrolü
     if (existingPortfolio.user_id !== session.user.email) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+      console.log('❌ Ownership violation:', {
+        portfolioOwner: existingPortfolio.user_id,
+        currentUser: session.user.email
+      })
+      return NextResponse.json(
+        { success: false, error: 'Access denied - You can only edit your own portfolios' },
+        { status: 403 }
+      )
     }
-    
-    // Update verilerini al
+
     const updateData = await request.json()
-    console.log('📝 Güncelleme verileri:', updateData)
-    
-    // Güncelleme verilerini portfolyo format'ına çevir
-    const portfolioUpdateData: any = {}
-    
-    if (updateData.template) {
-      portfolioUpdateData.selected_template = updateData.template
-    }
-    
-    if (updateData.selectedRepos) {
-      portfolioUpdateData.selected_repos = updateData.selectedRepos
-    }
-    
-    if (updateData.cvUrl !== undefined) {
-      portfolioUpdateData.cv_url = updateData.cvUrl
-    }
-    
-    // Metadata'yı güncelle
-    const newMetadata = {
-      ...existingPortfolio.metadata,
-      ...updateData.metadata
-    }
-    portfolioUpdateData.metadata = newMetadata
-    
-    // Portfolio'yu güncelle
-    const updatedPortfolio = await PortfolioService.updatePortfolio(portfolioId, portfolioUpdateData)
+    console.log('📝 Update data:', updateData)
+
+    const updatedPortfolio = await PortfolioService.updatePortfolio(params.id, updateData)
     
     if (!updatedPortfolio) {
-      return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 })
+      return NextResponse.json(
+        { success: false, error: 'Failed to update portfolio' },
+        { status: 500 }
+      )
     }
-    
-    // Güncellenmiş portfolio'yu formatla
-    const formattedPortfolio = {
-      id: updatedPortfolio.id,
-      template: updatedPortfolio.selected_template,
-      selectedRepos: updatedPortfolio.selected_repos || [],
-      cvUrl: updatedPortfolio.cv_url,
-      url: updatedPortfolio.generated_url,
-      createdAt: updatedPortfolio.created_at,
-      updatedAt: updatedPortfolio.updated_at,
-      metadata: updatedPortfolio.metadata || {}
-    }
-    
-    console.log('✅ Portfolio başarıyla güncellendi:', portfolioId)
+
+    console.log('✅ Portfolio güncellendi:', updatedPortfolio.id)
     
     return NextResponse.json({
       success: true,
-      portfolio: formattedPortfolio
+      portfolio: updatedPortfolio
     })
-    
+
   } catch (error) {
-    console.error('❌ Portfolio PATCH hatası:', error)
+    console.error('💥 Portfolio güncelleme hatası:', error)
     return NextResponse.json(
-      { error: 'Failed to update portfolio' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+// DELETE - Portfolio sil (requires authentication and ownership)
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const resolvedParams = await params
-    const portfolioId = resolvedParams.id
-    
-    console.log('🗑️ Portfolio DELETE API çağrıldı! ID:', portfolioId)
+    console.log('🗑️ Portfolio siliniyor:', params.id)
     
     // Session kontrolü
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      console.log('❌ Unauthorized - session yok')
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
-    
-    // Mevcut portfolio'yu kontrol et
-    const existingPortfolio = await PortfolioService.getPortfolio(portfolioId)
+
+    // Portfolio'nun varlığını ve sahipliğini kontrol et
+    const existingPortfolio = await PortfolioService.getPortfolio(params.id)
     if (!existingPortfolio) {
-      return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 })
+      console.log('❌ Portfolio bulunamadı:', params.id)
+      return NextResponse.json(
+        { success: false, error: 'Portfolio not found' },
+        { status: 404 }
+      )
     }
-    
-    // Kullanıcı kontrolü - sadece portfolio sahibi silebilir
+
+    // Ownership kontrolü
     if (existingPortfolio.user_id !== session.user.email) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+      console.log('❌ Ownership violation:', {
+        portfolioOwner: existingPortfolio.user_id,
+        currentUser: session.user.email
+      })
+      return NextResponse.json(
+        { success: false, error: 'Access denied - You can only delete your own portfolios' },
+        { status: 403 }
+      )
     }
+
+    const deleted = await PortfolioService.deletePortfolio(params.id)
     
-    // Portfolio'yu sil
-    const success = await PortfolioService.deletePortfolio(portfolioId)
-    
-    if (!success) {
-      return NextResponse.json({ error: 'Failed to delete portfolio' }, { status: 500 })
+    if (!deleted) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to delete portfolio' },
+        { status: 500 }
+      )
     }
-    
-    console.log('✅ Portfolio başarıyla silindi:', portfolioId)
+
+    console.log('✅ Portfolio silindi:', params.id)
     
     return NextResponse.json({
       success: true,
-      message: 'Portfolio deleted successfully'
+      message: 'Portfolio successfully deleted'
     })
-    
+
   } catch (error) {
-    console.error('❌ Portfolio DELETE hatası:', error)
+    console.error('💥 Portfolio silme hatası:', error)
     return NextResponse.json(
-      { error: 'Failed to delete portfolio' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }

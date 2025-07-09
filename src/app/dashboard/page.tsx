@@ -12,6 +12,7 @@ import { CVUpload } from '@/components/dashboard/steps/CVUpload'
 import { GenerateStep } from '@/components/dashboard/steps/GenerateStep'
 import { CompletedStep } from '@/components/dashboard/steps/CompletedStep'
 import { StepType, PortfolioTemplate } from '@/types/dashboard'
+import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary'
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -171,7 +172,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
 
 export default function DashboardPage() {
   const { data: session } = useSession()
-  const { repos: realRepos, loading: reposLoading, error: reposError, refetch } = useGitHubRepos()
+  const { repos: realRepos, loading: reposLoading, error: reposError, refetch, initialLoad } = useGitHubRepos()
   const { generatePortfolio, result: portfolioResult, loading: portfolioLoading, error: portfolioError, clearResult } = usePortfolioGenerator()
   
   // Demo mode kontrolü
@@ -209,22 +210,17 @@ export default function DashboardPage() {
   }
 
   const handleGenerate = async () => {
-    console.log('🎬 handleGenerate çağrıldı! Demo mode:', demoMode)
     // Demo mode'da da gerçek portfolio oluştur ama mock verilerle
     setStep('generate')
     clearResult()
     
     try {
       const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName]
-      console.log('📋 Seçilen template:', templateName)
       
       // Selected repo ID'lerini isimlere çevir
       const selectedRepoNames = selectedRepos
         .map(repoId => repos.find(repo => repo.id === repoId)?.name)
         .filter(Boolean) as string[]
-      
-      console.log('📋 Seçilen repo ID\'leri:', selectedRepos)
-      console.log('📋 Seçilen repo isimleri:', selectedRepoNames)
       
       // CV URL'i oluştur (gelecekte file upload implementasyonu için)
       const cvUrl = cvFile ? URL.createObjectURL(cvFile) : undefined
@@ -240,128 +236,131 @@ export default function DashboardPage() {
     }
   }
 
-
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardHeader demoMode={demoMode} />
+    <ErrorBoundary fallback={DashboardErrorFallback}>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader demoMode={demoMode} />
 
-      <div className="container mx-auto px-4 py-8">
-        <ProgressSteps currentStep={step} />
+        <div className="container mx-auto px-4 py-8">
+          <ProgressSteps currentStep={step} />
 
-        {/* Step 1: Repository Selection */}
-        {step === 'repos' && (
-          <RepositorySelection
-            repos={repos}
-            selectedRepos={selectedRepos}
-            onToggleRepo={toggleRepo}
-            onNext={() => setStep('template')}
-            demoMode={demoMode}
-            loading={reposLoading}
-            error={reposError}
-            onRefetch={refetch}
-          />
-        )}
 
-        {/* Step 2: Template Selection */}
-        {step === 'template' && (
-          <TemplateSelection
-            templates={portfolioTemplates}
-            selectedTemplate={selectedTemplate}
-            onSelectTemplate={setSelectedTemplate}
-            onNext={() => setStep('cv')}
-            onBack={() => setStep('repos')}
-            onPreview={(templateId) => setPreviewModal({ isOpen: true, templateId })}
-          />
-        )}
 
-        {/* Template Preview Modal */}
-        {previewModal.isOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
-              <div className="flex items-center justify-between p-4 border-b">
-                <h3 className="text-lg font-semibold">
-                  {portfolioTemplates.find(t => t.id === previewModal.templateId)?.name} - Önizleme
-                </h3>
-                <button
-                  onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex-1 p-4">
-                <iframe
-                  srcDoc={portfolioTemplates.find(t => t.id === previewModal.templateId)?.previewHtml}
-                  className="w-full h-full border border-gray-200 rounded-lg"
-                  title="Template Preview"
-                />
-              </div>
-              <div className="p-4 border-t flex justify-between">
-                <button
-                  onClick={() => {
-                    if (previewModal.templateId) {
-                      setSelectedTemplate(previewModal.templateId)
-                    }
-                    setPreviewModal({ isOpen: false, templateId: null })
-                  }}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Bu Şablonu Seç
-                </button>
-                <button
-                  onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Kapat
-                </button>
+          {/* Step 1: Repository Selection */}
+          {step === 'repos' && (
+            <RepositorySelection
+              key={`repos-${repos.length}-${reposLoading}`} // Force re-mount when data changes
+              repos={repos}
+              selectedRepos={selectedRepos}
+              onToggleRepo={toggleRepo}
+              onNext={() => setStep('template')}
+              demoMode={demoMode}
+              loading={reposLoading && initialLoad} // Only show loading on initial load
+              error={reposError}
+              onRefetch={refetch}
+            />
+          )}
+
+          {/* Step 2: Template Selection */}
+          {step === 'template' && (
+            <TemplateSelection
+              templates={portfolioTemplates}
+              selectedTemplate={selectedTemplate}
+              onSelectTemplate={setSelectedTemplate}
+              onNext={() => setStep('cv')}
+              onBack={() => setStep('repos')}
+              onPreview={(templateId) => setPreviewModal({ isOpen: true, templateId })}
+            />
+          )}
+
+          {/* Template Preview Modal */}
+          {previewModal.isOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b">
+                  <h3 className="text-lg font-semibold">
+                    {portfolioTemplates.find(t => t.id === previewModal.templateId)?.name} - Önizleme
+                  </h3>
+                  <button
+                    onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div className="flex-1 p-4">
+                  <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden">
+                    <iframe
+                      src={`/templates/${templateIdToName[previewModal.templateId! as keyof typeof templateIdToName]}/index.html`}
+                      className="w-full h-full"
+                      title="Template Preview"
+                    />
+                  </div>
+                </div>
+                
+                <div className="p-4 border-t flex justify-end space-x-3">
+                  <button
+                    onClick={() => {
+                      setSelectedTemplate(previewModal.templateId!)
+                      setPreviewModal({ isOpen: false, templateId: null })
+                    }}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Şablonu Seç
+                  </button>
+                  <button
+                    onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Kapat
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Step 3: CV Upload */}
-        {step === 'cv' && (
-          <CVUpload
-            cvFile={cvFile}
-            onFileUpload={handleCvUpload}
-            onClearFile={() => setCvFile(null)}
-            onNext={handleGenerate}
-            onBack={() => setStep('template')}
-          />
-        )}
+          {/* Step 3: CV Upload */}
+          {step === 'cv' && (
+            <CVUpload
+              cvFile={cvFile}
+              onFileUpload={handleCvUpload}
+              onClearFile={() => setCvFile(null)}
+              onNext={handleGenerate}
+              onBack={() => setStep('template')}
+            />
+          )}
 
-         {/* Step 4: Generate */}
-         {step === 'generate' && (
-           <GenerateStep
-             selectedReposCount={selectedRepos.length}
-             demoMode={demoMode}
-             portfolioLoading={portfolioLoading}
-             portfolioResult={portfolioResult}
-             portfolioError={portfolioError}
-             onBack={() => setStep('cv')}
-           />
-         )}
+          {/* Step 4: Generate */}
+          {step === 'generate' && (
+            <GenerateStep
+              selectedReposCount={selectedRepos.length}
+              demoMode={demoMode}
+              portfolioLoading={portfolioLoading}
+              portfolioResult={portfolioResult}
+              portfolioError={portfolioError}
+              onBack={() => setStep('cv')}
+            />
+          )}
 
-         {/* Step 5: Completed */}
-         {step === 'completed' && (
-           <CompletedStep
-             demoMode={demoMode}
-             portfolioResult={portfolioResult}
-             portfolioError={portfolioError}
-             userName={session?.user?.name || undefined}
-             onNewPortfolio={() => {
-               setStep('repos')
-               clearResult()
-               setSelectedRepos([])
-               setSelectedTemplate(1)
-               setCvFile(null)
-             }}
-           />
-         )}
+          {/* Step 5: Completed */}
+          {step === 'completed' && (
+            <CompletedStep
+              demoMode={demoMode}
+              portfolioResult={portfolioResult}
+              portfolioError={portfolioError}
+              userName={session?.user?.name || undefined}
+              onNewPortfolio={() => {
+                setStep('repos')
+                clearResult()
+                setSelectedRepos([])
+                setSelectedTemplate(1)
+                setCvFile(null)
+              }}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   )
 } 
