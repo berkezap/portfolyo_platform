@@ -1,4 +1,5 @@
-import { Check, Globe } from 'lucide-react'
+import { Check, Globe, Folder } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface CompletedStepProps {
   demoMode: boolean
@@ -15,6 +16,7 @@ export function CompletedStep({
   userName,
   onNewPortfolio
 }: CompletedStepProps) {
+  const router = useRouter()
   return (
     <div className="text-center">
       <div className="max-w-lg mx-auto">
@@ -29,7 +31,7 @@ export function CompletedStep({
             Tebrikler! Portfolyo siteniz başarıyla oluşturuldu{demoMode ? '' : ' ve canlıya alındı'}.
           </p>
 
-          {portfolioResult?.metadata && !demoMode && (
+          {portfolioResult?.metadata && (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <div className="text-sm text-gray-600 space-y-1">
                 <p><strong>Kullanıcı:</strong> {portfolioResult.metadata.user}</p>
@@ -40,26 +42,20 @@ export function CompletedStep({
             </div>
           )}
           
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600 mb-2">Portfolio siteniz:</p>
-            <p className="font-mono text-blue-600 font-medium break-all">
-              {demoMode 
-                ? 'https://mockuser.portfolyo.dev'
-                : `https://${userName?.toLowerCase().replace(/\s+/g, '')}.portfolyo.dev`
-              }
-            </p>
-          </div>
+          {portfolioResult?.html && (
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-600 mb-2">Portfolio siteniz:</p>
+              <p className="font-mono text-blue-600 font-medium break-all">
+                {demoMode 
+                  ? 'Portfolio HTML dosyası oluşturuldu (Önizle butonu ile görüntüleyin)'
+                  : `https://${userName?.toLowerCase().replace(/\s+/g, '')}.portfolyo.dev`
+                }
+              </p>
+            </div>
+          )}
 
           <div className="space-y-4">
-            {demoMode ? (
-              <button
-                onClick={() => window.open('https://portfolyo.dev/templates/modern-demo', '_blank')}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Globe className="inline-block mr-2 h-5 w-5" />
-                Demo Portfolyonu Görüntüle
-              </button>
-            ) : (
+            {portfolioResult?.html ? (
               <>
                 <button
                   onClick={() => {
@@ -72,7 +68,7 @@ export function CompletedStep({
                   className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Globe className="inline-block mr-2 h-5 w-5" />
-                  Portfolyonu Önizle
+                  {demoMode ? 'Demo Portfolyonu Görüntüle' : 'Portfolyonu Önizle'}
                 </button>
                 
                 <button
@@ -92,7 +88,25 @@ export function CompletedStep({
                   📥 HTML İndir
                 </button>
               </>
-            )}
+            ) : demoMode ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 mb-4">Demo portfolio oluşturuluyor...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              </div>
+                         ) : (
+               <div className="text-center py-4">
+                 <p className="text-gray-600">Portfolio oluşturulamadı</p>
+               </div>
+             )}
+            
+            {/* Portfolyolarım Butonu */}
+            <button
+              onClick={() => router.push('/my-portfolios')}
+              className="w-full px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Folder className="inline-block mr-2 h-5 w-5" />
+              Portfolyolarımı Yönet
+            </button>
             
             <div className="grid grid-cols-2 gap-3">
               <button

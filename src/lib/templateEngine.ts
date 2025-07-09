@@ -1,186 +1,158 @@
-import 'server-only'
 import fs from 'fs'
 import path from 'path'
-import { TemplateData, TemplateProject } from '../types/templates'
+import { TemplateData, TemplateProject } from '@/types/templates'
 
-// Template engine: HTML template'lerini string replacement ile render eder
-export function renderTemplate(templateName: string, data: TemplateData): string {
-  console.log('🎨 renderTemplate başladı')
-  console.log('📊 Template data özeti:', {
-    USER_NAME: data.USER_NAME,
-    projectCount: data.projects?.length || 0,
-    TOTAL_STARS: data.TOTAL_STARS
-  })
-  
-  // HTML template dosyasını oku
-  const templatePath = path.join(process.cwd(), 'public', 'templates', templateName, 'index.html')
-  
-  if (!fs.existsSync(templatePath)) {
-    console.log('⚠️ Template bulunamadı:', templatePath)
-    throw new Error(`Template not found: ${templateName}`)
-  }
-  
-  let htmlContent = fs.readFileSync(templatePath, 'utf-8')
-  console.log('🧪 Template içeriği ilk 500 karakter:', htmlContent.substring(0, 500))
-  
-  // Tüm template data key'lerini logla
-  console.log('🧪 Template data keys:', Object.keys(data))
-  
-  // Basit placeholder değiştirme
-  Object.entries(data).forEach(([key, value]) => {
-    if (key === 'projects') return; // Projects ayrı işlenecek
-    
-    if (typeof value === 'string' || typeof value === 'number') {
-      const placeholder = `{{${key}}}`;
-      htmlContent = htmlContent.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), String(value));
-    }
-  })
-  
-  // Projects döngüsü işle
-  console.log('🔧 PROJECTS döngüsü bulundu')
-  const projectsStartMarker = '{{PROJECTS_START}}'
-  const projectsEndMarker = '{{PROJECTS_END}}'
-  
-  const projectsStart = htmlContent.indexOf(projectsStartMarker)
-  const projectsEnd = htmlContent.indexOf(projectsEndMarker)
-  
-  if (projectsStart !== -1 && projectsEnd !== -1) {
-    console.log('🔧 Projects döngüsü başladı, proje sayısı:', data.projects.length)
-    
-    const projectTemplate = htmlContent.substring(
-      projectsStart + projectsStartMarker.length,
-      projectsEnd
-    )
-    
-    let projectsHtml = ''
-    data.projects.forEach((project: TemplateProject) => {
-      let projectHtml = projectTemplate
-      
-      // Project verilerini değiştir
-      Object.entries(project).forEach(([key, value]) => {
-        if (key === 'topics') {
-          // Teknoloji etiketleri için döngü
-          const techStartMarker = '{{TECH_TAGS_START}}'
-          const techEndMarker = '{{TECH_TAGS_END}}'
-          
-          const techStart = projectHtml.indexOf(techStartMarker)
-          const techEnd = projectHtml.indexOf(techEndMarker)
-          
-          if (techStart !== -1 && techEnd !== -1 && Array.isArray(value)) {
-            const techTemplate = projectHtml.substring(
-              techStart + techStartMarker.length,
-              techEnd
-            )
-            
-            let techHtml = ''
-            value.forEach(tech => {
-              let techItemHtml = techTemplate
-              techItemHtml = techItemHtml.replace(/\{\{TECH_NAME\}\}/g, tech)
-              techHtml += techItemHtml
-            })
-            
-            projectHtml = projectHtml.substring(0, techStart) + 
-                         techHtml + 
-                         projectHtml.substring(techEnd + techEndMarker.length)
-          }
-        } else if (typeof value === 'string' || typeof value === 'number') {
-          const placeholder = `{{${key}}}`
-          projectHtml = projectHtml.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), String(value))
-        }
-      })
-      
-      // Koşullu rendering: {{#KEY}}...{{/KEY}}
-      const conditionalRegex = /\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g
-      projectHtml = projectHtml.replace(conditionalRegex, (match, key, content) => {
-        return project[key as keyof TemplateProject] ? content : ''
-      })
-      
-      projectsHtml += projectHtml
-    })
-    
-    htmlContent = htmlContent.substring(0, projectsStart) + 
-                 projectsHtml + 
-                 htmlContent.substring(projectsEnd + projectsEndMarker.length)
-  }
-  
-  // Kalan placeholder'ları say
-  const remainingPlaceholders = (htmlContent.match(/\{\{[^}]+\}\}/g) || []).length
-  console.log('✅ renderTemplate tamamlandı, placeholder sayısı:', remainingPlaceholders)
-  
-  console.log('✅ Template render tamamlandı, HTML uzunluğu:', htmlContent.length)
-  console.log('🧪 Render sonrası ilk 500 karakter:', htmlContent.substring(0, 500))
-  
-  return htmlContent
-}
+// Template cache to avoid file system reads
+const templateCache = new Map<string, string>()
 
-// Kullanıcı verilerini portfolyo template için formatla
-export function formatUserDataForTemplate(userData: any, repos: any[], selectedRepos?: string[]): TemplateData {
-  console.log('🔧 Template Debug - Toplam repo sayısı:', repos.length);
-  console.log('🔧 Template Debug - İlk 3 repo:', repos.slice(0, 3));
-  console.log('🔧 Template Debug - Seçilen repo listesi:', selectedRepos);
+export function formatUserDataForTemplate(userData: any, repos: any[], selectedRepos: string[]): TemplateData {
+  // Seçilen repoları filtrele
+  const selectedRepoObjects = repos.filter(repo => 
+    selectedRepos.includes(repo.name)
+  )
 
-  let topRepos: any[] = [];
+  // Toplam yıldız sayısını hesapla
+  const totalStars = selectedRepoObjects.reduce((sum, repo) => sum + repo.stargazers_count, 0)
 
-  if (selectedRepos && selectedRepos.length > 0) {
-    // Kullanıcının seçtiği repoları filtrele
-    console.log('✅ Kullanıcı seçimli repo listesi kullanılıyor');
-    topRepos = repos.filter(repo => selectedRepos.includes(repo.name));
-    console.log('🔧 Template Debug - Seçilen repolardan bulunanlar:', topRepos.map(r => r.name));
-  } else {
-    // Seçim yoksa, en popüler repoları seç
-    console.log('⚠️ Seçilen repo listesi yok, otomatik seçim yapılıyor');
-    topRepos = repos
-      .filter(repo => !repo.fork && repo.name) // Sadece ismi olan ve fork olmayan repoları al
-      .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
-      .slice(0, 6);
+  // Deneyim yılını hesapla (en eski repo'nun yaşına göre)
+  const oldestRepo = selectedRepoObjects.reduce((oldest, repo) => {
+    const repoDate = new Date(repo.created_at)
+    const oldestDate = new Date(oldest.created_at)
+    return repoDate < oldestDate ? repo : oldest
+  }, selectedRepoObjects[0])
 
-    // Eğer hiç repo yoksa, fork'ları da dahil et
-    if (topRepos.length === 0) {
-      console.log('⚠️ Fork olmayan repo yok, tüm repoları dahil ediyoruz...')
-      const allRepos = repos
-        .filter(repo => repo.name) // Sadece ismi olan
-        .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
-        .slice(0, 6);
-      topRepos.push(...allRepos);
-    }
-  }
-
-  console.log('🔧 Template Debug - Seçilen repo sayısı:', topRepos.length);
-  console.log('🔧 Template Debug - Seçilen repolar:', topRepos.map(r => r.name));
-
-  // Toplam istatistikler
-  const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
-  const totalRepos = repos.length;
+  const yearsExperience = oldestRepo 
+    ? Math.max(1, new Date().getFullYear() - new Date(oldestRepo.created_at).getFullYear())
+    : 3
 
   return {
-    // Kullanıcı bilgileri
-    USER_NAME: userData.name || userData.login || 'Developer',
-    USER_BIO: userData.bio || 'Passionate software developer creating amazing projects.',
-    USER_AVATAR: userData.avatar_url || '/default-avatar.png',
-    USER_EMAIL: userData.email || 'contact@example.com',
-    USER_PHONE: '+90 555 123 45 67', // Varsayılan telefon
-    USER_LOCATION: 'Istanbul, Turkey', // Varsayılan konum
-    GITHUB_URL: userData.html_url || '#',
-    LINKEDIN_URL: '#', // Bu sonra kullanıcıdan alınabilir
-    CV_URL: '#', // Bu sonra CV upload'dan gelecek
-    
-    // İstatistikler ve deneyim
-    TOTAL_REPOS: totalRepos,
+    USER_NAME: userData.name || userData.login,
+    USER_BIO: userData.bio || 'Passionate software developer',
+    USER_AVATAR: userData.avatar_url || '',
+    USER_EMAIL: userData.email || '',
+    GITHUB_URL: userData.html_url || '',
+    LINKEDIN_URL: '#', // Mock LinkedIn URL
+    CV_URL: '#', // Will be overridden if provided
+    TOTAL_REPOS: userData.public_repos || repos.length,
     TOTAL_STARS: totalStars,
-    YEARS_EXPERIENCE: Math.max(3, Math.floor((Date.now() - new Date(userData.created_at || '2020-01-01').getTime()) / (1000 * 60 * 60 * 24 * 365))), // GitHub hesabı yaşına göre deneyim
-
-    // Projeler döngüsü için
-    projects: topRepos.map(repo => ({
+    YEARS_EXPERIENCE: yearsExperience,
+    projects: selectedRepoObjects.map(repo => ({
       PROJECT_NAME: repo.name,
-      PROJECT_URL: repo.html_url,
-      PROJECT_DEMO: repo.homepage || '',
       PROJECT_DESCRIPTION: repo.description || 'No description available',
+      PROJECT_URL: repo.html_url,
+      PROJECT_DEMO: repo.homepage,
+      PROJECT_LANGUAGE: repo.language || 'Unknown',
       PROJECT_STARS: repo.stargazers_count,
       PROJECT_FORKS: repo.forks_count,
-      PROJECT_LANGUAGE: repo.language || 'Mixed',
-      
-      // Teknoloji etiketleri - direkt string array olarak
       topics: repo.topics || []
     }))
-  };
+  }
+}
+
+export function renderTemplate(templateName: string, data: TemplateData): string {
+  try {
+    // Template cache'den oku veya dosyadan yükle
+    let template = templateCache.get(templateName)
+    if (!template) {
+      console.log('📋 Loading template from file:', templateName)
+      const templatePath = path.join(process.cwd(), 'public', 'templates', templateName, 'index.html')
+      template = fs.readFileSync(templatePath, 'utf-8')
+      templateCache.set(templateName, template)
+    } else {
+      console.log('📋 Using cached template:', templateName)
+    }
+
+    // Template değişkenlerini değiştir - optimize edilmiş tek geçiş
+    let renderedTemplate = template
+      .replace(/{{USER_NAME}}/g, data.USER_NAME)
+      .replace(/{{USER_BIO}}/g, data.USER_BIO)
+      .replace(/{{USER_AVATAR}}/g, data.USER_AVATAR)
+      .replace(/{{USER_EMAIL}}/g, data.USER_EMAIL)
+      .replace(/{{GITHUB_URL}}/g, data.GITHUB_URL)
+      .replace(/{{TOTAL_REPOS}}/g, data.TOTAL_REPOS.toString())
+      .replace(/{{TOTAL_STARS}}/g, data.TOTAL_STARS.toString())
+      .replace(/{{YEARS_EXPERIENCE}}/g, (data.YEARS_EXPERIENCE || 3).toString())
+      .replace(/{{CV_URL}}/g, data.CV_URL || '#')
+      .replace(/{{LINKEDIN_URL}}/g, data.LINKEDIN_URL || '#')
+
+    // Projeler için dinamik içerik oluştur - daha basit ve hızlı
+    if (data.projects && data.projects.length > 0) {
+      // HTML projects section'ını bul ve değiştir
+      let projectsHtml = ''
+      data.projects.forEach(project => {
+        projectsHtml += `
+          <div class="project-card fade-in">
+            <div class="project-header">
+              <div class="project-icon">
+                <i class="fas fa-code"></i>
+              </div>
+              <h3 class="project-title">${project.PROJECT_NAME}</h3>
+            </div>
+            <p class="project-description">${project.PROJECT_DESCRIPTION}</p>
+            <div class="project-tech">
+              <span class="tech-tag">${project.PROJECT_LANGUAGE}</span>
+              ${project.topics.slice(0, 3).map(topic => `<span class="tech-tag">${topic}</span>`).join('')}
+            </div>
+            <div class="project-links">
+              <a href="${project.PROJECT_URL}" target="_blank" class="project-link link-github">
+                <i class="fab fa-github"></i> GitHub
+              </a>
+              ${project.PROJECT_DEMO ? `<a href="${project.PROJECT_DEMO}" target="_blank" class="project-link link-demo">
+                <i class="fas fa-external-link-alt"></i> Demo
+              </a>` : ''}
+            </div>
+          </div>
+        `
+      })
+      
+      // Replace projects grid content - multiple fallback patterns
+      if (renderedTemplate.includes('<!-- Bu bölüm dinamik olarak doldurulacak -->')) {
+        renderedTemplate = renderedTemplate.replace(
+          /<div class="projects-grid">\s*<!-- Bu bölüm dinamik olarak doldurulacak -->\s*<\/div>/g,
+          `<div class="projects-grid">${projectsHtml}</div>`
+        )
+      } else if (renderedTemplate.includes('projects-grid')) {
+        // Fallback: just find any projects-grid div and inject content
+        renderedTemplate = renderedTemplate.replace(
+          /<div class="projects-grid"[^>]*>[\s\S]*?<\/div>/g,
+          `<div class="projects-grid">${projectsHtml}</div>`
+        )
+      } else {
+        // Last resort: inject before skills section
+        const skillsSection = renderedTemplate.indexOf('<section id="skills"')
+        if (skillsSection !== -1) {
+          const projectsSection = `
+            <section id="projects" class="projects">
+              <div class="container">
+                <div class="section-title fade-in">
+                  <h2>Projelerim</h2>
+                  <p class="section-subtitle">Yaratıcılık ve teknolojiyi birleştiren çalışmalarım</p>
+                </div>
+                <div class="projects-grid">${projectsHtml}</div>
+              </div>
+            </section>
+          `
+          renderedTemplate = renderedTemplate.slice(0, skillsSection) + projectsSection + renderedTemplate.slice(skillsSection)
+        }
+      }
+    }
+
+    console.log('✅ Template rendered successfully, length:', renderedTemplate.length)
+    return renderedTemplate
+
+  } catch (error) {
+    console.error('❌ Template rendering error:', error)
+    return `
+      <html>
+        <head><title>Template Error</title></head>
+        <body>
+          <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
+            <h1 style="color: red;">Template Rendering Error</h1>
+            <p>Template could not be rendered. Please try again later.</p>
+            <p style="color: gray; font-size: 12px;">Error: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+          </div>
+        </body>
+      </html>
+    `
+  }
 } 

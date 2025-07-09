@@ -113,6 +113,38 @@ export class PortfolioService {
   }
 
   /**
+   * Portfolio güncelle
+   */
+  static async updatePortfolio(id: string, data: Partial<CreatePortfolioData>): Promise<Portfolio | null> {
+    try {
+      const updateData: any = {}
+      
+      if (data.selected_template) updateData.selected_template = data.selected_template
+      if (data.selected_repos) updateData.selected_repos = data.selected_repos  
+      if (data.cv_url !== undefined) updateData.cv_url = data.cv_url
+      if (data.metadata) updateData.metadata = data.metadata
+
+      const { data: portfolio, error } = await supabaseAdmin
+        .from('portfolios')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('❌ Portfolio güncelleme hatası:', error)
+        return null
+      }
+
+      console.log('✅ Portfolio başarıyla güncellendi:', id)
+      return portfolio
+    } catch (error) {
+      console.error('❌ Portfolio güncelleme exception:', error)
+      return null
+    }
+  }
+
+  /**
    * Portfolio sil
    */
   static async deletePortfolio(id: string): Promise<boolean> {

@@ -1,5 +1,6 @@
 import { useSession, signOut } from 'next-auth/react'
-import { Github, LogOut } from 'lucide-react'
+import { Github, LogOut, Folder } from 'lucide-react'
+import Link from 'next/link'
 
 interface DashboardHeaderProps {
   demoMode: boolean
@@ -12,12 +13,32 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <div className="bg-blue-600 rounded-lg p-2">
               <Github className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">PortfolYO</span>
-          </div>
+          </Link>
+          
+          {/* Navigation Links */}
+          <nav className="flex items-center space-x-4 md:space-x-6">
+            <Link 
+              href="/dashboard"
+              className="flex items-center space-x-1 md:space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm md:text-base"
+            >
+              <span className="hidden sm:inline">Yeni Portfolyo</span>
+              <span className="sm:hidden">Yeni</span>
+            </Link>
+            <Link 
+              href="/my-portfolios"
+              className="flex items-center space-x-1 md:space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm md:text-base"
+            >
+              <Folder className="h-4 w-4" />
+              <span className="hidden sm:inline">Portfolyolarım</span>
+              <span className="sm:hidden">Listele</span>
+            </Link>
+          </nav>
+          
           <div className="flex items-center space-x-4">
             {demoMode ? (
               <>

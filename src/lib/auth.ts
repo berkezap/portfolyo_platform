@@ -4,8 +4,8 @@ import GitHubProvider from 'next-auth/providers/github'
 export const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      clientId: process.env.GITHUB_CLIENT_ID || 'demo-client-id',
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || 'demo-client-secret',
       authorization: {
         params: {
           scope: 'read:user user:email public_repo'

@@ -210,18 +210,7 @@ export default function DashboardPage() {
 
   const handleGenerate = async () => {
     console.log('🎬 handleGenerate çağrıldı! Demo mode:', demoMode)
-    if (demoMode) {
-      console.log('🎭 Demo modunda çalışıyor, gerçek API çağrılmayacak')
-      // Demo modunda eski simulasyon davranışını koru
-      setStep('generate')
-      setTimeout(() => {
-        setStep('completed')
-      }, 3000)
-      return
-    }
-
-    console.log('🔥 Gerçek portfolyo oluşturma başlıyor...')
-    // Gerçek portfolyo oluşturma
+    // Demo mode'da da gerçek portfolio oluştur ama mock verilerle
     setStep('generate')
     clearResult()
     
