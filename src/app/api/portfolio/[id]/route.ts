@@ -28,18 +28,18 @@ export async function GET(
 
     console.log('✅ Portfolio bulundu:', portfolio.id)
     
-    // snake_case -> camelCase dönüşümü yap ve frontend'e gönder
+    // Veritabanından gelen formatı doğrudan döndür (zaten snake_case)
     return NextResponse.json({
       success: true,
       portfolio: {
         id: portfolio.id,
-        template: portfolio.selected_template,
-        selectedRepos: portfolio.selected_repos,
-        cvUrl: portfolio.cv_url,
-        generatedHtml: portfolio.generated_html,
+        selected_template: portfolio.selected_template,
+        selected_repos: portfolio.selected_repos,
+        cv_url: portfolio.cv_url,
+        generated_html: portfolio.generated_html,
         metadata: portfolio.metadata,
-        createdAt: portfolio.created_at,
-        updatedAt: portfolio.updated_at
+        created_at: portfolio.created_at,
+        updated_at: portfolio.updated_at
       }
     })
 
@@ -77,11 +77,14 @@ export async function PATCH(
     }
 
     const requestBody = await request.json()
+    console.log('📥 PATCH isteği alındı:', requestBody)
+    
+    // Frontend'den gelen snake_case formatını kabul et
     const validation = await validateRequest(portfolioUpdateSchema, {
-      template: requestBody.template,
-      selectedRepos: requestBody.selectedRepos,
-      cvUrl: requestBody.cvUrl,
-      userBio: requestBody.userBio
+      template: requestBody.selected_template || requestBody.template,
+      selectedRepos: requestBody.selected_repos || requestBody.selectedRepos,
+      cvUrl: requestBody.cv_url || requestBody.cvUrl,
+      userBio: requestBody.user_bio || requestBody.userBio
     })
     
     if (!validation.success) {
@@ -99,25 +102,49 @@ export async function PATCH(
     let newGeneratedHtml: string | undefined = undefined;
 
     if (template || selectedRepos) {
-      const githubService = new GitHubService(session.accessToken)
-      const [userData, allRepos] = await Promise.all([
-        githubService.getUserData(),
-        githubService.getUserRepos()
-      ]);
+      try {
+        const githubService = new GitHubService(session.accessToken)
+        const [userData, allRepos] = await Promise.all([
+          githubService.getUserData(),
+          githubService.getUserRepos()
+        ]);
 
-      const finalTemplateName = template || existingPortfolio.selected_template;
-      const finalSelectedRepos = selectedRepos || existingPortfolio.selected_repos;
-      const finalCvUrl = cvUrl !== undefined ? cvUrl : existingPortfolio.cv_url;
-      const finalUserBio = userBio !== undefined ? userBio : existingPortfolio.metadata?.user_bio;
+        const finalTemplateName = template || existingPortfolio.selected_template;
+        const finalSelectedRepos = selectedRepos || existingPortfolio.selected_repos;
+        const finalCvUrl = cvUrl !== undefined ? cvUrl : existingPortfolio.cv_url;
+        const finalUserBio = userBio !== undefined ? userBio : existingPortfolio.metadata?.user_bio;
 
-      const templateData = formatUserDataForTemplate(userData, allRepos, finalSelectedRepos);
+        console.log('🔄 Template verisi hazırlanıyor...', {
+          templateName: finalTemplateName,
+          repoCount: finalSelectedRepos.length,
+          cvUrl: finalCvUrl,
+          userBio: finalUserBio
+        });
 
-      if (finalCvUrl) templateData.CV_URL = finalCvUrl;
-      if (finalUserBio) templateData.USER_BIO = finalUserBio;
-      
-      newGeneratedHtml = renderTemplate(finalTemplateName, templateData);
-      updatePayload.generated_html = newGeneratedHtml;
-      updatePayload.metadata = PortfolioService.createMetadataFromTemplateData(templateData, finalTemplateName);
+        const templateData = formatUserDataForTemplate(userData, allRepos, finalSelectedRepos);
+
+        if (finalCvUrl) templateData.CV_URL = finalCvUrl;
+        if (finalUserBio) templateData.USER_BIO = finalUserBio;
+        
+        console.log('🎨 Template render ediliyor...');
+        newGeneratedHtml = renderTemplate(finalTemplateName, templateData);
+        
+        if (!newGeneratedHtml) {
+          throw new Error('Generated HTML is empty');
+        }
+        
+        console.log('✅ Template başarıyla render edildi, HTML uzunluğu:', newGeneratedHtml.length);
+        
+        updatePayload.generated_html = newGeneratedHtml;
+        updatePayload.metadata = PortfolioService.createMetadataFromTemplateData(templateData, finalTemplateName);
+      } catch (error) {
+        console.error('❌ Template render hatası:', error);
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Failed to generate portfolio HTML',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        }, { status: 500 });
+      }
     } else {
       // Sadece user_bio değişmişse metadata'yı güncelle
       updatePayload.metadata = {
@@ -126,10 +153,14 @@ export async function PATCH(
       };
     }
 
+    console.log('📤 Veritabanına gönderilen payload:', updatePayload)
+    
     const updatedPortfolio = await PortfolioService.updatePortfolio(id, updatePayload)
     if (!updatedPortfolio) {
       return NextResponse.json({ success: false, error: 'Failed to update portfolio' }, { status: 500 })
     }
+    
+    console.log('✅ Portfolio başarıyla güncellendi:', updatedPortfolio.id)
     
     return NextResponse.json({ success: true, portfolio: updatedPortfolio })
 

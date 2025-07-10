@@ -1,146 +1,108 @@
-import { useState, useEffect, useRef } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
-// The frontend interface uses camelCase for consistency in component code.
-interface Portfolio {
+// Veri yapıları için net arayüzler (Type Safety)
+export interface Portfolio {
   id: string
-  template: string
-  selectedRepos: string[]
-  cvUrl?: string
-  url?: string // This can represent the generated URL for viewing
-  createdAt: string
-  updatedAt: string
-  metadata: {
-    user?: string
-    repoCount?: number
-    totalStars?: number
-    template?: string
-    user_bio?: string
-  }
+  selected_template: string
+  selected_repos: string[]
+  cv_url?: string
+  updated_at: string
 }
 
-interface UsePortfolioEditorReturn {
-  portfolio: Portfolio | null
-  loading: boolean
-  error: string | null
-  updatePortfolio: (data: Partial<Omit<Portfolio, 'generatedHtml'>>) => Promise<boolean>
-  refetch: () => Promise<void>
+interface UpdatePortfolioPayload {
+  id: string
+  data: Partial<Omit<Portfolio, 'id' | 'updated_at'>>
 }
 
-// Cache for portfolio data
-const portfolioCache = new Map<string, { data: Portfolio, timestamp: number }>()
-const PORTFOLIO_CACHE_DURATION = 2 * 60 * 1000 // 2 minutes
+// --- Fetcher Fonksiyonları: Sorumlulukları net ve tekil ---
 
-export function usePortfolioEditor(portfolioId: string): UsePortfolioEditorReturn {
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const fetchingRef = useRef(false)
-  const queryClient = useQueryClient();
+// 1. Portfolio verisini çeken fonksiyon
+// - Başarılı olursa, beklenen veriyi döndürür.
+// - Başarısız olursa, anlamlı bir hata fırlatır (Error Propagation).
+const fetchPortfolioById = async (portfolioId: string): Promise<Portfolio> => {
+  if (!portfolioId) throw new Error('Portfolio ID is required.')
 
-  const fetchPortfolio = async (force = false) => {
-    if (!portfolioId) return
-    if (fetchingRef.current && !force) return
-    
-    const cached = portfolioCache.get(portfolioId)
-    if (!force && cached && (Date.now() - cached.timestamp) < PORTFOLIO_CACHE_DURATION) {
-      setPortfolio(cached.data)
-      return
-    }
-    
-    fetchingRef.current = true
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/portfolio/${portfolioId}`)
-      
-      if (!response.ok) {
-        if (response.status === 404) throw new Error('Portfolio bulunamadı')
-        if (response.status === 403) throw new Error('Bu portfolyoya erişim yetkiniz yok')
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const data = await response.json()
-      
-      if (data.success && data.portfolio) {
-        // API'den gelen veri zaten camelCase olmalı (bir sonraki adımla düzelteceğiz)
-        // Bu yüzden doğrudan kullanabiliriz.
-        setPortfolio(data.portfolio)
-        portfolioCache.set(portfolioId, { data: data.portfolio, timestamp: Date.now() })
-        console.log('✅ Portfolio başarıyla yüklendi:', data.portfolio.id)
-      } else {
-        throw new Error(data.error || 'Portfolio yüklenemedi')
-      }
-    } catch (err) {
-      console.error('❌ Portfolio yükleme hatası:', err)
-      setError(err instanceof Error ? err.message : 'Bağlantı hatası')
-    } finally {
-      setLoading(false)
-      fetchingRef.current = false
-    }
+  const response = await fetch(`/api/portfolio/${portfolioId}`)
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to fetch portfolio (status: ${response.status})`)
   }
-
-  const updatePortfolio = async (updateData: Partial<Omit<Portfolio, 'generatedHtml'>>): Promise<boolean> => {
-    if (!portfolioId) return false
-    
-    console.log('🔄 Portfolio güncelleniyor, ID:', portfolioId)
-    
-    try {
-      const response = await fetch(`/api/portfolio/${portfolioId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData) // Gönderilen veri zaten camelCase
-      })
-      
-      if (!response.ok) {
-        if (response.status === 404) throw new Error('Portfolio bulunamadı')
-        if (response.status === 403) throw new Error('Bu portfolyoyu güncelleme yetkiniz yok')
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const data = await response.json()
-      
-      if (data.success && data.portfolio) {
-         // Dönen veri snake_case, camelCase'e çevir
-        const updatedPortfolioData: Portfolio = {
-          id: data.portfolio.id,
-          template: data.portfolio.selected_template,
-          selectedRepos: data.portfolio.selected_repos,
-          cvUrl: data.portfolio.cv_url,
-          url: `/portfolio/${data.portfolio.id}`,
-          createdAt: data.portfolio.created_at,
-          updatedAt: data.portfolio.updated_at,
-          metadata: data.portfolio.metadata
-        };
-
-        setPortfolio(updatedPortfolioData)
-        portfolioCache.set(portfolioId, { data: updatedPortfolioData, timestamp: Date.now() })
-        // Invalidate portfolio list cache so /my-portfolios reflects latest data
-        queryClient.invalidateQueries({ queryKey: ['portfolio-list'] });
-        console.log('✅ Portfolio başarıyla güncellendi')
-        return true
-      } else {
-        throw new Error(data.error || 'Portfolio güncellenemedi')
-      }
-    } catch (err) {
-      console.error('❌ Portfolio güncelleme hatası:', err)
-      setError(err instanceof Error ? err.message : 'Güncelleme hatası')
-      return false
-    }
+  const data = await response.json()
+  if (!data.success || !data.portfolio) {
+    throw new Error(data.error || 'Invalid portfolio data received.')
   }
+  return data.portfolio // Veri Yapısı Garantisi: Her zaman Portfolio nesnesi döner
+}
 
-  useEffect(() => {
-    fetchPortfolio()
-  }, [portfolioId])
+// 2. Portfolio verisini güncelleyen fonksiyon
+const updatePortfolioById = async (payload: UpdatePortfolioPayload): Promise<Portfolio> => {
+  const { id, data } = payload
+  console.log('[RQ] updatePortfolioById - Gönderilen veri:', { id, data })
+  const response = await fetch(`/api/portfolio/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `Failed to update portfolio (status: ${response.status})`)
+  }
+  const result = await response.json()
+  console.log('[RQ] updatePortfolioById - API yanıtı:', result)
+  if (!result.success) {
+    throw new Error(result.error || 'Failed to process portfolio update.')
+  }
+  return result.portfolio
+}
 
+
+// --- "Kurşun Geçirmez" Custom Hook ---
+
+export function usePortfolioEditor(portfolioId: string) {
+  const queryClient = useQueryClient()
+
+  // VERİ ÇEKME (QUERY)
+  // - enabled: !!portfolioId -> ID yoksa gereksiz API isteği yapmaz.
+  const { 
+    data: portfolio, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useQuery<Portfolio, Error>({
+    queryKey: ['portfolio', portfolioId], // Net Query Key
+    queryFn: () => fetchPortfolioById(portfolioId),
+    enabled: !!portfolioId,
+  })
+
+  // VERİ GÜNCELLEME (MUTATION)
+  // - onSuccess ve onError mantığı hook içinde yönetilir.
+  const { 
+    mutate: updatePortfolio, 
+    isPending: isUpdating,
+    isSuccess: isUpdateSuccess,
+    error: updateError
+  } = useMutation<Portfolio, Error, Partial<Omit<Portfolio, 'id' | 'updated_at'>>>({
+    mutationFn: (updateData) => updatePortfolioById({ id: portfolioId, data: updateData }),
+    onSuccess: (updatedData) => {
+      // Başarılı güncelleme sonrası ilgili cache'leri geçersiz kıl.
+      // Bu, React Query'nin veriyi arka planda tazeleyip UI'ı güncellemesini tetikler.
+      queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId] })
+      queryClient.invalidateQueries({ queryKey: ['portfolios'] })
+    },
+    // onError: Hata yönetimi burada merkezi olarak yapılabilir.
+  })
+
+  // Hook'un dışarıya sunduğu arayüz (Interface)
   return {
+    // Veri ve Durumları
     portfolio,
-    loading,
-    error,
+    isLoading,
+    isUpdating,
+    isUpdateSuccess,
+    error: error || updateError, // Hem query hem de mutation hatalarını tek bir yerden yönet
+
+    // Fonksiyonlar
     updatePortfolio,
-    refetch: () => fetchPortfolio(true)
+    refetch,
   }
 } 

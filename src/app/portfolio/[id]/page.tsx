@@ -6,13 +6,21 @@ import { notFound } from 'next/navigation'
 
 interface Portfolio {
   id: string
-  template: string
-  selectedRepos: string[]
-  cvUrl?: string
-  generatedHtml?: string
+  selected_template: string
+  selected_repos: string[]
+  cv_url?: string
+  generated_html?: string
   metadata?: {
     user?: string
     repoCount?: number
+    user_bio?: string
+    user_avatar?: string
+    user_email?: string
+    github_url?: string
+    total_repos?: number
+    total_stars?: number
+    years_experience?: number
+    generated_at?: string
   }
 }
 
@@ -49,7 +57,7 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
 
       const data = await response.json()
       
-      if (data.success && data.portfolio?.generatedHtml) {
+      if (data.success && data.portfolio?.generated_html) {
         // Gelen portfolyo verisini doğrudan state'e set et
         setPortfolio(data.portfolio)
         console.log('✅ Portfolio yüklendi:', data.portfolio.id)
@@ -142,12 +150,12 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
   }
 
   // Portfolio var ve HTML yüklendi - iframe ile göster
-  if (portfolio?.generatedHtml) {
+  if (portfolio?.generated_html) {
     return (
       <div className="min-h-screen bg-white">
         <div 
           className="w-full h-screen"
-          dangerouslySetInnerHTML={{ __html: portfolio.generatedHtml }}
+          dangerouslySetInnerHTML={{ __html: portfolio.generated_html }}
         />
       </div>
     )

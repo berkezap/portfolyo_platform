@@ -233,15 +233,14 @@ const portfolioTemplates: PortfolioTemplate[] = [
 
 export default function DashboardPage() {
   const { data: session } = useSession()
-  const { repos: realRepos, loading: reposLoading, error: reposError, refetch, initialLoad } = useGitHubRepos()
+  const { data: realRepos, isLoading: reposLoading, error: reposError, refetch } = useGitHubRepos()
   const { generatePortfolio, result: portfolioResult, loading: portfolioLoading, error: portfolioError, clearResult } = usePortfolioGenerator()
   
   // Demo mode kontrolü
   const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
   
-  // Mock veriler veya gerçek veriler
-  const repos = demoMode ? mockRepos : realRepos
-  
+  const repos = demoMode ? mockRepos : realRepos || []
+
   // Template ID'lerini şablon isimlerine çevir
   const templateIdToName = {
     1: 'modern-developer',
@@ -313,8 +312,8 @@ export default function DashboardPage() {
               onToggleRepo={toggleRepo}
               onNext={() => setStep('template')}
               demoMode={demoMode}
-              loading={reposLoading && initialLoad} // Only show loading on initial load
-              error={reposError}
+              loading={reposLoading}
+              error={reposError?.message || null}
               onRefetch={refetch}
             />
           )}
