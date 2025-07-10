@@ -44,24 +44,24 @@ export class PortfolioService {
   }
 
   /**
-   * Portfolio'yu generated_url ile güncelle
+   * Portfolio'yu generated_html ile güncelle
    */
-  static async updatePortfolioUrl(id: string, generated_url: string): Promise<boolean> {
+  static async updatePortfolioHtml(id: string, generated_html: string): Promise<boolean> {
     try {
       const { error } = await supabaseAdmin
         .from('portfolios')
-        .update({ generated_url })
+        .update({ generated_html })
         .eq('id', id)
 
       if (error) {
-        console.error('❌ Portfolio URL güncelleme hatası:', error)
+        console.error('❌ Portfolio HTML güncelleme hatası:', error)
         return false
       }
 
-      console.log('✅ Portfolio URL güncellendi:', generated_url)
+      console.log('✅ Portfolio HTML güncellendi, ID:', id)
       return true
     } catch (error) {
-      console.error('❌ Portfolio URL güncelleme exception:', error)
+      console.error('❌ Portfolio HTML güncelleme exception:', error)
       return false
     }
   }
@@ -115,29 +115,40 @@ export class PortfolioService {
   /**
    * Portfolio güncelle
    */
-  static async updatePortfolio(id: string, data: Partial<CreatePortfolioData>): Promise<Portfolio | null> {
+  static async updatePortfolio(id: string, data: Partial<Portfolio>): Promise<Portfolio | null> {
     try {
-      const updateData: any = {}
-      
-      if (data.selected_template) updateData.selected_template = data.selected_template
-      if (data.selected_repos) updateData.selected_repos = data.selected_repos  
-      if (data.cv_url !== undefined) updateData.cv_url = data.cv_url
-      if (data.metadata) updateData.metadata = data.metadata
+      // Gelen veriden null/undefined olmayanları alarak dinamik bir update objesi oluştur
+      const updateData = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== null && v !== undefined)
+      );
+
+      if (Object.keys(updateData).length === 0) {
+        console.log('⚠️ Güncellenecek veri yok, işlem atlanıyor.');
+        return this.getPortfolio(id); // Güncel portfolyoyu döndür
+      }
 
       const { data: portfolio, error } = await supabaseAdmin
         .from('portfolios')
         .update(updateData)
         .eq('id', id)
         .select()
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error('❌ Portfolio güncelleme hatası:', error)
         return null
       }
 
+      // Eğer update hiçbir satırı etkilemediyse Supabase null döner; bu durumda mevcut kaydı alıp döndür
+      const finalPortfolio = portfolio ?? (await supabaseAdmin
+        .from('portfolios')
+        .select('*')
+        .eq('id', id)
+        .single()
+      ).data
+
       console.log('✅ Portfolio başarıyla güncellendi:', id)
-      return portfolio
+      return finalPortfolio
     } catch (error) {
       console.error('❌ Portfolio güncelleme exception:', error)
       return null

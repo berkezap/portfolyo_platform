@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS portfolios (
     selected_template TEXT NOT NULL, -- "modern-developer", "creative-portfolio", "professional-tech"
     selected_repos JSONB NOT NULL DEFAULT '[]'::jsonb, -- Seçilen repo isimleri: ["repo1", "repo2"]
     cv_url TEXT, -- CV dosyasının URL'i (S3, Vercel Blob vs.)
-    generated_url TEXT, -- Oluşturulan portfolyonun canlı URL'i
+    generated_html TEXT, -- Oluşturulan portfolyonun HTML içeriği
     metadata JSONB DEFAULT '{}'::jsonb, -- Ek veriler (user info, stats vs.)
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

@@ -1,77 +1,41 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
-
-interface Portfolio {
-  id: string
-  template: string
-  selectedRepos: string[]
-  cvUrl?: string
-  url?: string
-  createdAt: string
-  updatedAt: string
-  metadata: {
-    user?: string
-    repoCount?: number
-    totalStars?: number
-    template?: string
-  }
-}
-
-interface PortfolioListResponse {
-  success: boolean
-  portfolios: Portfolio[]
-  count: number
-}
+import { usePortfolioList } from '@/hooks/usePortfolioList'
+import { PortfolioGridSkeleton } from '@/components/ui/Skeleton'
 
 export default function MyPortfoliosPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set())
+  
+  // React Query hook - API calls artık otomatik!
+  const {
+    portfolios,
+    loading,
+    error,
+    deletePortfolio,
+    isDeleting,
+    refetch
+  } = usePortfolioList()
 
-  useEffect(() => {
-    if (status === 'loading') return
-    
-    if (!session) {
-      router.push('/')
-      return
-    }
+  // Redirect if not authenticated
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
 
-    fetchPortfolios()
-  }, [session, status, router])
-
-  const fetchPortfolios = async () => {
-    console.log('📋 Portfolio listesi getiriliyor...')
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch('/api/portfolio/list')
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const data: PortfolioListResponse = await response.json()
-      
-      if (data.success) {
-        setPortfolios(data.portfolios)
-        console.log(`✅ ${data.count} portfolio yüklendi`)
-      } else {
-        setError('Portfolio listesi getirilemedi')
-      }
-    } catch (err) {
-      console.error('❌ Portfolio listesi hatası:', err)
-      setError('Bağlantı hatası')
-    } finally {
-      setLoading(false)
-    }
+  if (!session) {
+    router.push('/')
+    return null
   }
 
   const handleEdit = (portfolioId: string, event?: React.MouseEvent) => {
@@ -81,12 +45,11 @@ export default function MyPortfoliosPage() {
     }
     
     // Prevent action if any delete operation is in progress
-    if (deletingIds.size > 0) {
+    if (isDeleting) {
       return
     }
     
     console.log('🔧 Düzenle butonu tıklandı, portfolio ID:', portfolioId)
-    console.log('🔧 Router push çağrılıyor:', `/dashboard/edit/${portfolioId}`)
     router.push(`/dashboard/edit/${portfolioId}`)
   }
 
@@ -96,48 +59,17 @@ export default function MyPortfoliosPage() {
       event.stopPropagation()
     }
     
-    // Prevent double-click and multiple operations
-    if (deletingIds.has(portfolioId)) {
+    // Prevent multiple operations
+    if (isDeleting) {
       return
     }
     
-    if (!confirm('Bu portfolyoyu silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!')) {
-      return
-    }
-
-    // Loading state'i başlat
-    setDeletingIds(prev => new Set(prev).add(portfolioId))
-
+    // Use the hook's delete function (already has confirm dialog)
     try {
-      console.log('🗑️ Portfolio siliniyor:', portfolioId)
-
-      const response = await fetch(`/api/portfolio/${portfolioId}`, {
-        method: 'DELETE'
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const data = await response.json()
-      
-      if (data.success) {
-        console.log('✅ Portfolio başarıyla silindi')
-        // Portfolio'yu listeden kaldır
-        setPortfolios(prev => prev.filter(p => p.id !== portfolioId))
-      } else {
-        throw new Error(data.error || 'Portfolio silinemedi')
-      }
+      await deletePortfolio(portfolioId)
     } catch (err) {
       console.error('❌ Portfolio silme hatası:', err)
       alert('Portfolio silinirken hata oluştu: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'))
-    } finally {
-      // Loading state'i kaldır
-      setDeletingIds(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(portfolioId)
-        return newSet
-      })
     }
   }
 
@@ -148,7 +80,7 @@ export default function MyPortfoliosPage() {
     }
     
     // Prevent action if any delete operation is in progress
-    if (deletingIds.size > 0) {
+    if (isDeleting) {
       return
     }
     
@@ -173,17 +105,6 @@ export default function MyPortfoliosPage() {
       'professional-tech': 'Professional Tech'
     }
     return templateNames[template] || template
-  }
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Yükleniyor...</p>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -212,12 +133,17 @@ export default function MyPortfoliosPage() {
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Loading State with Skeleton */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Portfolyolar yükleniyor...</p>
-          </div>
+          <>
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center space-x-2 text-blue-600">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <span className="text-sm font-medium">Portfolyolar yükleniyor...</span>
+              </div>
+            </div>
+            <PortfolioGridSkeleton count={6} />
+          </>
         )}
 
         {/* Error State */}
@@ -231,7 +157,7 @@ export default function MyPortfoliosPage() {
                 <button 
                   onClick={(e) => {
                     e.preventDefault()
-                    fetchPortfolios()
+                    refetch()
                   }}
                   className="mt-3 text-red-600 hover:text-red-800 underline"
                 >
@@ -263,7 +189,7 @@ export default function MyPortfoliosPage() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {portfolios.map((portfolio) => (
-                  <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200">
+                  <div key={portfolio.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200 border border-gray-200">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                                                  <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{color: '#111827'}}>
@@ -302,10 +228,10 @@ export default function MyPortfoliosPage() {
                       {/* View Button */}
                       <button
                         onClick={(e) => handleView(portfolio.id, e)}
-                        disabled={deletingIds.size > 0}
+                        disabled={isDeleting}
                         className="flex-1 bg-green-600 text-white py-2.5 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{
-                          backgroundColor: deletingIds.size > 0 ? '#9ca3af' : '#16a34a',
+                          backgroundColor: isDeleting ? '#9ca3af' : '#16a34a',
                           color: '#ffffff'
                         }}
                       >
@@ -315,10 +241,10 @@ export default function MyPortfoliosPage() {
                       {/* Edit Button */}
                       <button
                         onClick={(e) => handleEdit(portfolio.id, e)}
-                        disabled={deletingIds.size > 0}
+                        disabled={isDeleting}
                         className="flex-1 bg-blue-600 text-white py-2.5 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{
-                          backgroundColor: deletingIds.size > 0 ? '#9ca3af' : '#2563eb',
+                          backgroundColor: isDeleting ? '#9ca3af' : '#2563eb',
                           color: '#ffffff'
                         }}
                       >
@@ -328,14 +254,14 @@ export default function MyPortfoliosPage() {
                       {/* Delete Button */}
                       <button
                         onClick={(e) => handleDelete(portfolio.id, e)}
-                        disabled={deletingIds.has(portfolio.id) || deletingIds.size > 0}
+                        disabled={isDeleting}
                         className="flex-1 bg-red-600 text-white py-2.5 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{
-                          backgroundColor: deletingIds.has(portfolio.id) ? '#9ca3af' : '#dc2626',
+                          backgroundColor: isDeleting ? '#9ca3af' : '#dc2626',
                           color: '#ffffff'
                         }}
                       >
-                        {deletingIds.has(portfolio.id) ? (
+                        {isDeleting ? (
                           <span className="flex items-center justify-center">
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                             Siliniyor...

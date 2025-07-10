@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { GitHubService } from '@/lib/github'
+import * as Sentry from '@sentry/nextjs'
 
 export async function GET(request: NextRequest) {
   console.log('🔗 GitHub Repos API endpoint hit')
   
+  let session: any = null
+  
   try {
-    const session = await getServerSession(authOptions)
+    session = await getServerSession(authOptions)
     console.log('📋 Session check:', {
       hasSession: !!session,
       hasUser: !!session?.user,
@@ -43,6 +46,19 @@ export async function GET(request: NextRequest) {
     
   } catch (error) {
     console.error('💥 GitHub API Error:', error)
+    
+    // Capture error in Sentry with context
+    Sentry.captureException(error, {
+      tags: {
+        api: 'github-repos',
+        endpoint: '/api/github/repos'
+      },
+      extra: {
+        userEmail: session?.user?.email,
+        hasAccessToken: !!session?.accessToken,
+        timestamp: new Date().toISOString()
+      }
+    })
     
     // Handle specific GitHub API errors
     if (error instanceof Error) {

@@ -4,22 +4,48 @@ import { authOptions } from '@/lib/auth'
 import { GitHubService } from '@/lib/github'
 import { renderTemplate, formatUserDataForTemplate } from '@/lib/templateEngine'
 import { PortfolioService } from '@/lib/portfolioService'
+import { portfolioGenerationSchema, validateRequest, sanitizeString } from '@/lib/validation'
+import * as Sentry from '@sentry/nextjs'
 
 export async function POST(request: NextRequest) {
   console.log('🚀 Portfolio Generate API çağrıldı!')
+  
+  let session: any = null
+  
   try {
     // Demo mode kontrolü
     const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
     console.log('🎭 Demo mode:', demoMode)
 
-    const { templateName, selectedRepos, cvUrl } = await request.json()
+    // Request body al ve validate et
+    const requestBody = await request.json()
+    console.log('📥 Raw request:', requestBody)
+    
+    // Zod validation
+    const validation = await validateRequest(portfolioGenerationSchema, {
+      template: sanitizeString(requestBody.templateName || requestBody.template),
+      selectedRepos: Array.isArray(requestBody.selectedRepos) 
+        ? requestBody.selectedRepos.map((repo: string) => sanitizeString(repo))
+        : [],
+      cvUrl: requestBody.cvUrl ? sanitizeString(requestBody.cvUrl) : undefined,
+      userBio: requestBody.userBio ? sanitizeString(requestBody.userBio) : undefined,
+      userEmail: requestBody.userEmail ? sanitizeString(requestBody.userEmail) : undefined,
+      linkedinUrl: requestBody.linkedinUrl ? sanitizeString(requestBody.linkedinUrl) : undefined
+    })
+    
+    if (!validation.success) {
+      console.log('❌ Validation failed:', validation.error)
+      return NextResponse.json({ 
+        error: 'Invalid request data', 
+        details: validation.error 
+      }, { status: 400 })
+    }
+    
+    const { template: templateName, selectedRepos, cvUrl } = validation.data
+    console.log('✅ Validated data:', { templateName, selectedRepos: selectedRepos.length, cvUrl })
     console.log('📂 Template name:', templateName)
     console.log('📋 Selected repos:', selectedRepos)
     console.log('📄 CV URL:', cvUrl)
-    
-    if (!templateName) {
-      return NextResponse.json({ error: 'Template name is required' }, { status: 400 })
-    }
 
     let userData, repos
 
@@ -83,7 +109,7 @@ export async function POST(request: NextRequest) {
       ]
     } else {
       // Gerçek mode - GitHub API kullan
-      const session = await getServerSession(authOptions)
+      session = await getServerSession(authOptions)
       console.log('🔐 Session var mı?', !!session)
       
       if (!session || !session.accessToken) {
@@ -110,10 +136,9 @@ export async function POST(request: NextRequest) {
         id: 'demo-portfolio-' + Date.now(),
         created_at: new Date().toISOString()
       }
-    } else {
-      console.log('🗃️ Portfolio database\'e kaydediliyor...')
-      const session = await getServerSession(authOptions)
-      const portfolioData = {
+          } else {
+        console.log('🗃️ Portfolio database\'e kaydediliyor...')
+        const portfolioData = {
         user_id: session?.user?.email || userData.login,
         selected_template: templateName,
         selected_repos: selectedRepos || [],
@@ -154,27 +179,30 @@ export async function POST(request: NextRequest) {
     // 🔗 3. ADIM: Metadata oluştur ve database'i güncelle
     const metadata = PortfolioService.createMetadataFromTemplateData(templateData, templateName)
     
-    // Doğru portfolio URL'ini kaydet
-    const portfolioUrl = `/portfolio/${savedPortfolio.id}`
-    await PortfolioService.updatePortfolioUrl(savedPortfolio.id, portfolioUrl)
+    // Oluşturulan HTML'i veritabanına kaydet
+    await PortfolioService.updatePortfolioHtml(savedPortfolio.id, generatedHTML)
 
     return NextResponse.json({ 
       success: true,
-      html: generatedHTML,
-      portfolioUrl: portfolioUrl,
-      portfolio: {
-        id: savedPortfolio.id,
-        user: userData.name || userData.login,
-        template: templateName,
-        selectedRepos: selectedRepos || [],
-        repoCount: repos.length,
-        totalStars: templateData.TOTAL_STARS,
-        createdAt: savedPortfolio.created_at
-      },
-      metadata
+      html: generatedHTML, // HTML'i frontend'e de gönderiyoruz
+      portfolioId: savedPortfolio.id
     })
   } catch (error) {
-    console.error('Portfolio generation error:', error)
+    console.error('💥 Portfolio generation error:', error)
+    
+    // Capture error in Sentry with context
+    Sentry.captureException(error, {
+      tags: {
+        api: 'portfolio-generation',
+        endpoint: '/api/portfolio/generate'
+      },
+      extra: {
+        userEmail: session?.user?.email,
+        hasSession: !!session,
+        timestamp: new Date().toISOString()
+      }
+    })
+    
     return NextResponse.json(
       { error: 'Failed to generate portfolio' }, 
       { status: 500 }

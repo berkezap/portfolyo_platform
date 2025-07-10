@@ -31,7 +31,6 @@ export async function GET() {
       template: portfolio.selected_template,
       selectedRepos: portfolio.selected_repos || [],
       cvUrl: portfolio.cv_url,
-      url: portfolio.generated_url,
       createdAt: portfolio.created_at,
       updatedAt: portfolio.updated_at,
       metadata: portfolio.metadata || {}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { notFound } from 'next/navigation'
 
@@ -16,8 +16,9 @@ interface Portfolio {
   }
 }
 
-export default function PortfolioViewPage({ params }: { params: { id: string } }) {
+export default function PortfolioViewPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const { id } = use(params)
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,16 +26,17 @@ export default function PortfolioViewPage({ params }: { params: { id: string } }
 
   useEffect(() => {
     fetchPortfolio()
-  }, [params.id])
+  }, [id])
 
   const fetchPortfolio = async () => {
-    console.log('🔍 Portfolio detayı getiriliyor:', params.id)
+    console.log('🔍 Portfolio HTML getiriliyor:', id)
     
     try {
       setLoading(true)
       setError(null)
       
-      const response = await fetch(`/api/portfolio/${params.id}`)
+      // Ana API endpoint'ini kullanarak kayıtlı portfolyo verisini çek
+      const response = await fetch(`/api/portfolio/${id}`)
       
       if (response.status === 404) {
         setNotFoundError(true)
@@ -47,11 +49,13 @@ export default function PortfolioViewPage({ params }: { params: { id: string } }
 
       const data = await response.json()
       
-      if (data.success && data.portfolio) {
+      if (data.success && data.portfolio?.generatedHtml) {
+        // Gelen portfolyo verisini doğrudan state'e set et
         setPortfolio(data.portfolio)
         console.log('✅ Portfolio yüklendi:', data.portfolio.id)
       } else {
-        setNotFoundError(true)
+        setError(data.error || 'Portfolio could not be loaded.')
+        console.log('❌ Portfolio yüklenemedi veya HTML içeriği boş:', data)
       }
     } catch (err) {
       console.error('❌ Portfolio getirme hatası:', err)

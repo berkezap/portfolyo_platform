@@ -1,5 +1,6 @@
 import { RefreshCw, Github, Lock, BookOpen, AlertCircle } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
+import { RepositoryGridSkeleton } from '@/components/ui/Skeleton'
 
 interface RepositorySelectionProps {
   repos: any[]
@@ -177,7 +178,7 @@ export function RepositorySelection({
     )
   }
 
-  // Loading State
+  // Loading State with Skeleton
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto">
@@ -188,12 +189,13 @@ export function RepositorySelection({
           <p className="text-gray-600">
             Portfolio sitenizde gösterilecek GitHub projelerini seçin
           </p>
+          <div className="mt-4 inline-flex items-center space-x-2 text-blue-600">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span className="text-sm font-medium">GitHub projeleriniz yükleniyor...</span>
+          </div>
         </div>
         
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">GitHub projeleriniz yükleniyor...</p>
-        </div>
+        <RepositoryGridSkeleton count={6} />
       </div>
     )
   }

@@ -30,7 +30,7 @@ export interface Portfolio {
   selected_template: string
   selected_repos: string[]
   cv_url?: string
-  generated_url?: string
+  generated_html?: string
   metadata?: Record<string, any>
   created_at: string
   updated_at: string
