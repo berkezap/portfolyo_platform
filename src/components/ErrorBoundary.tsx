@@ -106,7 +106,7 @@ function DefaultErrorFallback({ error, resetError }: { error?: Error; resetError
 }
 
 // Specific Error Fallbacks for different contexts
-export function DashboardErrorFallback({ error, resetError }: { error?: Error; resetError: () => void }) {
+export function DashboardErrorFallback({ resetError }: { error?: Error; resetError: () => void }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-red-200">
       <div className="text-center">
@@ -140,7 +140,7 @@ export function DashboardErrorFallback({ error, resetError }: { error?: Error; r
   )
 }
 
-export function PortfolioErrorFallback({ error, resetError }: { error?: Error; resetError: () => void }) {
+export function PortfolioErrorFallback({ resetError }: { error?: Error; resetError: () => void }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-red-200">
       <div className="text-center">

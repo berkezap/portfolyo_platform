@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { GitHubService } from '@/lib/github'
 import * as Sentry from '@sentry/nextjs'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   console.log('🔗 GitHub Repos API endpoint hit')
   
   let session: any = null
@@ -15,10 +15,10 @@ export async function GET(request: NextRequest) {
       hasSession: !!session,
       hasUser: !!session?.user,
       userEmail: session?.user?.email,
-      hasAccessToken: !!session?.accessToken
+      hasAccessToken: !!session?.user?.accessToken
     })
     
-    if (!session || !session.accessToken) {
+    if (!session || !session.user?.accessToken) {
       console.log('❌ No session or access token')
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in again' }, 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('🔑 Creating GitHub service with access token')
-    const githubService = new GitHubService(session.accessToken)
+    const githubService = new GitHubService(session.user.accessToken)
     
     console.log('📡 Fetching repos from GitHub API...')
     const repos = await githubService.getUserRepos()
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       },
       extra: {
         userEmail: session?.user?.email,
-        hasAccessToken: !!session?.accessToken,
+        hasAccessToken: !!session?.user?.accessToken,
         timestamp: new Date().toISOString()
       }
     })

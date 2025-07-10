@@ -4,9 +4,9 @@ import { useState, useEffect, use } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useGitHubRepos } from '@/hooks/useGitHubRepos'
-import { usePortfolioEditor, Portfolio as PortfolioType } from '@/hooks/usePortfolioEditor'
+import { usePortfolioEditor } from '@/hooks/usePortfolioEditor'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
-import { GitHubRepo } from '@/lib/github'
+import { GitHubRepo } from '@/types/github'
 
 interface EditPortfolioPageProps {
   params: Promise<{
@@ -34,14 +34,14 @@ const templateDisplayNames: { [key: number]: string } = {
 }
 
 export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
-  const { data: session, status: sessionStatus } = useSession()
+  const { status: sessionStatus } = useSession()
   const router = useRouter()
   
   const resolvedParams = use(params)
   const portfolioId = resolvedParams.id
   
   const { 
-    portfolio, isLoading: portfolioLoading, error: portfolioError, refetch,
+    portfolio, isLoading: portfolioLoading, error: portfolioError,
     isUpdating, isUpdateSuccess, updatePortfolio: updatePortfolioMutation
   } = usePortfolioEditor(portfolioId);
   const { data: allRepos, isLoading: reposLoading } = useGitHubRepos()

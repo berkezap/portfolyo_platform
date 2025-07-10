@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { GitHubRepo } from '@/lib/github'
+import { GitHubRepo } from '@/types/github'
 
 const fetchGitHubRepos = async (): Promise<GitHubRepo[]> => {
   const response = await fetch('/api/github/repos')

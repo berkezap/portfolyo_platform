@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
-import { notFound } from 'next/navigation'
+
 
 interface Portfolio {
   id: string

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { GitHubService } from '@/lib/github'
 import { renderTemplate, formatUserDataForTemplate } from '@/lib/templateEngine'
@@ -112,13 +112,13 @@ export async function POST(request: NextRequest) {
       session = await getServerSession(authOptions)
       console.log('🔐 Session var mı?', !!session)
       
-      if (!session || !session.accessToken) {
+      if (!session || !session.user?.accessToken) {
         console.log('❌ Session veya accessToken yok!')
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
       // GitHub servisini kullanarak kullanıcı verilerini al
-      const githubService = new GitHubService(session.accessToken)
+      const githubService = new GitHubService(session.user.accessToken)
       const [userDataResult, reposResult] = await Promise.all([
         githubService.getUserData(),
         githubService.getUserRepos()
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
     console.log('🧪 Render sonrası ilk 500 karakter:', generatedHTML.substring(0, 500))
 
     // 🔗 3. ADIM: Metadata oluştur ve database'i güncelle
-    const metadata = PortfolioService.createMetadataFromTemplateData(templateData, templateName)
+    PortfolioService.createMetadataFromTemplateData(templateData, templateName)
     
     // Oluşturulan HTML'i veritabanına kaydet
     await PortfolioService.updatePortfolioHtml(savedPortfolio.id, generatedHTML)

@@ -6,7 +6,7 @@ export async function GET() {
   
   try {
     // Database bağlantı testi
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from('portfolios')
       .select('count(*)', { count: 'exact', head: true })
 

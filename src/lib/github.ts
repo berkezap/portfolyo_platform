@@ -1,18 +1,7 @@
 import { Octokit } from '@octokit/rest'
-
-export interface GitHubRepo {
-  id: number
-  name: string
-  description: string | null
-  html_url: string
-  language: string | null
-  stargazers_count: number
-  forks_count: number
-  created_at: string | null
-  updated_at: string | null
-  topics: string[]
-  homepage: string | null
-}
+import { GitHubRepo } from '@/types/github';
+import { RestEndpointMethodTypes } from '@octokit/rest';
+type OctokitRepo = RestEndpointMethodTypes["repos"]["listForAuthenticatedUser"]["response"]["data"][number];
 
 export class GitHubService {
   private octokit: Octokit
@@ -37,25 +26,25 @@ export class GitHubService {
       console.log('✅ GitHub API raw response:', {
         totalRepos: data.length,
         firstRepoName: data[0]?.name || 'none',
-        sampleRepos: data.slice(0, 3).map(repo => ({
+        sampleRepos: data.slice(0, 3).map((repo: OctokitRepo) => ({
           name: repo.name,
-          visibility: repo.private ? 'private' : 'public',
+          visibility: (repo as any).private ? 'private' : 'public',
           language: repo.language
         }))
       })
 
-      const formattedRepos = data.map(repo => ({
+      const formattedRepos = data.map((repo: OctokitRepo) => ({
         id: repo.id,
         name: repo.name,
-        description: repo.description,
+        description: repo.description ?? null,
         html_url: repo.html_url,
-        language: repo.language,
+        language: repo.language ?? null,
         stargazers_count: repo.stargazers_count,
         forks_count: repo.forks_count,
-        created_at: repo.created_at,
-        updated_at: repo.updated_at,
-        topics: repo.topics || [],
-        homepage: repo.homepage
+        created_at: repo.created_at ?? null,
+        updated_at: repo.updated_at ?? null,
+        topics: repo.topics ?? [],
+        homepage: repo.homepage ?? null
       }))
 
       console.log('🔄 Formatted repos:', {

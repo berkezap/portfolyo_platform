@@ -57,8 +57,8 @@ export function CVUpload({ cvUrl, onFileUpload, onClearFile, onNext, onBack }: C
 
       setFileName(file.name)
       onFileUpload(publicUrl)
-    } catch (err: any) {
-      setUploadError(err.message || 'Dosya yüklenirken hata')
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : 'Dosya yüklenirken hata')
     } finally {
       setIsUploading(false)
     }
@@ -79,7 +79,7 @@ export function CVUpload({ cvUrl, onFileUpload, onClearFile, onNext, onBack }: C
           CV'nizi Yükleyin (Opsiyonel)
         </h1>
         <p className="text-gray-600">
-          Portfolio sitenizde CV'nizi de göstermek istiyorsanız PDF formatında yükleyebilirsiniz.
+          Portfolio sitenizde CV&apos;nizi de göstermek istiyorsanız PDF formatında yükleyebilirsiniz.
         </p>
         <p className="text-sm text-gray-500 mt-2">
           Maksimum dosya boyutu: 10MB • Desteklenen format: PDF
@@ -131,7 +131,7 @@ export function CVUpload({ cvUrl, onFileUpload, onClearFile, onNext, onBack }: C
           ) : (
             <div>
               <Upload className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">CV'nizi buraya sürükleyin</p>
+              <p className="text-gray-600 mb-2">CV&apos;nizi buraya sürükleyin</p>
               <p className="text-sm text-gray-500 mb-4">veya dosya seçmek için tıklayın</p>
               <input
                 type="file"

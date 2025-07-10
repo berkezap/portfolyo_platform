@@ -46,13 +46,13 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white text-sm font-bold">MU</span>
                 </div>
-                <a
+                <Link
                   href="/"
                   className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
                 >
                   <LogOut className="h-4 w-4 mr-1" />
                   Ana Sayfa
-                </a>
+                </Link>
               </>
             ) : (
               <>

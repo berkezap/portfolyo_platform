@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { PortfolioService } from '@/lib/portfolioService'
-import { portfolioUpdateSchema, validateRequest, sanitizeString } from '@/lib/validation'
+import { portfolioUpdateSchema, validateRequest } from '@/lib/validation'
 import * as Sentry from '@sentry/nextjs'
 import { GitHubService } from '@/lib/github'
 import { formatUserDataForTemplate, renderTemplate } from '@/lib/templateEngine'
@@ -63,7 +63,7 @@ export async function PATCH(
   try {
     id = (await params).id
     const session = await getServerSession(authOptions)
-    if (!session?.user?.email || !session.accessToken) {
+    if (!session?.user?.email || !session.user.accessToken) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -103,7 +103,7 @@ export async function PATCH(
 
     if (template || selectedRepos) {
       try {
-        const githubService = new GitHubService(session.accessToken)
+        const githubService = new GitHubService(session.user.accessToken)
         const [userData, allRepos] = await Promise.all([
           githubService.getUserData(),
           githubService.getUserRepos()

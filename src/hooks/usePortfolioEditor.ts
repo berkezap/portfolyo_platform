@@ -83,7 +83,7 @@ export function usePortfolioEditor(portfolioId: string) {
     error: updateError
   } = useMutation<Portfolio, Error, Partial<Omit<Portfolio, 'id' | 'updated_at'>>>({
     mutationFn: (updateData) => updatePortfolioById({ id: portfolioId, data: updateData }),
-    onSuccess: (updatedData) => {
+    onSuccess: () => {
       // Başarılı güncelleme sonrası ilgili cache'leri geçersiz kıl.
       // Bu, React Query'nin veriyi arka planda tazeleyip UI'ı güncellemesini tetikler.
       queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId] })

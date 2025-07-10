@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession, signIn } from 'next-auth/react'
-import { Github, Zap, Globe, Star, Users, Code2 } from 'lucide-react'
+import { Github, Zap, Globe, Code2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -53,7 +53,7 @@ export default function HomePage() {
                className="inline-flex items-center px-4 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
              >
                <Code2 className="mr-2 h-4 w-4" />
-               Demo'yu Dene
+               Demo&apos;yu Dene
              </Link>
            ) : (
              <button
@@ -86,7 +86,7 @@ export default function HomePage() {
                    className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-lg"
                  >
                    <Code2 className="mr-3 h-5 w-5" />
-                   Demo'yu Dene
+                   Demo&apos;yu Dene
                  </Link>
                ) : (
                  <button
@@ -145,7 +145,7 @@ export default function HomePage() {
               <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Globe className="h-8 w-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Canlı & SEO Dostu</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Canlı &amp; SEO Dostu</h3>
               <p className="text-gray-600">
                 Statik siteler Google'da üst sıralarda. Portfolyonuz kolayca bulunabilir.
               </p>
@@ -206,7 +206,7 @@ export default function HomePage() {
                className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors text-lg"
              >
                <Code2 className="mr-3 h-5 w-5" />
-               Demo'yu Dene
+               Demo&apos;yu Dene
              </Link>
            ) : (
              <button

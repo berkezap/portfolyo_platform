@@ -127,7 +127,7 @@ export function CompletedStep({
           {demoMode && (
             <div className="mt-8 p-4 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Demo Modu:</strong> Bu portfolyo gerçek değildir. Gerçek portfolyo oluşturmak için GitHub OAuth'u kurmanız gerekir.
+                <strong>Demo Modu:</strong> Bu portfolyo gerçek değildir. Gerçek portfolyo oluşturmak için GitHub OAuth&apos;u kurmanız gerekir.
               </p>
             </div>
           )}

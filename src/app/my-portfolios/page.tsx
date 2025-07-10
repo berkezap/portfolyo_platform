@@ -14,7 +14,7 @@ export default function MyPortfoliosPage() {
   // React Query hook - API calls artık otomatik!
   const {
     portfolios,
-    loading,
+    isLoading,
     error,
     deletePortfolio,
     isDeleting,
@@ -88,15 +88,7 @@ export default function MyPortfoliosPage() {
     router.push(`/portfolio/${portfolioId}`)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+
 
   const getTemplateDisplayName = (template: string) => {
     const templateNames: Record<string, string> = {
@@ -134,7 +126,7 @@ export default function MyPortfoliosPage() {
         </div>
 
         {/* Loading State with Skeleton */}
-        {loading && (
+        {isLoading && (
           <>
             <div className="text-center mb-8">
               <div className="inline-flex items-center space-x-2 text-blue-600">
@@ -169,7 +161,7 @@ export default function MyPortfoliosPage() {
         )}
 
         {/* Portfolio List */}
-        {!loading && !error && (
+        {!isLoading && !error && (
           <>
             {portfolios.length === 0 ? (
               <div className="text-center py-12">

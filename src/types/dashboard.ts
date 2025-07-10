@@ -1,18 +1,6 @@
-export type StepType = 'repos' | 'template' | 'cv' | 'generate' | 'completed'
+import { GitHubRepo } from './github'
 
-export interface GitHubRepo {
-  id: number
-  name: string
-  description: string | null
-  html_url: string
-  language: string | null
-  stargazers_count: number
-  forks_count: number
-  created_at: string | null
-  updated_at: string | null
-  topics: string[]
-  homepage: string | null
-}
+export type StepType = 'repos' | 'template' | 'cv' | 'generate' | 'completed'
 
 export interface PortfolioTemplate {
   id: number

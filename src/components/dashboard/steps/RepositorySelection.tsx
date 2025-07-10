@@ -1,5 +1,5 @@
-import { RefreshCw, Github, Lock, BookOpen, AlertCircle } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import { RefreshCw, Github, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { RepositoryGridSkeleton } from '@/components/ui/Skeleton'
 
 interface RepositorySelectionProps {

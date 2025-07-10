@@ -2,7 +2,7 @@ interface GenerateStepProps {
   selectedReposCount: number
   demoMode: boolean
   portfolioLoading: boolean
-  portfolioResult: any
+  portfolioResult: unknown
   portfolioError: string | null
   onBack: () => void
 }

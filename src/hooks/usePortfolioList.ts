@@ -5,6 +5,9 @@ export interface Portfolio {
   created_at: string
   selected_template: string
   selected_repos: string[]
+  template: string
+  selectedRepos: string[]
+  createdAt: string
   // Add other portfolio fields as necessary
 }
 
@@ -45,5 +48,6 @@ export function usePortfolioList() {
     error: error?.message || null,
     deletePortfolio: deleteMutation.mutate,
     isDeleting: deleteMutation.isPending,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ['portfolios'] })
   }
 } 
