@@ -2,16 +2,17 @@ import { Upload, FileText, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 
 interface CVUploadProps {
-  cvFile: File | null
-  onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
+  cvUrl: string | null
+  onFileUpload: (url: string) => void
   onClearFile: () => void
   onNext: () => void
   onBack: () => void
 }
 
-export function CVUpload({ cvFile, onFileUpload, onClearFile, onNext, onBack }: CVUploadProps) {
+export function CVUpload({ cvUrl, onFileUpload, onClearFile, onNext, onBack }: CVUploadProps) {
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [fileName, setFileName] = useState<string | null>(null)
 
   const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB in bytes
   const ALLOWED_TYPES = ['application/pdf']
@@ -19,43 +20,47 @@ export function CVUpload({ cvFile, onFileUpload, onClearFile, onNext, onBack }: 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     setUploadError(null)
-    
     if (!file) return
 
-    // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
       setUploadError('Sadece PDF formatındaki dosyalar kabul edilmektedir.')
-      event.target.value = '' // Clear the input
+      event.target.value = ''
       return
     }
-
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       setUploadError(`Dosya boyutu çok büyük. Maksimum ${MAX_FILE_SIZE / (1024 * 1024)}MB olmalıdır.`)
-      event.target.value = '' // Clear the input
+      event.target.value = ''
       return
     }
 
-    // Validate file is not corrupted (basic check)
     try {
       setIsUploading(true)
-      
-      // Create a FileReader to check if file is readable
-      const reader = new FileReader()
-      reader.onload = () => {
-        onFileUpload(event)
-        setIsUploading(false)
-      }
-      reader.onerror = () => {
-        setUploadError('Dosya okunamadı. Lütfen geçerli bir PDF dosyası seçin.')
-        setIsUploading(false)
-        event.target.value = ''
-      }
-      reader.readAsArrayBuffer(file.slice(0, 1024)) // Read first 1KB to check if file is readable
-    } catch (error) {
-      setUploadError('Dosya yüklenirken bir hata oluştu.')
+      // 1) Get signed URL
+      const res = await fetch('/api/upload/cv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName: file.name, fileType: file.type })
+      })
+      if (!res.ok) throw new Error('Signed URL alınamadı')
+      const { uploadUrl, publicUrl } = await res.json()
+
+      // 2) Upload file
+      const putRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        }
+      })
+      if (!putRes.ok) throw new Error('Dosya yüklenemedi')
+
+      setFileName(file.name)
+      onFileUpload(publicUrl)
+    } catch (err: any) {
+      setUploadError(err.message || 'Dosya yüklenirken hata')
+    } finally {
       setIsUploading(false)
-      event.target.value = ''
     }
   }
 
@@ -83,7 +88,7 @@ export function CVUpload({ cvFile, onFileUpload, onClearFile, onNext, onBack }: 
 
       <div className="max-w-md mx-auto">
         <div className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-          cvFile ? 'border-green-500 bg-green-50' : 
+          cvUrl ? 'border-green-500 bg-green-50' : 
           uploadError ? 'border-red-500 bg-red-50' :
           'border-gray-300 hover:border-gray-400'
         }`}>
@@ -92,13 +97,10 @@ export function CVUpload({ cvFile, onFileUpload, onClearFile, onNext, onBack }: 
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <p className="text-gray-600">CV dosyanız kontrol ediliyor...</p>
             </div>
-          ) : cvFile ? (
+          ) : cvUrl ? (
             <div>
               <FileText className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <p className="text-green-700 font-medium mb-2">{cvFile.name}</p>
-              <p className="text-sm text-green-600 mb-2">
-                Boyut: {(cvFile.size / (1024 * 1024)).toFixed(2)}MB
-              </p>
+              <p className="text-green-700 font-medium mb-2">{fileName}</p>
               <p className="text-sm text-green-600">CV başarıyla yüklendi!</p>
               <button
                 onClick={clearFile}

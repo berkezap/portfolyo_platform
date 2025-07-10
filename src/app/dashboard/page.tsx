@@ -167,7 +167,68 @@ const portfolioTemplates: PortfolioTemplate[] = [
       </div>
     `,
     features: ['Timeline View', 'Skill Bars', 'Testimonials', 'Blog Section']
-  }
+  },
+  // YENİ TEMPLATE'LER
+  {
+    id: 4,
+    name: 'Minimalist Professional',
+    description: 'Monokrom, grid tabanlı, tipografi odaklı minimalist portfolyo.',
+    previewHtml: `
+      <div style="background: #F1F1F1; color: #111; font-family: Inter, sans-serif; padding: 24px; border-radius: 12px; border: 1px solid #E5E5E5;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Minimalist Pro</h1>
+        <p style="font-size: 13px; color: #555; margin-bottom: 12px;">Senior Backend Engineer</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <span style="color: #2563eb;">GitHub</span>
+          <span style="color: #2563eb;">LinkedIn</span>
+        </div>
+        <div style="background: #fff; border-radius: 8px; padding: 10px;">
+          <h3 style="font-size: 14px; font-weight: 600;">Project Title</h3>
+          <p style="font-size: 12px; color: #555;">Short project description.</p>
+        </div>
+      </div>
+    `,
+    features: ['Strict Grid', 'Monochrome', 'Minimal Accent', 'Professional']
+  },
+  {
+    id: 5,
+    name: 'Creative Technologist',
+    description: 'Koyu tema, neon vurgular, animasyonlu ve enerjik portfolyo.',
+    previewHtml: `
+      <div style="background: linear-gradient(90deg, #1A1A1A 60%, #F000B8 100%); color: #E0E0E0; font-family: Satoshi, sans-serif; padding: 24px; border-radius: 12px;">
+        <h1 style="font-size: 22px; font-family: 'JetBrains Mono', monospace; background: linear-gradient(45deg, #F000B8, #32F5C8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Creative Tech</h1>
+        <p style="font-size: 13px; color: #32F5C8; margin-bottom: 12px;">Frontend / Fullstack</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <span style="color: #32F5C8;">GitHub</span>
+          <span style="color: #F000B8;">LinkedIn</span>
+        </div>
+        <div style="background: #212121; border-radius: 8px; padding: 10px;">
+          <h3 style="font-size: 14px; font-weight: 600;">Project Name</h3>
+          <p style="font-size: 12px; color: #808080;">Energetic project card.</p>
+        </div>
+      </div>
+    `,
+    features: ['Dark Mode', 'Neon Accent', 'Micro-interactions', 'Animated']
+  },
+  {
+    id: 6,
+    name: 'Storyteller',
+    description: 'Dikey zaman çizgisi, anlatı odaklı, sıcak renkli portfolyo.',
+    previewHtml: `
+      <div style="background: #FFF7ED; color: #B24536; font-family: Lora, serif; padding: 24px; border-radius: 12px; border: 1px solid #F2994A;">
+        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Storyteller</h1>
+        <p style="font-size: 13px; color: #B24536; margin-bottom: 12px;">A Narrative Journey</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <span style="color: #B24536;">GitHub</span>
+          <span style="color: #B24536;">LinkedIn</span>
+        </div>
+        <div style="background: #fff; border-radius: 8px; padding: 10px;">
+          <h3 style="font-size: 14px; font-weight: 600;">Case Study</h3>
+          <p style="font-size: 12px; color: #7C5E48;">Project as a story.</p>
+        </div>
+      </div>
+    `,
+    features: ['Timeline', 'Serif Headings', 'Case Study', 'Warm Colors']
+  },
 ]
 
 export default function DashboardPage() {
@@ -185,12 +246,15 @@ export default function DashboardPage() {
   const templateIdToName = {
     1: 'modern-developer',
     2: 'creative-portfolio',
-    3: 'professional-tech'
+    3: 'professional-tech',
+    4: 'minimalist-professional',
+    5: 'creative-technologist',
+    6: 'storyteller',
   }
   
   const [selectedRepos, setSelectedRepos] = useState<number[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1)
-  const [cvFile, setCvFile] = useState<File | null>(null)
+  const [cvUrl, setCvUrl] = useState<string | null>(null)
   const [step, setStep] = useState<StepType>('repos')
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({ isOpen: false, templateId: null })
 
@@ -202,11 +266,8 @@ export default function DashboardPage() {
     )
   }
 
-  const handleCvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file && file.type === 'application/pdf') {
-      setCvFile(file)
-    }
+  const handleCvUpload = (url: string) => {
+    setCvUrl(url)
   }
 
   const handleGenerate = async () => {
@@ -222,10 +283,7 @@ export default function DashboardPage() {
         .map(repoId => repos.find(repo => repo.id === repoId)?.name)
         .filter(Boolean) as string[]
       
-      // CV URL'i oluştur (gelecekte file upload implementasyonu için)
-      const cvUrl = cvFile ? URL.createObjectURL(cvFile) : undefined
-      
-      await generatePortfolio(templateName, selectedRepoNames, cvUrl)
+      await generatePortfolio(templateName, selectedRepoNames, cvUrl || undefined)
       
       // Portfolyo başarıyla oluşturulduysa completed adımına geç
       setStep('completed')
@@ -323,9 +381,9 @@ export default function DashboardPage() {
           {/* Step 3: CV Upload */}
           {step === 'cv' && (
             <CVUpload
-              cvFile={cvFile}
+              cvUrl={cvUrl}
               onFileUpload={handleCvUpload}
-              onClearFile={() => setCvFile(null)}
+              onClearFile={() => setCvUrl(null)}
               onNext={handleGenerate}
               onBack={() => setStep('template')}
             />
@@ -355,7 +413,7 @@ export default function DashboardPage() {
                 clearResult()
                 setSelectedRepos([])
                 setSelectedTemplate(1)
-                setCvFile(null)
+                setCvUrl(null)
               }}
             />
           )}

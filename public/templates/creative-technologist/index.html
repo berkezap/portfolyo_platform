@@ -5,15 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{USER_NAME}} - Creative Technologist</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Satoshi:wght@400;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+      body { font-family: 'Satoshi', sans-serif; }
+      .font-display { font-family: 'JetBrains Mono', monospace; }
+    </style>
 </head>
-<body class="antialiased">
-
+<body class="antialiased bg-[#1A1A1A] text-[#E0E0E0] min-h-screen">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Hero Section -->
         <section class="min-h-screen flex flex-col justify-center items-center text-center">
-            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-wider mb-4">
-                <span class="gradient-text">{{USER_NAME}}</span>
+            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold uppercase tracking-wider mb-4 gradient-text animate-gradient">
+                {{USER_NAME}}
             </h1>
             <p class="text-lg md:text-xl text-muted max-w-2xl">{{USER_BIO}}</p>
             <div class="mt-12 flex flex-wrap justify-center gap-4">
@@ -58,8 +62,8 @@
             </a>
         </section>
     </div>
-
     <script>
+        // Scroll-triggered fade-in animation
         const animatedElements = document.querySelectorAll('.scroll-animate');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -68,7 +72,6 @@
                 }
             });
         }, { threshold: 0.1 });
-
         animatedElements.forEach(el => observer.observe(el));
     </script>
 </body>

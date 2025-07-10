@@ -2,7 +2,14 @@ import { z } from 'zod'
 
 // Portfolio Generation Schema
 export const portfolioGenerationSchema = z.object({
-  template: z.enum(['modern-developer', 'creative-portfolio', 'professional-tech']),
+  template: z.enum([
+    'modern-developer',
+    'creative-portfolio',
+    'professional-tech',
+    'minimalist-professional',
+    'creative-technologist',
+    'storyteller',
+  ]),
   selectedRepos: z.array(z.string().min(1, 'Repository name cannot be empty'))
     .min(1, 'At least one repository must be selected')
     .max(10, 'Maximum 10 repositories allowed'),
@@ -14,7 +21,14 @@ export const portfolioGenerationSchema = z.object({
 
 // Portfolio Update Schema
 export const portfolioUpdateSchema = z.object({
-  template: z.enum(['modern-developer', 'creative-portfolio', 'professional-tech']).optional(),
+  template: z.enum([
+    'modern-developer',
+    'creative-portfolio',
+    'professional-tech',
+    'minimalist-professional',
+    'creative-technologist',
+    'storyteller',
+  ]).optional(),
   selectedRepos: z.array(z.string().min(1))
     .min(1, 'At least one repository must be selected')
     .max(10, 'Maximum 10 repositories allowed')
