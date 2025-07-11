@@ -1,5 +1,7 @@
 import { Check, Globe } from 'lucide-react'
 import { PortfolioTemplate } from '@/types/dashboard'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
 
 interface TemplateSelectionProps {
   templates: PortfolioTemplate[]
@@ -19,74 +21,70 @@ export function TemplateSelection({
   onPreview
 }: TemplateSelectionProps) {
   return (
-    <div>
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Şablonunuzu Seçin
-        </h1>
-        <p className="text-gray-600">
-          Portfolyonuz için modern ve profesyonel şablonlardan birini seçin.
-        </p>
+    <div className="max-w-6xl mx-auto">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">Şablonunuzu Seçin</h1>
+        <p className="text-gray-500 text-base">Portfolyonuz için modern ve profesyonel şablonlardan birini seçin.</p>
       </div>
-
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid md:grid-cols-3 gap-8 mb-12">
         {templates.map((template) => (
-          <div
+          <Card
             key={template.id}
-            className={`bg-white rounded-lg border-2 p-6 cursor-pointer transition-all hover:shadow-md ${
-              selectedTemplate === template.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-            onClick={() => onSelectTemplate(template.id)}
+            variant="portfolio"
+            className={`transition-all duration-200 border-none shadow-sm hover:shadow-lg rounded-2xl p-6 bg-white flex flex-col gap-4 ${selectedTemplate === template.id ? 'ring-2 ring-blue-500' : ''}`}
           >
-            <div className="aspect-video bg-white rounded-lg mb-4 border overflow-hidden">
-              <iframe
-                srcDoc={template.previewHtml}
-                className="w-full h-full border-0"
-                title={`${template.name} Preview`}
-              />
-            </div>
-            
-            <h3 className="font-semibold text-gray-900 mb-2">{template.name}</h3>
-            <p className="text-sm text-gray-600 mb-4">{template.description}</p>
-            
-            <div className="space-y-1 mb-4">
-              {template.features.map((feature) => (
-                <div key={feature} className="flex items-center text-sm text-gray-600">
-                  <Check className="h-4 w-4 text-green-500 mr-2" />
-                  {feature}
-                </div>
-              ))}
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onPreview(template.id)
-              }}
-              className="w-full px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            <div 
+              className="cursor-pointer"
+              onClick={() => onSelectTemplate(template.id)}
             >
-              <Globe className="h-4 w-4 mr-1 inline" />
-              Büyük Önizleme
-            </button>
-          </div>
+              <div className="aspect-video bg-gray-50 rounded-xl mb-4 border overflow-hidden flex items-center justify-center">
+                <iframe
+                  srcDoc={template.previewHtml}
+                  className="w-full h-full border-0"
+                  title={`${template.name} Preview`}
+                />
+              </div>
+              <h3 className="font-semibold text-gray-900 text-lg mb-1 truncate">{template.name}</h3>
+              <p className="text-sm text-gray-500 mb-2 line-clamp-2">{template.description}</p>
+              <div className="space-y-1 mb-2">
+                {template.features.map((feature) => (
+                  <div key={feature} className="flex items-center text-xs text-gray-500">
+                    <Check className="h-4 w-4 text-green-500 mr-2" />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 mt-auto">
+              <Button
+                variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
+                size="sm"
+                className="flex-1"
+                onClick={() => onSelectTemplate(template.id)}
+              >
+                {selectedTemplate === template.id ? 'Seçili' : 'Seç'}
+              </Button>
+              {/* Önizleme butonu geçici olarak devre dışı - güvenlik nedeniyle */}
+              <Button
+                variant="secondary"
+                size="sm"
+                className="flex-1 opacity-50 cursor-not-allowed"
+                disabled
+                title="Önizleme özelliği geçici olarak devre dışı"
+              >
+                <Globe className="h-4 w-4 mr-1 inline text-gray-400" /> Önizleme
+              </Button>
+            </div>
+          </Card>
         ))}
       </div>
-
       <div className="flex justify-center gap-4">
-        <button
-          onClick={onBack}
-          className="px-8 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-        >
+        <Button variant="secondary" onClick={onBack} size="lg">
           Geri
-        </button>
-        <button
-          onClick={onNext}
-          className="px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
+        </Button>
+        <Button onClick={onNext} size="lg">
           Devam Et
-        </button>
+        </Button>
       </div>
     </div>
   )

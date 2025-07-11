@@ -1,38 +1,81 @@
-import { Check, Globe, Folder } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { CheckCircle2, ExternalLink, FolderOpen, Share2, Download } from 'lucide-react'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
 
 interface CompletedStepProps {
-  demoMode: boolean
   portfolioResult: any
-  portfolioError: string | null
+  demoMode: boolean
   userName?: string
   onNewPortfolio: () => void
 }
 
-export function CompletedStep({
-  demoMode,
-  portfolioResult,
-  portfolioError,
-  userName,
-  onNewPortfolio
+export function CompletedStep({ 
+  portfolioResult, 
+  demoMode, 
+  userName, 
+  onNewPortfolio 
 }: CompletedStepProps) {
-  const router = useRouter()
+  const handleViewPortfolio = () => {
+    if (portfolioResult?.html) {
+      const blob = new Blob([portfolioResult.html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+    }
+  }
+
+  const handleDownloadHTML = () => {
+    if (portfolioResult?.html) {
+      const blob = new Blob([portfolioResult.html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'portfolio.html'
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+  }
+
+  const handleShare = async () => {
+    const text = 'PortfolYO ile 5 dakikada portfolyo oluşturdum! 🚀'
+    const url = 'https://portfolyo.dev'
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'PortfolYO',
+          text: text,
+          url: url
+        })
+      } catch (error) {
+        // Share canceled veya diğer hatalar için sessizce geç
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.log('Share failed:', error)
+        }
+      }
+    } else {
+      // Fallback: Twitter'da paylaş
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank')
+    }
+  }
+
+  const handleManagePortfolios = () => {
+    window.location.href = '/my-portfolios'
+  }
+
   return (
-    <div className="text-center">
-      <div className="max-w-lg mx-auto">
-        <div className="bg-white rounded-lg p-8 shadow-lg">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="h-10 w-10 text-green-600" />
+    <div className="max-w-2xl mx-auto">
+      <Card variant="portfolio" className="mb-8">
+        <div className="flex flex-col items-center text-center space-y-6">
+          <CheckCircle2 className="w-16 h-16 text-green-600" />
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold text-gray-900">Portfolyo Oluşturuldu!</h2>
+            <p className="text-gray-600 text-lg">
+              Tebrikler! Portfolyo siteniz başarıyla oluşturuldu{demoMode ? '' : ' ve yayında'}.
+            </p>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            🎉 Portfolyonuz Hazır!
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Tebrikler! Portfolyo siteniz başarıyla oluşturuldu{demoMode ? '' : ' ve canlıya alındı'}.
-          </p>
 
           {portfolioResult?.metadata && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <div className="bg-gray-50 rounded-lg p-4 w-full max-w-md">
               <div className="text-sm text-gray-600 space-y-1">
                 <p><strong>Kullanıcı:</strong> {portfolioResult.metadata.user}</p>
                 <p><strong>Proje Sayısı:</strong> {portfolioResult.metadata.repoCount}</p>
@@ -41,106 +84,68 @@ export function CompletedStep({
               </div>
             </div>
           )}
-          
-          {portfolioResult?.html && (
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-600 mb-2">Portfolio siteniz:</p>
-              <p className="font-mono text-blue-600 font-medium break-all">
-                {demoMode 
-                  ? 'Portfolio HTML dosyası oluşturuldu (Önizle butonu ile görüntüleyin)'
-                  : `https://${userName?.toLowerCase().replace(/\s+/g, '')}.portfolyo.dev`
-                }
-              </p>
-            </div>
-          )}
 
-          <div className="space-y-4">
-            {portfolioResult?.html ? (
-              <>
-                <button
-                  onClick={() => {
-                    if (portfolioResult?.html) {
-                      const blob = new Blob([portfolioResult.html], { type: 'text/html' })
-                      const url = URL.createObjectURL(blob)
-                      window.open(url, '_blank')
-                    }
-                  }}
-                  className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Globe className="inline-block mr-2 h-5 w-5" />
-                  {demoMode ? 'Demo Portfolyonu Görüntüle' : 'Portfolyonu Önizle'}
-                </button>
-                
-                <button
-                  onClick={() => {
-                    if (portfolioResult?.html) {
-                      const blob = new Blob([portfolioResult.html], { type: 'text/html' })
-                      const url = URL.createObjectURL(blob)
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = 'portfolio.html'
-                      a.click()
-                      URL.revokeObjectURL(url)
-                    }
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  📥 HTML İndir
-                </button>
-              </>
-            ) : demoMode ? (
-              <div className="text-center py-4">
-                <p className="text-gray-600 mb-4">Demo portfolio oluşturuluyor...</p>
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              </div>
-                         ) : (
-               <div className="text-center py-4">
-                 <p className="text-gray-600">Portfolio oluşturulamadı</p>
-               </div>
-             )}
-            
-            {/* Portfolyolarım Butonu */}
-            <button
-              onClick={() => router.push('/my-portfolios')}
-              className="w-full px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+            <Button 
+              variant="primary" 
+              size="lg" 
+              onClick={handleViewPortfolio}
+              className="flex-1"
             >
-              <Folder className="inline-block mr-2 h-5 w-5" />
-              Portfolyolarımı Yönet
-            </button>
+              <ExternalLink className="w-5 h-5 mr-2" />
+              {demoMode ? 'Demo Portfolyonu Görüntüle' : 'Portfolyomu Görüntüle'}
+            </Button>
             
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => window.open('https://twitter.com/intent/tweet?text=PortfolYO ile 5 dakikada portfolyo oluşturdum! 🚀', '_blank')}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                📢 Paylaş
-              </button>
-              <button
-                onClick={onNewPortfolio}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                🔄 Yeni Portfolyo
-              </button>
-            </div>
+            <Button 
+              variant="secondary" 
+              onClick={handleDownloadHTML}
+              className="flex-1"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              HTML İndir
+            </Button>
           </div>
-
-          {demoMode && (
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Demo Modu:</strong> Bu portfolyo gerçek değildir. Gerçek portfolyo oluşturmak için GitHub OAuth&apos;u kurmanız gerekir.
-              </p>
-            </div>
-          )}
-
-          {portfolioError && !demoMode && (
-            <div className="mt-4 p-4 bg-red-50 rounded-lg">
-              <p className="text-sm text-red-800">
-                <strong>Hata:</strong> {portfolioError}
-              </p>
-            </div>
-          )}
         </div>
+      </Card>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        <Button 
+          variant="primary" 
+          onClick={handleManagePortfolios}
+          className="w-full"
+        >
+          <FolderOpen className="w-5 h-5 mr-2" />
+          Portfolyolarımı Yönet
+        </Button>
+        
+        <Button 
+          variant="secondary" 
+          onClick={handleShare}
+          className="w-full"
+        >
+          <Share2 className="w-5 h-5 mr-2" />
+          Paylaş
+        </Button>
       </div>
+
+      <div className="flex justify-center">
+        <Button 
+          variant="secondary" 
+          onClick={onNewPortfolio}
+        >
+          Yeni Portfolyo Oluştur
+        </Button>
+      </div>
+
+      {demoMode && (
+        <Card className="mt-8">
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Demo Modu:</strong> Bu portfolyo gerçek değildir. Gerçek portfolyo oluşturmak için GitHub OAuth'u kurmanız gerekir.
+            </p>
+          </div>
+        </Card>
+      )}
     </div>
   )
 } 

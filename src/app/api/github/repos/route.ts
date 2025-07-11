@@ -5,38 +5,20 @@ import { GitHubService } from '@/lib/github'
 import * as Sentry from '@sentry/nextjs'
 
 export async function GET() {
-  console.log('🔗 GitHub Repos API endpoint hit')
-  
   let session: any = null
   
   try {
     session = await getServerSession(authOptions)
-    console.log('📋 Session check:', {
-      hasSession: !!session,
-      hasUser: !!session?.user,
-      userEmail: session?.user?.email,
-      hasAccessToken: !!session?.user?.accessToken
-    })
     
     if (!session || !session.user?.accessToken) {
-      console.log('❌ No session or access token')
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in again' }, 
         { status: 401 }
       )
     }
 
-    console.log('🔑 Creating GitHub service with access token')
     const githubService = new GitHubService(session.user.accessToken)
-    
-    console.log('📡 Fetching repos from GitHub API...')
     const repos = await githubService.getUserRepos()
-    
-    console.log('✅ GitHub API response:', {
-      repoCount: repos.length,
-      firstRepo: repos[0]?.name || 'none',
-      sampleRepos: repos.slice(0, 3).map(r => ({ name: r.name, language: r.language }))
-    })
     
     return NextResponse.json({ 
       repos,
@@ -45,8 +27,6 @@ export async function GET() {
     })
     
   } catch (error) {
-    console.error('💥 GitHub API Error:', error)
-    
     // Capture error in Sentry with context
     Sentry.captureException(error, {
       tags: {
@@ -62,12 +42,6 @@ export async function GET() {
     
     // Handle specific GitHub API errors
     if (error instanceof Error) {
-      console.error('Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack?.split('\n').slice(0, 3)
-      })
-      
       if (error.message.includes('401')) {
         return NextResponse.json(
           { error: 'GitHub token expired - Please sign out and sign in again' },

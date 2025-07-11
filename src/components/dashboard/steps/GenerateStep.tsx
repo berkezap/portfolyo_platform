@@ -1,78 +1,40 @@
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
+
 interface GenerateStepProps {
-  selectedReposCount: number
-  demoMode: boolean
-  portfolioLoading: boolean
-  portfolioResult: unknown
-  portfolioError: string | null
+  loading: boolean
+  error: string | null
+  onGenerate: () => void
   onBack: () => void
 }
 
-export function GenerateStep({
-  selectedReposCount,
-  demoMode,
-  portfolioLoading,
-  portfolioResult,
-  portfolioError,
-  onBack
-}: GenerateStepProps) {
+export function GenerateStep({ loading, error, onGenerate, onBack }: GenerateStepProps) {
   return (
-    <div className="text-center">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-lg p-8 shadow-lg">
-          {portfolioError && !demoMode ? (
-            // Error state
-            <>
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Portfolyo Oluşturulamadı
-              </h2>
-              <p className="text-red-600 mb-6">
-                {portfolioError}
-              </p>
-              <button
-                onClick={onBack}
-                className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Geri Dön
-              </button>
-            </>
+    <div className="max-w-xl mx-auto">
+      <Card variant="portfolio" className="mb-8">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <h2 className="text-2xl font-bold text-gray-900">Portfolyo Oluştur</h2>
+          <p className="text-gray-600 text-base mb-2">Seçtiğiniz projeler ve şablon ile portfolyonuzu oluşturun.</p>
+          {loading ? (
+            <div className="flex flex-col items-center space-y-2 mt-4">
+              <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+              <span className="text-blue-700 font-medium">Portfolyo oluşturuluyor...</span>
+            </div>
+          ) : error ? (
+            <div className="flex items-center space-x-2 bg-red-50 border border-red-200 rounded-lg px-4 py-2 mt-2">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="text-red-700 text-sm font-medium">{error}</span>
+            </div>
           ) : (
-            // Loading state
-            <>
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-6"></div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Portfolyonuz Oluşturuluyor...
-              </h2>
-              <p className="text-gray-600 mb-6">
-                {demoMode 
-                  ? `Seçtiğiniz ${selectedReposCount} proje ve şablon kullanılarak portfolyo sitesi hazırlanıyor.`
-                  : `Seçtiğiniz ${selectedReposCount} proje ve şablon kullanılarak gerçek portfolyo sitesi hazırlanıyor.`
-                }
-              </p>
-              <div className="space-y-2 text-sm text-gray-500">
-                {demoMode ? (
-                  <>
-                    <p>✅ GitHub verileriniz çekiliyor...</p>
-                    <p>✅ Şablon uygulanıyor...</p>
-                    <p>⏳ Statik site oluşturuluyor...</p>
-                    <p>⏳ Canlıya alınıyor...</p>
-                  </>
-                ) : (
-                  <>
-                    <p>✅ GitHub verileriniz çekiliyor...</p>
-                    <p>{portfolioLoading ? '⏳' : '✅'} Şablon uygulanıyor...</p>
-                    <p>{portfolioResult ? '✅' : '⏳'} HTML oluşturuluyor...</p>
-                    <p>⏳ İşlem tamamlanıyor...</p>
-                  </>
-                )}
-              </div>
-            </>
+            <Button variant="primary" size="lg" onClick={onGenerate}>
+              Portfolyo Oluştur
+            </Button>
           )}
         </div>
+      </Card>
+      <div className="flex justify-between mt-6">
+        <Button variant="secondary" onClick={onBack}>Geri</Button>
       </div>
     </div>
   )

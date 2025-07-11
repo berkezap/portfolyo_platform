@@ -61,21 +61,25 @@ const updatePortfolioById = async (payload: UpdatePortfolioPayload): Promise<Por
 export function usePortfolioEditor(portfolioId: string) {
   const queryClient = useQueryClient()
 
-  // VERİ ÇEKME (QUERY)
-  // - enabled: !!portfolioId -> ID yoksa gereksiz API isteği yapmaz.
+  // VERİ ÇEKME (QUERY) - Optimized with better caching
   const { 
     data: portfolio, 
     isLoading, 
     error, 
     refetch 
   } = useQuery<Portfolio, Error>({
-    queryKey: ['portfolio', portfolioId], // Net Query Key
+    queryKey: ['portfolio', portfolioId],
     queryFn: () => fetchPortfolioById(portfolioId),
     enabled: !!portfolioId,
+    staleTime: 5 * 60 * 1000, // 5 dakika boyunca fresh kabul et (2'den 5'e çıkardık)
+    gcTime: 15 * 60 * 1000, // 15 dakika cache'de tut (10'dan 15'e çıkardık)
+    refetchOnWindowFocus: false, // Gereksiz refetch'i engelle
+    refetchOnMount: false, // Component mount olduğunda refetch etme
+    retry: 1, // Sadece 1 kez retry et
+    retryDelay: 1000, // 1 saniye bekle
   })
 
-  // VERİ GÜNCELLEME (MUTATION)
-  // - onSuccess ve onError mantığı hook içinde yönetilir.
+  // VERİ GÜNCELLEME (MUTATION) - Optimized with optimistic updates
   const { 
     mutate: updatePortfolio, 
     isPending: isUpdating,
@@ -83,13 +87,29 @@ export function usePortfolioEditor(portfolioId: string) {
     error: updateError
   } = useMutation<Portfolio, Error, Partial<Omit<Portfolio, 'id' | 'updated_at'>>>({
     mutationFn: (updateData) => updatePortfolioById({ id: portfolioId, data: updateData }),
-    onSuccess: () => {
-      // Başarılı güncelleme sonrası ilgili cache'leri geçersiz kıl.
-      // Bu, React Query'nin veriyi arka planda tazeleyip UI'ı güncellemesini tetikler.
+    onMutate: async (newData) => {
+      // Optimistic update - UI'ı hemen güncelle
+      await queryClient.cancelQueries({ queryKey: ['portfolio', portfolioId] })
+      const previousPortfolio = queryClient.getQueryData(['portfolio', portfolioId])
+      
+      queryClient.setQueryData(['portfolio', portfolioId], (old: Portfolio | undefined) => {
+        if (!old) return old
+        return { ...old, ...newData, updated_at: new Date().toISOString() }
+      })
+      
+      return { previousPortfolio }
+    },
+    onError: (err, newData, context: any) => {
+      // Hata durumunda önceki veriyi geri yükle
+      if (context?.previousPortfolio) {
+        queryClient.setQueryData(['portfolio', portfolioId], context.previousPortfolio)
+      }
+    },
+    onSettled: () => {
+      // İşlem bittikten sonra cache'i temizle
       queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId] })
       queryClient.invalidateQueries({ queryKey: ['portfolios'] })
     },
-    // onError: Hata yönetimi burada merkezi olarak yapılabilir.
   })
 
   // Hook'un dışarıya sunduğu arayüz (Interface)

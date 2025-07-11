@@ -20,43 +20,12 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (config: any, { isServer }: { isServer: boolean }) => {
-    // Bundle analyzer
-    if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          openAnalyzer: false,
-        })
-      );
-    }
-
-    // SVG loader
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    });
-
-    // Suppress OpenTelemetry and Sentry logs
-    config.infrastructureLogging = {
-      level: 'error',
-    };
-
-    // Suppress webpack warnings
-    config.stats = {
-      warnings: false,
-      errors: true,
-    };
-
-    // Suppress specific module warnings
-    config.ignoreWarnings = [
-      /Critical dependency: the request of a dependency is an expression/,
-      /Module not found: Can't resolve/,
-    ];
-
-    return config;
-  },
+  // Performance optimizations
+  swcMinify: true,
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  
   // Security headers
   async headers() {
     return [
@@ -83,23 +52,6 @@ const nextConfig = {
       },
     ];
   },
-  // CSP configuration
-  async rewrites() {
-    return [
-      {
-        source: '/api/auth/:path*',
-        destination: '/api/auth/:path*',
-      },
-    ];
-  },
-  // Disable Sentry in development
-  ...(process.env.NODE_ENV === 'development' && {
-    sentry: {
-      hideSourceMaps: true,
-      disableServerWebpackPlugin: true,
-      disableClientWebpackPlugin: true,
-    },
-  }),
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

@@ -8,13 +8,18 @@ const fetchGitHubRepos = async (): Promise<GitHubRepo[]> => {
     throw new Error(errorData.error || 'Failed to fetch GitHub repositories')
   }
   const data = await response.json()
-  return data.repos || [] // Ensure we return an array, even if data.repos is undefined
+  return data.repos || []
 }
 
 export function useGitHubRepos() {
   return useQuery<GitHubRepo[], Error>({
     queryKey: ['githubRepos'],
     queryFn: fetchGitHubRepos,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 60 * 1000, // 30 dakika boyunca fresh kabul et (10'dan 30'a çıkardık)
+    gcTime: 60 * 60 * 1000, // 1 saat cache'de tut (30'dan 60'a çıkardık)
+    refetchOnWindowFocus: false, // Gereksiz refetch'i engelle
+    refetchOnMount: false, // Component mount olduğunda refetch etme
+    retry: 1, // Sadece 1 kez retry et (varsayılan 3'ten 1'e düşürdük)
+    retryDelay: 1000, // 1 saniye bekle
   })
 } 

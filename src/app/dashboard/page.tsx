@@ -13,6 +13,9 @@ import { GenerateStep } from '@/components/dashboard/steps/GenerateStep'
 import { CompletedStep } from '@/components/dashboard/steps/CompletedStep'
 import { StepType, PortfolioTemplate } from '@/types/dashboard'
 import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary'
+import Button from '@/components/ui/Button'
+import Card from '@/components/ui/Card'
+import { Github, Zap, FolderOpen, FileText, CheckCircle2 } from 'lucide-react'
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -254,8 +257,12 @@ export default function DashboardPage() {
   const [selectedRepos, setSelectedRepos] = useState<number[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1)
   const [cvUrl, setCvUrl] = useState<string | null>(null)
+  const [cvUploading, setCvUploading] = useState(false)
+  const [cvError, setCvError] = useState<string | null>(null)
   const [step, setStep] = useState<StepType>('repos')
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({ isOpen: false, templateId: null })
+  const [previewHtml, setPreviewHtml] = useState<string>('')
+  const [previewLoading, setPreviewLoading] = useState(false)
 
   const toggleRepo = (repoId: number) => {
     setSelectedRepos(prev => 
@@ -265,8 +272,50 @@ export default function DashboardPage() {
     )
   }
 
-  const handleCvUpload = (url: string) => {
-    setCvUrl(url)
+  const handleCvUpload = async (file: File) => {
+    setCvUploading(true)
+    setCvError(null)
+    
+    try {
+      const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+      const ALLOWED_TYPES = ['application/pdf']
+      
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        throw new Error('Sadece PDF formatındaki dosyalar kabul edilmektedir.')
+      }
+      
+      if (file.size > MAX_FILE_SIZE) {
+        throw new Error(`Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.`)
+      }
+
+      // 1) Get signed URL
+      const res = await fetch('/api/upload/cv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName: file.name, fileType: file.type })
+      })
+      
+      if (!res.ok) throw new Error('Signed URL alınamadı')
+      const { uploadUrl, publicUrl } = await res.json()
+
+      // 2) Upload file
+      const putRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        }
+      })
+      
+      if (!putRes.ok) throw new Error('Dosya yüklenemedi')
+
+      setCvUrl(publicUrl)
+    } catch (err: unknown) {
+      setCvError(err instanceof Error ? err.message : 'Dosya yüklenirken hata')
+    } finally {
+      setCvUploading(false)
+    }
   }
 
   const handleGenerate = async () => {
@@ -293,6 +342,34 @@ export default function DashboardPage() {
     }
   }
 
+  const handleGoToDashboard = () => {
+    setStep('repos')
+    clearResult()
+    setSelectedRepos([])
+    setSelectedTemplate(1)
+    setCvUrl(null)
+    setCvError(null)
+  }
+
+  const handlePreview = async (templateId: number) => {
+    setPreviewModal({ isOpen: true, templateId })
+    setPreviewLoading(true)
+    
+    try {
+      const response = await fetch(`/api/templates/preview/${templateId}`)
+      if (response.ok) {
+        const html = await response.text()
+        setPreviewHtml(html)
+      } else {
+        setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>')
+      }
+    } catch (error) {
+      setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenirken hata oluştu</div>')
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
+
   return (
     <ErrorBoundary fallback={DashboardErrorFallback}>
       <div className="min-h-screen bg-gray-50">
@@ -300,8 +377,6 @@ export default function DashboardPage() {
 
         <div className="container mx-auto px-4 py-8">
           <ProgressSteps currentStep={step} />
-
-
 
           {/* Step 1: Repository Selection */}
           {step === 'repos' && (
@@ -326,7 +401,7 @@ export default function DashboardPage() {
               onSelectTemplate={setSelectedTemplate}
               onNext={() => setStep('cv')}
               onBack={() => setStep('repos')}
-              onPreview={(templateId) => setPreviewModal({ isOpen: true, templateId })}
+              onPreview={handlePreview}
             />
           )}
 
@@ -339,21 +414,27 @@ export default function DashboardPage() {
                     {portfolioTemplates.find(t => t.id === previewModal.templateId)?.name} - Önizleme
                   </h3>
                   <button
-                    onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
+                    onClick={() => {
+                      setPreviewModal({ isOpen: false, templateId: null })
+                      setPreviewHtml('')
+                    }}
                     className="text-gray-500 hover:text-gray-700"
                   >
                     ✕
                   </button>
                 </div>
                 
-                <div className="flex-1 p-4">
-                  <div className="w-full h-full border border-gray-300 rounded-lg overflow-hidden">
-                    <iframe
-                      src={`/templates/${templateIdToName[previewModal.templateId! as keyof typeof templateIdToName]}/index.html`}
-                      className="w-full h-full"
-                      title="Template Preview"
+                <div className="flex-1 p-4 overflow-auto">
+                  {previewLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : (
+                    <div 
+                      className="w-full h-full border border-gray-300 rounded-lg overflow-auto bg-white"
+                      dangerouslySetInnerHTML={{ __html: previewHtml }}
                     />
-                  </div>
+                  )}
                 </div>
                 
                 <div className="p-4 border-t flex justify-end space-x-3">
@@ -361,13 +442,17 @@ export default function DashboardPage() {
                     onClick={() => {
                       setSelectedTemplate(previewModal.templateId!)
                       setPreviewModal({ isOpen: false, templateId: null })
+                      setPreviewHtml('')
                     }}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Şablonu Seç
                   </button>
                   <button
-                    onClick={() => setPreviewModal({ isOpen: false, templateId: null })}
+                    onClick={() => {
+                      setPreviewModal({ isOpen: false, templateId: null })
+                      setPreviewHtml('')
+                    }}
                     className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Kapat
@@ -380,9 +465,10 @@ export default function DashboardPage() {
           {/* Step 3: CV Upload */}
           {step === 'cv' && (
             <CVUpload
-              cvUrl={cvUrl}
-              onFileUpload={handleCvUpload}
-              onClearFile={() => setCvUrl(null)}
+              cvUrl={cvUrl || undefined}
+              uploading={cvUploading}
+              error={cvError}
+              onUpload={handleCvUpload}
               onNext={handleGenerate}
               onBack={() => setStep('template')}
             />
@@ -391,11 +477,9 @@ export default function DashboardPage() {
           {/* Step 4: Generate */}
           {step === 'generate' && (
             <GenerateStep
-              selectedReposCount={selectedRepos.length}
-              demoMode={demoMode}
-              portfolioLoading={portfolioLoading}
-              portfolioResult={portfolioResult}
-              portfolioError={portfolioError}
+              loading={portfolioLoading}
+              error={portfolioError}
+              onGenerate={handleGenerate}
               onBack={() => setStep('cv')}
             />
           )}
@@ -403,9 +487,8 @@ export default function DashboardPage() {
           {/* Step 5: Completed */}
           {step === 'completed' && (
             <CompletedStep
-              demoMode={demoMode}
               portfolioResult={portfolioResult}
-              portfolioError={portfolioError}
+              demoMode={demoMode}
               userName={session?.user?.name || undefined}
               onNewPortfolio={() => {
                 setStep('repos')
@@ -413,6 +496,7 @@ export default function DashboardPage() {
                 setSelectedRepos([])
                 setSelectedTemplate(1)
                 setCvUrl(null)
+                setCvError(null)
               }}
             />
           )}

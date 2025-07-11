@@ -99,11 +99,14 @@ export async function PATCH(
       cv_url: cvUrl,
     };
     
-    let newGeneratedHtml: string | undefined = undefined;
-
-    if (template || selectedRepos) {
+    // Template render işlemini optimize et - sadece gerekli olduğunda yap
+    const needsTemplateRender = template || selectedRepos || cvUrl !== undefined || userBio !== undefined;
+    
+    if (needsTemplateRender) {
       try {
         const githubService = new GitHubService(session.user.accessToken)
+        
+        // Paralel veri çekme - daha hızlı
         const [userData, allRepos] = await Promise.all([
           githubService.getUserData(),
           githubService.getUserRepos()
@@ -127,7 +130,7 @@ export async function PATCH(
         if (finalUserBio) templateData.USER_BIO = finalUserBio;
         
         console.log('🎨 Template render ediliyor...');
-        newGeneratedHtml = renderTemplate(finalTemplateName, templateData);
+        const newGeneratedHtml = renderTemplate(finalTemplateName, templateData);
         
         if (!newGeneratedHtml) {
           throw new Error('Generated HTML is empty');

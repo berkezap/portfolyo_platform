@@ -7,7 +7,6 @@ export class GitHubService {
   private octokit: Octokit
 
   constructor(accessToken: string) {
-    console.log('🔑 GitHub Service initialized with token:', accessToken?.slice(0, 8) + '...')
     this.octokit = new Octokit({
       auth: accessToken
     })
@@ -15,22 +14,11 @@ export class GitHubService {
 
   async getUserRepos(): Promise<GitHubRepo[]> {
     try {
-      console.log('📡 Calling GitHub API to fetch user repositories...')
-      
+      // Sadece son 30 repo'yu çek - performans için
       const { data } = await this.octokit.repos.listForAuthenticatedUser({
         visibility: 'public',
         sort: 'updated',
-        per_page: 100
-      })
-
-      console.log('✅ GitHub API raw response:', {
-        totalRepos: data.length,
-        firstRepoName: data[0]?.name || 'none',
-        sampleRepos: data.slice(0, 3).map((repo: OctokitRepo) => ({
-          name: repo.name,
-          visibility: (repo as any).private ? 'private' : 'public',
-          language: repo.language
-        }))
+        per_page: 30 // 100'den 30'a düşürdük
       })
 
       const formattedRepos = data.map((repo: OctokitRepo) => ({
@@ -47,32 +35,12 @@ export class GitHubService {
         homepage: repo.homepage ?? null
       }))
 
-      console.log('🔄 Formatted repos:', {
-        count: formattedRepos.length,
-        sample: formattedRepos.slice(0, 2)
-      })
-
       return formattedRepos
       
     } catch (error) {
-      console.error('💥 Error fetching repositories from GitHub:', error)
-      
-      if (error instanceof Error) {
-        console.error('Error details:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack?.split('\n').slice(0, 3)
-        })
-      }
-      
       // Check if it's an Octokit error
       if (error && typeof error === 'object' && 'status' in error) {
         const octokitError = error as any
-        console.error('Octokit error details:', {
-          status: octokitError.status,
-          message: octokitError.message,
-          response: octokitError.response?.data
-        })
         
         switch (octokitError.status) {
           case 401:
@@ -92,15 +60,7 @@ export class GitHubService {
 
   async getUserData() {
     try {
-      console.log('👤 Fetching GitHub user data...')
-      
       const { data } = await this.octokit.users.getAuthenticated()
-      
-      console.log('✅ GitHub user data fetched:', {
-        login: data.login,
-        name: data.name,
-        publicRepos: data.public_repos
-      })
       
       return {
         login: data.login,
@@ -116,8 +76,6 @@ export class GitHubService {
         following: data.following
       }
     } catch (error) {
-      console.error('💥 Error fetching user data from GitHub:', error)
-      
       if (error && typeof error === 'object' && 'status' in error) {
         const octokitError = error as any
         switch (octokitError.status) {
