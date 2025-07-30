@@ -1,7 +1,16 @@
 import * as Sentry from '@sentry/nextjs';
 
-// Client-side Sentry initialization - sadece gerekli environment variable varsa
-if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+// Client-side Sentry initialization - consent kontrolü ile
+const hasThirdPartyConsent = (() => {
+  try {
+    const consent = localStorage.getItem('cookie-consent')
+    return consent ? JSON.parse(consent).thirdParty : false
+  } catch {
+    return false
+  }
+})()
+
+if (process.env.NEXT_PUBLIC_SENTRY_DSN && hasThirdPartyConsent) {
   try {
     Sentry.init({
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,

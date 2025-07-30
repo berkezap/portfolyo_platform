@@ -1,5 +1,6 @@
 import React from 'react'
 import AppHeader from './AppHeader'
+import Footer from './Footer'
 
 interface PageLayoutProps {
   children: React.ReactNode
@@ -34,6 +35,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       <main className="flex-1">
         {children}
       </main>
+      <Footer />
     </div>
   )
 }

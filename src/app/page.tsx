@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Suspense, lazy, useEffect, useState } from 'react'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
+import Footer from '@/components/ui/Footer'
 import { Github, Zap, Globe, Code2, Sparkles, Plus, Star, CheckCircle } from 'lucide-react'
 import { usePortfolioList } from '@/hooks/usePortfolioList'
 
@@ -291,6 +292,7 @@ export default function HomePage() {
           )}
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

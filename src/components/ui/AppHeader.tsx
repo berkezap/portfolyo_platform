@@ -44,7 +44,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({
       case 'dashboard':
         return [
           { href: '/dashboard', label: 'Yeni Portfolyo', shortLabel: 'Yeni' },
-          { href: '/my-portfolios', label: 'Portfolyolarım', shortLabel: 'Portfolyolarım' }
+          { href: '/my-portfolios', label: 'Portfolyolarım', shortLabel: 'Portfolyolarım' },
+          { href: '/gdpr-settings', label: 'GDPR Ayarları', shortLabel: 'GDPR' }
         ]
       case 'portfolio':
         return [

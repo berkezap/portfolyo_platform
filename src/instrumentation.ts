@@ -7,6 +7,22 @@ export function register() {
     return;
   }
 
+  // Third party consent kontrolü (server-side'da varsayılan olarak kapalı)
+  const hasThirdPartyConsent = process.env.NODE_ENV === 'development' || 
+    (typeof window !== 'undefined' && (() => {
+      try {
+        const consent = localStorage.getItem('cookie-consent')
+        return consent ? JSON.parse(consent).thirdParty : false
+      } catch {
+        return false
+      }
+    })())
+
+  if (!hasThirdPartyConsent) {
+    console.log('⚠️ Third party consent yok, Sentry devre dışı');
+    return;
+  }
+
   try {
     Sentry.init({
       dsn: process.env.SENTRY_DSN,

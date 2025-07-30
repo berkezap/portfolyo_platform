@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { Star, MessageCircle, X, Send, Smile, Meh, Frown } from 'lucide-react'
 import Button from './Button'
@@ -17,6 +19,17 @@ interface FeedbackData {
 
 const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = '' }) => {
   const [isOpen, setIsOpen] = useState(false)
+  
+  // Feedback consent kontrolü
+  const hasFeedbackConsent = () => {
+    if (typeof window === 'undefined') return false
+    const consent = localStorage.getItem('cookie-consent')
+    if (consent) {
+      const consentData = JSON.parse(consent)
+      return consentData.feedback
+    }
+    return false
+  }
   const [step, setStep] = useState<'initial' | 'rating' | 'feedback' | 'thanks'>('initial')
   const [feedbackData, setFeedbackData] = useState<FeedbackData>({
     rating: 0,
@@ -64,6 +77,11 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
     return <Frown className="w-6 h-6 text-red-500" />
   }
 
+  // Feedback consent yoksa widget'ı gösterme
+  if (!hasFeedbackConsent()) {
+    return null
+  }
+
   if (!isOpen) {
     return (
       <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
@@ -73,6 +91,7 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
           icon={MessageCircle}
           onClick={() => setIsOpen(true)}
           className="shadow-xl hover-lift"
+          data-feedback-widget="true"
         >
           Geri Bildirim
         </Button>

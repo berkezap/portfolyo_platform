@@ -16,6 +16,7 @@
     "performance:lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",
     "performance:budget": "npx webpack-bundle-analyzer .next/static/chunks/*.js",
     "performance:optimize": "npm run build && npm run performance:lighthouse",
+    "setup:gdpr": "node scripts/setup-gdpr-db.js",
     "postinstall": "npm run security:audit"
   },
   "dependencies": {

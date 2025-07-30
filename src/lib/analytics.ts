@@ -89,6 +89,20 @@ class Analytics {
   }
 
   track(event: string, properties: Record<string, any> = {}) {
+    // Consent kontrolü
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem('cookie-consent')
+      if (consent) {
+        const consentData = JSON.parse(consent)
+        if (!consentData.analytics) {
+          // Analytics consent yoksa sadece kritik olayları takip et
+          if (!this.isCriticalEvent(event)) {
+            return
+          }
+        }
+      }
+    }
+    
     if (!this.config.enabled || Math.random() > this.config.sampleRate) return
 
     const userEvent: UserEvent = {

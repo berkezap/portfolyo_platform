@@ -4,6 +4,8 @@ import './globals.css'
 import { AuthProvider } from '@/components/auth-provider'
 import { QueryProvider } from '@/components/query-provider'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import CookieConsentWrapper from '@/components/CookieConsentWrapper'
+import FeedbackWidget from '@/components/ui/FeedbackWidget'
 
 // Font optimizasyonu - display swap ve preload
 const inter = Inter({ 
@@ -101,6 +103,8 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               {children}
+              <CookieConsentWrapper />
+              <FeedbackWidget />
             </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>
