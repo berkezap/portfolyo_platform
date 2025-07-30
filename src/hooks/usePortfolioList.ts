@@ -27,12 +27,13 @@ const deletePortfolio = async (id: string): Promise<void> => {
   }
 }
 
-export function usePortfolioList() {
+export function usePortfolioList(enabled: boolean = true) {
   const queryClient = useQueryClient()
 
   const { data: portfolios, isLoading, error } = useQuery<Portfolio[], Error>({
     queryKey: ['portfolios'],
     queryFn: fetchPortfolios,
+    enabled: enabled, // Sadece enabled true ise çalışsın
   })
 
   const deleteMutation = useMutation<void, Error, string>({

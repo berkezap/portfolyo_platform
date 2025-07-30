@@ -7,14 +7,23 @@ export async function GET() {
   console.log('📋 Portfolio List API çağrıldı!')
   
   try {
-    // 🔐 Session kontrolü
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
-      console.log('❌ Session yok, unauthorized')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Demo mode kontrolü
+    const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+    
+    let userId: string
+    
+    if (demoMode) {
+      // Demo mode - test user kullan
+      userId = 'test@example.com'
+    } else {
+      // Gerçek mode - session kontrolü
+      const session = await getServerSession(authOptions)
+      if (!session?.user?.email) {
+        console.log('❌ Session yok, unauthorized')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      userId = session.user.email
     }
-
-    const userId = session.user.email
     console.log('👤 User ID:', userId)
 
     // 📊 Kullanıcının portfolyolarını getir

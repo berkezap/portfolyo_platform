@@ -8,6 +8,48 @@ export async function GET() {
   let session: any = null // TODO: Proper type from next-auth
   
   try {
+    // Demo mode kontrolü
+    const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+    
+    if (demoMode) {
+      // Demo mode - mock repos döndür
+      const mockRepos = [
+        {
+          id: 1,
+          name: 'e-commerce-app',
+          description: 'Modern React e-commerce application',
+          html_url: 'https://github.com/testuser/e-commerce-app',
+          language: 'TypeScript',
+          stargazers_count: 42,
+          forks_count: 12,
+          created_at: '2024-01-15T10:30:00Z',
+          updated_at: '2024-12-20T15:45:00Z',
+          topics: ['react', 'nextjs', 'ecommerce'],
+          homepage: 'https://my-shop.vercel.app'
+        },
+        {
+          id: 2,
+          name: 'task-manager-api',
+          description: 'RESTful API for task management',
+          html_url: 'https://github.com/testuser/task-manager-api',
+          language: 'JavaScript',
+          stargazers_count: 18,
+          forks_count: 5,
+          created_at: '2024-02-10T08:20:00Z',
+          updated_at: '2024-11-30T12:15:00Z',
+          topics: ['nodejs', 'express', 'mongodb'],
+          homepage: null
+        }
+      ]
+      
+      return NextResponse.json({ 
+        repos: mockRepos,
+        success: true,
+        count: mockRepos.length 
+      })
+    }
+    
+    // Gerçek mode - session kontrolü
     session = await getServerSession(authOptions)
     
     if (!session || !session.user?.accessToken) {

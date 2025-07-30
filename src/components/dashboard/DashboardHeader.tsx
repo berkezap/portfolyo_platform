@@ -13,7 +13,8 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
-  const { portfolios, isLoading } = usePortfolioList()
+  const shouldFetchPortfolios = Boolean(session)
+  const { portfolios, isLoading } = usePortfolioList(shouldFetchPortfolios)
 
   // Portfolyo sayısına göre link metnini belirle
   const getPortfolioLinkText = () => {

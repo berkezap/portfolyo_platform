@@ -5,11 +5,21 @@ export async function GET() {
   console.log('🗄️ Supabase test başlıyor...')
   
   try {
-    // Önce basit bir bağlantı testi yap
-    const { data, error } = await supabaseAdmin
+    // Optimized bağlantı testi (daha hızlı timeout)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Database timeout')), 2000) // 2 saniye timeout (optimized)
+    })
+    
+    const dbPromise = supabaseAdmin
       .from('portfolios')
       .select('id')
       .limit(1)
+      .maybeSingle() // Daha hızlı query
+    
+    const { data, error } = await Promise.race([
+      dbPromise,
+      timeoutPromise
+    ])
 
     if (error) {
       console.log('❌ Supabase bağlantı hatası:', error)

@@ -117,12 +117,24 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
-      // GitHub servisini kullanarak kullanıcı verilerini al
+      // GitHub servisini kullanarak kullanıcı verilerini al (timeout ile)
       const githubService = new GitHubService(session.user.accessToken)
-      const [userDataResult, reposResult] = await Promise.all([
+      
+      // Timeout ile GitHub API çağrıları (optimized)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('GitHub API timeout')), 8000) // 8 saniye timeout (optimized)
+      })
+      
+      const githubPromise = Promise.all([
         githubService.getUserData(),
         githubService.getUserRepos()
       ])
+      
+      const [userDataResult, reposResult] = await Promise.race([
+        githubPromise,
+        timeoutPromise
+      ])
+      
       userData = userDataResult
       repos = reposResult
     }

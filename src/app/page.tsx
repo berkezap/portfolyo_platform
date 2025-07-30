@@ -13,7 +13,9 @@ export default function HomePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-  const { portfolios, isLoading: portfoliosLoading } = usePortfolioList()
+  // Sadece session varsa portfolio listesini çek
+  const shouldFetchPortfolios = Boolean(session && status === 'authenticated')
+  const { portfolios, isLoading: portfoliosLoading } = usePortfolioList(shouldFetchPortfolios)
 
   // Session kontrolü kaldırıldı - güvenli alanda logo artık /my-portfolios'a gidiyor
   // useEffect(() => {

@@ -25,6 +25,7 @@ export default function MyPortfoliosPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   
+  const shouldFetchPortfolios = Boolean(session && status === 'authenticated')
   const {
     portfolios,
     isLoading,
@@ -32,7 +33,7 @@ export default function MyPortfoliosPage() {
     deletePortfolio,
     isDeleting,
     refetch
-  } = usePortfolioList()
+  } = usePortfolioList(shouldFetchPortfolios)
 
   // Eğer kullanıcının hiç portfolyosu yoksa ve veriler yüklendiyse dashboard'a yönlendir
   useEffect(() => {

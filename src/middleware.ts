@@ -1,6 +1,6 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
-import { checkRateLimit } from '@/lib/rateLimit'
+import { rateLimitMiddleware } from '@/lib/rateLimit'
 
 export default withAuth(
   async function middleware(req) {
@@ -9,35 +9,11 @@ export default withAuth(
     // API rotaları için rate limiting uygula (sadece Redis varsa)
     if (pathname.startsWith('/api/') && process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
       try {
-        const rateLimitResult = await checkRateLimit(req)
+        const rateLimitResponse = await rateLimitMiddleware(req)
         
-        if (!rateLimitResult.success) {
-          return new NextResponse(
-            JSON.stringify({
-              error: 'Rate limit exceeded',
-              retryAfter: rateLimitResult.reset,
-              remaining: rateLimitResult.remaining
-            }),
-            {
-              status: 429,
-              headers: {
-                'Content-Type': 'application/json',
-                'X-RateLimit-Limit': rateLimitResult.limit.toString(),
-                'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-                'X-RateLimit-Reset': rateLimitResult.reset.toString(),
-                'Retry-After': Math.ceil((rateLimitResult.reset - Date.now()) / 1000).toString()
-              }
-            }
-          )
+        if (rateLimitResponse) {
+          return rateLimitResponse
         }
-        
-        // Rate limit header'larını ekle
-        const response = NextResponse.next()
-        response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString())
-        response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
-        response.headers.set('X-RateLimit-Reset', rateLimitResult.reset.toString())
-        
-        return response
       } catch (error) {
         console.error('Rate limiting error:', error)
         // Rate limiting hatası durumunda isteği geçir

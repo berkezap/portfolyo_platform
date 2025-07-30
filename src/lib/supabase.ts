@@ -19,6 +19,20 @@ export const supabaseAdmin = createClient(
     auth: {
       autoRefreshToken: false,
       persistSession: false
+    },
+    db: {
+      schema: 'public'
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'portfolyo-platform'
+      }
+    },
+    // Connection pooling configuration
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
     }
   }
 )
