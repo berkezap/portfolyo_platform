@@ -145,7 +145,7 @@ export default function MyPortfoliosPage() {
               }}
               icon={Plus}
               size="lg"
-              variant="gradient-blue"
+              variant="primary"
             >
               Yeni Portfolyo
             </Button>
@@ -178,7 +178,7 @@ export default function MyPortfoliosPage() {
                     e.preventDefault()
                     refetch()
                   }}
-                  variant="gradient-blue"
+                  variant="primary"
                   icon={RefreshCw}
                   size="sm"
                 >
@@ -210,7 +210,7 @@ export default function MyPortfoliosPage() {
                   }}
                   icon={Plus}
                   size="lg"
-                  variant="gradient-blue"
+                  variant="primary"
                 >
                   Portfolyo Oluştur
                 </Button>
@@ -269,7 +269,7 @@ export default function MyPortfoliosPage() {
                         disabled={isDeleting}
                         icon={Edit3}
                         className="flex-1"
-                        variant="gradient-blue"
+                        variant="primary"
                       >
                         Düzenle
                       </Button>

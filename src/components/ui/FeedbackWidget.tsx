@@ -68,7 +68,7 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
     return (
       <div className={`fixed bottom-6 right-6 z-50 ${className}`}>
         <Button
-          variant="gradient"
+          variant="primary"
           size="lg"
           icon={MessageCircle}
           onClick={() => setIsOpen(true)}
@@ -176,7 +176,7 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
                 Geri
               </Button>
               <Button
-                variant="gradient"
+                variant="primary"
                 icon={Send}
                 onClick={handleSubmit}
                 className="flex-1"

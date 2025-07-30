@@ -15,8 +15,8 @@ html {
 body {
   margin: 0;
   font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f9fafb;
-  color: #111827;
+  background: #F9FAFB; /* Design system gray-50 */
+  color: #111827; /* Design system gray-900 */
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -56,17 +56,25 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* Optimized gradients - reduced complexity */
+/* Design System Gradients */
 .gradient-hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .gradient-brand {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
 }
 
 .gradient-accent {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
 }
 
 /* Optimized animations with will-change */
@@ -223,9 +231,8 @@ body {
 
 /* Optimized container */
 .container {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 2rem;
 }
 
 /* Optimized button styles */

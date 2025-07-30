@@ -19,7 +19,7 @@ const Card: React.FC<CardProps> = ({
     default: 'bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md',
     portfolio: 'bg-white border border-gray-200 rounded-2xl p-6 hover:border-gray-300 hover:shadow-xl cursor-pointer float-card',
     glass: 'glass rounded-2xl p-6 cursor-pointer float-card',
-    gradient: 'gradient-brand text-white rounded-2xl p-6 shadow-xl float-card'
+    gradient: 'gradient-hero text-white rounded-2xl p-6 shadow-xl float-card'
   }
   
   const classes = [

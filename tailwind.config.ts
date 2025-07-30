@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import { colors, spacing, typography, borderRadius, shadows, transitions, breakpoints, containers, animationDelays } from './src/lib/design-tokens'
 
 const config: Config = {
   content: [
@@ -18,32 +19,11 @@ const config: Config = {
         sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
-      // Color optimizations
+      // Design System Colors
       colors: {
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-        },
+        ...colors,
+        // Legacy support
+        secondary: colors.gray,
       },
       // Animation optimizations
       animation: {
@@ -65,21 +45,42 @@ const config: Config = {
           '100%': { transform: 'translateX(0)' },
         },
       },
-      // Transition optimizations
-      transitionDuration: {
-        '200': '200ms',
-        '300': '300ms',
-      },
-      transitionTimingFunction: {
-        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
-      },
-      // Spacing optimizations
+      // Design System Spacing
       spacing: {
+        ...spacing,
+        // Additional spacing
         '18': '4.5rem',
         '88': '22rem',
         '128': '32rem',
       },
-      // Container optimizations
+      // Design System Typography
+      fontSize: typography.fontSizes,
+      fontWeight: typography.fontWeights,
+      lineHeight: typography.lineHeights,
+      
+      // Design System Border Radius
+      borderRadius: borderRadius,
+      
+      // Design System Shadows
+      boxShadow: shadows,
+      
+      // Design System Transitions
+      transitionDuration: {
+        fast: transitions.fast,
+        normal: transitions.normal,
+        slow: transitions.slow,
+        '200': '200ms',
+        '300': '300ms',
+      },
+      transitionTimingFunction: {
+        'smooth': transitions.easing.inOut,
+        'out': transitions.easing.out,
+      },
+      
+      // Design System Breakpoints
+      screens: breakpoints,
+      
+      // Design System Containers
       container: {
         center: true,
         padding: {
@@ -88,6 +89,10 @@ const config: Config = {
           lg: '4rem',
           xl: '5rem',
           '2xl': '6rem',
+        },
+        screens: {
+          ...containers,
+          '7xl': '90rem', // 1440px - daha geniş
         },
       },
       // Backdrop blur optimizations

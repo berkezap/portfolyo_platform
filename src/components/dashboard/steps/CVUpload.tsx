@@ -80,8 +80,8 @@ export function CVUpload({
       </Card>
       
       <div className="flex justify-between mt-12 mb-8">
-        <Button variant="gradient-blue" onClick={onBack}>Geri</Button>
-        <Button variant="gradient-blue" onClick={onNext} disabled={!cvUrl}>Devam Et</Button>
+        <Button variant="primary" onClick={onBack}>Geri</Button>
+        <Button variant="primary" onClick={onNext} disabled={!cvUrl}>Devam Et</Button>
       </div>
     </div>
   )

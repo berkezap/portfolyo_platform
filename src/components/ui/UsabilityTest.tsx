@@ -149,7 +149,7 @@ const UsabilityTest: React.FC<UsabilityTestProps> = ({
                 Duraklat
               </Button>
             ) : (
-              <Button variant="gradient" size="sm" icon={Play} onClick={resumeTest}>
+              <Button variant="primary" size="sm" icon={Play} onClick={resumeTest}>
                 Devam Et
               </Button>
             )}
@@ -233,7 +233,7 @@ const UsabilityTest: React.FC<UsabilityTestProps> = ({
             Başarısız
           </Button>
           <Button
-            variant="gradient"
+            variant="primary"
             size="lg"
             icon={CheckCircle}
             onClick={() => completeTask(true)}

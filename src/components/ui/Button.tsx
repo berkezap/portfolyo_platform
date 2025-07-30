@@ -25,10 +25,10 @@ const Button: React.FC<ButtonProps> = ({
   
   const variantClasses = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl hover-lift',
-    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 shadow-sm hover:shadow-md hover-lift',
+    secondary: 'bg-gray-100 text-gray-600 hover:bg-gray-200 focus:ring-gray-500 shadow-sm hover:shadow-md hover-lift',
     destructive: 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-600 focus:ring-red-500',
     gradient: 'gradient-brand text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover-lift',
-    'gradient-blue': 'bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover-lift',
+    'gradient-blue': 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover-lift',
     glass: 'glass-button text-gray-900 hover:bg-white/20 focus:ring-blue-500'
   }
   

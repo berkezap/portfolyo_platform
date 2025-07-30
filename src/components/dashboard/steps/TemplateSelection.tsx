@@ -132,7 +132,7 @@ export function TemplateSelection({
       {/* Navigation */}
       <div className="flex justify-between items-center mt-16 mb-8">
         <Button
-          variant="gradient-blue"
+          variant="primary"
           size="lg"
           onClick={onBack}
           className="hover-lift"
@@ -141,7 +141,7 @@ export function TemplateSelection({
         </Button>
 
         <Button
-          variant="gradient-blue"
+          variant="primary"
           size="lg"
           onClick={onNext}
           disabled={!selectedTemplate}

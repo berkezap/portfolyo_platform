@@ -59,7 +59,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <header className="glass border-b border-white/20 shadow-glass sticky top-0 z-50 backdrop-blur-xl">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link 
@@ -67,10 +67,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({
             className="flex items-center gap-3 group focus:outline-none hover-lift"
           >
             <div className="relative">
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-2.5 transition-all duration-300 group-hover:scale-105 group-active:scale-95 shadow-lg">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-2.5 transition-all duration-300 group-hover:scale-105 group-active:scale-95 shadow-lg">
                 {getLogoIcon()}
               </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full animate-pulse"></div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
             </div>
             <div className="flex items-center gap-2">
               <span className={`font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300 tracking-tight ${getLogoSize()}`}>
@@ -82,7 +82,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
           {/* Navigation */}
           {variant !== 'home' && (
-            <nav className="flex items-center gap-1 md:gap-3">
+            <nav className="flex items-center gap-2 md:gap-4">
               {getNavLinks().map((link) => (
                 <Link key={link.href} href={link.href} className="relative group">
                   <div className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 hover-lift
@@ -101,10 +101,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
           {/* Auth/CTA */}
           {showAuth && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {demoMode ? (
                 <Link href="/dashboard">
-                  <Button variant="gradient" size="md" icon={Code2} className="shadow-lg hover-lift">
+                  <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
                     Demo&apos;yu Dene
                   </Button>
                 </Link>
@@ -116,7 +116,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
                     </Button>
                   </Link>
                   <Link href="/auth/signin">
-                    <Button variant="gradient" size="md" icon={Code2} className="shadow-lg hover-lift">
+                    <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
                       Başlayın
                     </Button>
                   </Link>

@@ -87,21 +87,21 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col">
       {/* Header */}
       <header className="glass-warm border-b border-white/20 shadow-glass sticky top-0 z-50 backdrop-blur-xl">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6 flex justify-between items-center max-w-full gap-8">
           <Link href="/" className="flex items-center space-x-3 group focus:outline-none hover-lift">
-            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-2.5 shadow-lg transition-all duration-300 group-hover:scale-105 group-active:scale-95">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-2.5 shadow-lg transition-all duration-300 group-hover:scale-105 group-active:scale-95">
               <Code2 className="h-7 w-7 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
+                          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
               PortfolYO
             </span>
           </Link>
           {demoMode ? (
             <Link href="/dashboard">
-              <Button variant="gradient" size="md" icon={Code2} className="shadow-lg hover-lift">
+              <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
                 Demo&apos;yu Dene
               </Button>
             </Link>
@@ -110,19 +110,19 @@ export default function HomePage() {
               <div className="h-10 w-40 bg-white/20 rounded-lg animate-pulse"></div>
             ) : portfolios.length === 0 ? (
               <Link href="/dashboard">
-                <Button variant="gradient" size="md" icon={Plus} className="shadow-lg hover-lift">
+                <Button variant="primary" size="md" icon={Plus} className="shadow-lg hover-lift">
                   İlk Portfolyonuzu Oluşturun
                 </Button>
               </Link>
             ) : (
               <Link href="/my-portfolios">
-                <Button variant="gradient" size="md" icon={Code2} className="shadow-lg hover-lift">
+                <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
                   Portfolyolarım ({portfolios.length})
                 </Button>
               </Link>
             )
           ) : (
-            <Button variant="gradient" size="md" icon={Github} onClick={() => signIn('github')} className="shadow-lg hover-lift">
+            <Button variant="primary" size="md" icon={Github} onClick={() => signIn('github')} className="shadow-lg hover-lift">
               GitHub ile Giriş
             </Button>
           )}
@@ -145,22 +145,22 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center smooth-fade animation-delay-200">
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-2xl p-6 mb-4 shadow-lg">
-                <div className="text-3xl font-bold">5 dk</div>
-                <div className="text-sm opacity-90">Oluşturma Süresi</div>
-              </div>
+                          <div className="bg-blue-600 text-white rounded-2xl p-6 mb-4 shadow-lg">
+              <div className="text-3xl font-bold">5 dk</div>
+              <div className="text-sm opacity-90">Oluşturma Süresi</div>
+            </div>
             </div>
             <div className="text-center smooth-fade animation-delay-400">
-              <div className="bg-gradient-to-br from-green-600 to-emerald-600 text-white rounded-2xl p-6 mb-4 shadow-lg">
-                <div className="text-3xl font-bold">6+</div>
-                <div className="text-sm opacity-90">Modern Şablon</div>
-              </div>
+                          <div className="bg-blue-500 text-white rounded-2xl p-6 mb-4 shadow-lg">
+              <div className="text-3xl font-bold">6+</div>
+              <div className="text-sm opacity-90">Modern Şablon</div>
+            </div>
             </div>
             <div className="text-center smooth-fade animation-delay-600">
-              <div className="bg-gradient-to-br from-purple-600 to-pink-600 text-white rounded-2xl p-6 mb-4 shadow-lg">
-                <div className="text-3xl font-bold">100%</div>
-                <div className="text-sm opacity-90">Ücretsiz</div>
-              </div>
+                          <div className="bg-blue-400 text-white rounded-2xl p-6 mb-4 shadow-lg">
+              <div className="text-3xl font-bold">100%</div>
+              <div className="text-sm opacity-90">Ücretsiz</div>
+            </div>
             </div>
           </div>
         </div>
@@ -170,11 +170,11 @@ export default function HomePage() {
       <section id="features" className="py-20 bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-6 shadow-lg">
               <Star className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight">
-              Neden <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">PortfolYO</span>?
+              Neden <span className="text-blue-600">PortfolYO</span>?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Yazılımcılar için özel olarak tasarlanmış, hızlı ve etkili portfolyo çözümü.
@@ -183,7 +183,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-200">
               <div className="flex items-center justify-center mb-6">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-2xl shadow-lg">
+                <div className="bg-blue-500 p-4 rounded-2xl shadow-lg">
                   <Zap className="h-8 w-8 text-white" />
                 </div>
               </div>
@@ -194,7 +194,7 @@ export default function HomePage() {
             </Card>
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-400">
               <div className="flex items-center justify-center mb-6">
-                <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-2xl shadow-lg">
+                <div className="bg-blue-500 p-4 rounded-2xl shadow-lg">
                   <Github className="h-8 w-8 text-white" />
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function HomePage() {
             </Card>
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-600">
               <div className="flex items-center justify-center mb-6">
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-2xl shadow-lg">
+                <div className="bg-blue-400 p-4 rounded-2xl shadow-lg">
                   <Globe className="h-8 w-8 text-white" />
                 </div>
               </div>
@@ -219,14 +219,14 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-600 to-emerald-600 rounded-2xl mb-6 shadow-lg">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-6 shadow-lg">
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
-              3 Adımda <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Hazır</span>
+              3 Adımda <span className="text-blue-600">Hazır</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Basit, hızlı ve etkili. Sadece 3 adımda profesyonel portfolyonuzu oluşturun.
@@ -234,21 +234,21 @@ export default function HomePage() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-200">
-              <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
+              <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
                 1
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">GitHub ile Giriş</h3>
               <p className="text-gray-600 leading-relaxed">Güvenli GitHub OAuth ile giriş yapın ve projelerinize erişim sağlayın</p>
             </Card>
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-400">
-              <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
+              <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Projelerinizi Seçin</h3>
               <p className="text-gray-600 leading-relaxed">Göstermek istediğiniz 4-6 projeyi seçin ve CV&apos;nizi yükleyin</p>
             </Card>
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-600">
-              <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
+              <div className="bg-blue-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
                 3
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Şablon Seçip Oluştur</h3>
@@ -259,14 +259,14 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 relative overflow-hidden">
+      <section className="py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="container mx-auto px-6 text-center relative z-10">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 backdrop-blur-sm">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Portfolyonuzu <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Şimdi</span> Oluşturun
+            Portfolyonuzu <span className="text-yellow-300">Şimdi</span> Oluşturun
           </h2>
           <p className="text-blue-100 text-xl mb-10 max-w-3xl mx-auto leading-relaxed">
             Geliştiriciler için tasarlanmış, modern ve profesyonel portfolyo platformu. 

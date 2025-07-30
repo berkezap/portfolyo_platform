@@ -121,7 +121,7 @@ export function RepositorySelection({
             onClick={onNext}
             disabled={selectedRepos.length === 0}
             size="lg"
-            variant="gradient-blue"
+            variant="primary"
             className="w-full max-w-xs"
           >
             Devam Et ({selectedRepos.length} proje)
