@@ -1,6 +1,7 @@
 import { useSession, signOut } from 'next-auth/react'
 import { Github, LogOut, Folder } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 import { usePortfolioList } from '@/hooks/usePortfolioList'
@@ -114,9 +115,11 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                   </span>
                 </div>
                 {session?.user?.image ? (
-                  <img 
+                  <Image 
                     src={session.user.image} 
                     alt="User avatar" 
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-full border-2 border-white/20 shadow-lg object-cover transition-all duration-300 hover-lift hover:ring-2 hover:ring-blue-400/50"
                   />
                 ) : (

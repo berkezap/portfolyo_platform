@@ -34,10 +34,6 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
   const [error, setError] = useState<string | null>(null)
   const [notFoundError, setNotFoundError] = useState(false)
 
-  useEffect(() => {
-    fetchPortfolio()
-  }, [id])
-
   const fetchPortfolio = async () => {
     try {
       setLoading(true)
@@ -62,6 +58,10 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchPortfolio()
+  }, [id])
 
   if (notFoundError) {
     return (

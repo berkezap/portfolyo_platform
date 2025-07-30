@@ -1,16 +1,12 @@
 {
-  "name": "PortfolYO - GitHub Portfolio Oluşturucu",
+  "name": "PortfolYO - Portfolio Generator",
   "short_name": "PortfolYO",
-  "description": "GitHub projelerinizden otomatik portfolio website'i oluşturun",
+  "description": "Modern portfolio generator for developers",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f9fafb",
+  "background_color": "#ffffff",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "tr",
-  "dir": "ltr",
-  "categories": ["productivity", "utilities", "developer-tools"],
   "icons": [
     {
       "src": "/portfolyo-icon.svg",
@@ -19,102 +15,13 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/portfolyo-favicon.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/portfolyo-favicon.svg",
-      "sizes": "512x512",
+      "src": "/portfolyo-logo.svg",
+      "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "PortfolYO Desktop Görünümü"
-    },
-    {
-      "src": "/screenshots/mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "PortfolYO Mobil Görünümü"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Portfolio Oluştur",
-      "short_name": "Oluştur",
-      "description": "Yeni portfolio oluştur",
-      "url": "/dashboard",
-      "icons": [
-        {
-          "src": "/portfolyo-icon.svg",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Portfolyolarım",
-      "short_name": "Liste",
-      "description": "Portfolyolarımı görüntüle",
-      "url": "/my-portfolios",
-      "icons": [
-        {
-          "src": "/portfolyo-icon.svg",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ],
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "protocol_handlers": [
-    {
-      "protocol": "web+portfolyo",
-      "url": "/?url=%s"
-    }
-  ],
-  "file_handlers": [
-    {
-      "action": "/upload",
-      "accept": {
-        "text/markdown": [".md"],
-        "application/json": [".json"]
-      }
-    }
-  ],
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  "permissions": [
-    "notifications",
-    "background-sync"
-  ],
-  "background": {
-    "service_worker": "/sw.js",
-    "type": "module"
-  },
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "handle_links": "preferred",
-  "capture_links": "existing-client-navigate"
+  "categories": ["productivity", "utilities"],
+  "lang": "tr",
+  "dir": "ltr"
 } 

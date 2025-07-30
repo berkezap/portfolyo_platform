@@ -6,11 +6,13 @@ import { renderTemplate, formatUserDataForTemplate } from '@/lib/templateEngine'
 import { PortfolioService } from '@/lib/portfolioService'
 import { portfolioGenerationSchema, validateRequest, sanitizeString } from '@/lib/validation'
 import * as Sentry from '@sentry/nextjs'
+import { Session } from 'next-auth'
+import type { GitHubUser, GitHubRepo } from '@/types/github'
 
 export async function POST(request: NextRequest) {
   console.log('🚀 Portfolio Generate API çağrıldı!')
   
-  let session: any = null // TODO: Proper type from next-auth
+  let session: Session | null = null // TODO: Proper type from next-auth
   
   try {
     // Demo mode kontrolü
@@ -47,7 +49,8 @@ export async function POST(request: NextRequest) {
     console.log('📋 Selected repos:', selectedRepos)
     console.log('📄 CV URL:', cvUrl)
 
-    let userData, repos
+    let userData: GitHubUser;
+    let repos: GitHubRepo[];
 
     if (demoMode) {
       // Demo mode - Mock data kullan
@@ -118,7 +121,7 @@ export async function POST(request: NextRequest) {
       }
 
       // GitHub servisini kullanarak kullanıcı verilerini al (timeout ile)
-      const githubService = new GitHubService(session.user.accessToken)
+      const githubService = new GitHubService((session as any).user.accessToken)
       
       // Timeout ile GitHub API çağrıları (optimized)
       const timeoutPromise = new Promise((_, reject) => {
@@ -142,7 +145,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 🗃️ 1. ADIM: Portfolio kaydını database'e kaydet
-    let savedPortfolio
+    let savedPortfolio: unknown
     if (demoMode) {
       // Demo mode - Mock portfolio ID oluştur
       console.log('🎭 Demo mode: Mock portfolio ID oluşturuluyor')
@@ -153,7 +156,7 @@ export async function POST(request: NextRequest) {
           } else {
         console.log('🗃️ Portfolio database\'e kaydediliyor...')
         const portfolioData = {
-        user_id: session?.user?.email || userData.login,
+        user_id: (session as any)?.user?.email || (userData as any).login,
         selected_template: templateName,
         selected_repos: selectedRepos || [],
         cv_url: cvUrl
@@ -164,7 +167,7 @@ export async function POST(request: NextRequest) {
         console.log('❌ Portfolio database\'e kaydedilemedi!')
         return NextResponse.json({ error: 'Failed to save portfolio' }, { status: 500 })
       }
-      console.log('✅ Portfolio başarıyla kaydedildi:', savedPortfolio.id)
+      console.log('✅ Portfolio başarıyla kaydedildi:', (savedPortfolio as any).id)
     }
 
     // 🎨 2. ADIM: Template data formatla ve HTML oluştur
@@ -173,13 +176,13 @@ export async function POST(request: NextRequest) {
     
     // CV URL'i template data'ya ekle
     if (cvUrl) {
-      templateData.CV_URL = cvUrl
+      (templateData as any).CV_URL = cvUrl
     }
     
     console.log('📊 Template data oluşturuldu:', {
-      projectCount: templateData.projects?.length || 0,
-      totalStars: templateData.TOTAL_STARS,
-      userName: templateData.USER_NAME
+      projectCount: (templateData as any).projects?.length || 0,
+      totalStars: (templateData as any).TOTAL_STARS,
+      userName: (templateData as any).USER_NAME
     })
 
     // HTML render et
@@ -194,12 +197,12 @@ export async function POST(request: NextRequest) {
     PortfolioService.createMetadataFromTemplateData(templateData, templateName)
     
     // Oluşturulan HTML'i veritabanına kaydet
-    await PortfolioService.updatePortfolioHtml(savedPortfolio.id, generatedHTML)
+    await PortfolioService.updatePortfolioHtml((savedPortfolio as any).id, generatedHTML)
 
     return NextResponse.json({ 
       success: true,
       html: generatedHTML, // HTML'i frontend'e de gönderiyoruz
-      portfolioId: savedPortfolio.id
+      portfolioId: (savedPortfolio as any).id
     })
   } catch (error) {
     console.error('💥 Portfolio generation error:', error)
@@ -211,7 +214,7 @@ export async function POST(request: NextRequest) {
         endpoint: '/api/portfolio/generate'
       },
       extra: {
-        userEmail: session?.user?.email,
+        userEmail: (session as any)?.user?.email,
         hasSession: !!session,
         timestamp: new Date().toISOString()
       }

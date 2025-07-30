@@ -10,4 +10,18 @@ export interface GitHubRepo {
   updated_at: string | null;
   topics: string[];
   homepage: string | null;
+}
+
+export interface GitHubUser {
+  login: string;
+  name: string;
+  bio: string | null;
+  avatar_url: string;
+  html_url: string;
+  location: string | null;
+  company: string | null;
+  blog: string | null;
+  public_repos: number;
+  followers: number;
+  following: number;
 } 

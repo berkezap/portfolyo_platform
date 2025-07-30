@@ -200,7 +200,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Portfolyo Düzenle</h1>
-          <p className="text-gray-600">Portfolyonuzun projelerini ve template'ini güncelleyin</p>
+          <p className="text-gray-600">Portfolyonuzun projelerini ve template&apos;ini güncelleyin</p>
         </div>
 
         {isUpdateSuccess && (

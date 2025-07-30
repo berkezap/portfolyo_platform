@@ -4,7 +4,18 @@ const nextConfig: NextConfig = {
   // Basit konfigürasyon
   compress: true,
   poweredByHeader: false,
-  
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+
   // Webpack optimizasyonları - minimal
   webpack: (config, { dev, isServer }) => {
     // Critical dependency uyarılarını azalt
@@ -32,38 +43,62 @@ const nextConfig: NextConfig = {
       },
     };
 
-    // Development'ta daha basit konfigürasyon
-    if (dev) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: false,
-        minimize: false,
-      }
-    }
-    
-    return config
-  },
-  
-  // Image optimizasyonu
-  images: {
-    domains: ['avatars.githubusercontent.com'],
-    dangerouslyAllowSVG: true,
+    return config;
   },
 
-  // Experimental özellikler - minimal
+  // Experimental features
   experimental: {
+    // React 19 uyumluluğu
     reactCompiler: false,
   },
 
   // TypeScript ayarları
   typescript: {
+    // Build sırasında type check'i atla (zaten IDE'de yapılıyor)
     ignoreBuildErrors: false,
   },
 
   // ESLint ayarları
   eslint: {
+    // Build sırasında ESLint'i atla (zaten IDE'de yapılıyor)
     ignoreDuringBuilds: false,
   },
+
+  // Bundle analyzer
+  ...(process.env.ANALYZE === 'true' && {
+    webpack: (config) => {
+      config.plugins.push(
+        new (require('@next/bundle-analyzer'))({
+          enabled: true,
+        })
+      );
+      return config;
+    },
+  }),
 }
 
-export default nextConfig
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+  runtimeCaching: [
+    {
+      urlPattern: /^https?.*/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'offlineCache',
+        expiration: {
+          maxEntries: 200,
+        },
+      },
+    },
+  ],
+})
+
+module.exports = withPWA(withBundleAnalyzer(nextConfig))
+

@@ -3,9 +3,10 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { GitHubService } from '@/lib/github'
 import * as Sentry from '@sentry/nextjs'
+import { Session } from 'next-auth'
 
 export async function GET() {
-  let session: any = null // TODO: Proper type from next-auth
+  let session: Session | null = null
   
   try {
     // Demo mode kontrolü
@@ -59,7 +60,7 @@ export async function GET() {
       )
     }
 
-    const githubService = new GitHubService(session.user.accessToken)
+    const githubService = new GitHubService((session.user as any).accessToken)
     const repos = await githubService.getUserRepos()
     
     return NextResponse.json({ 
@@ -76,8 +77,8 @@ export async function GET() {
         endpoint: '/api/github/repos'
       },
       extra: {
-        userEmail: session?.user?.email,
-        hasAccessToken: !!session?.user?.accessToken,
+        userEmail: (session as any)?.user?.email,
+        hasAccessToken: !!(session as any)?.user?.accessToken,
         timestamp: new Date().toISOString()
       }
     })

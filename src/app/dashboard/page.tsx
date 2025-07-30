@@ -7,14 +7,35 @@ import { usePortfolioGenerator } from '@/hooks/usePortfolioGenerator'
 import { usePortfolioList } from '@/hooks/usePortfolioList'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { ProgressSteps } from '@/components/dashboard/ProgressSteps'
-import { RepositorySelection } from '@/components/dashboard/steps/RepositorySelection'
-import { TemplateSelection } from '@/components/dashboard/steps/TemplateSelection'
-import { CVUpload } from '@/components/dashboard/steps/CVUpload'
-import { GenerateStep } from '@/components/dashboard/steps/GenerateStep'
-import { CompletedStep } from '@/components/dashboard/steps/CompletedStep'
 import { StepType, PortfolioTemplate } from '@/types/dashboard'
 import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary'
-// Kullanılmayan import'lar kaldırıldı
+import dynamic from 'next/dynamic'
+
+// Dinamik import'lar - sadece ihtiyaç anında yüklenecek
+const RepositorySelection = dynamic(() => import('@/components/dashboard/steps/RepositorySelection').then(mod => ({ default: mod.RepositorySelection })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
+  ssr: false
+})
+
+const TemplateSelection = dynamic(() => import('@/components/dashboard/steps/TemplateSelection').then(mod => ({ default: mod.TemplateSelection })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
+  ssr: false
+})
+
+const CVUpload = dynamic(() => import('@/components/dashboard/steps/CVUpload').then(mod => ({ default: mod.CVUpload })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
+  ssr: false
+})
+
+const GenerateStep = dynamic(() => import('@/components/dashboard/steps/GenerateStep').then(mod => ({ default: mod.GenerateStep })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
+  ssr: false
+})
+
+const CompletedStep = dynamic(() => import('@/components/dashboard/steps/CompletedStep').then(mod => ({ default: mod.CompletedStep })), {
+  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
+  ssr: false
+})
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -361,7 +382,7 @@ export default function DashboardPage() {
       } else {
         setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>')
       }
-    } catch (_error) {
+    } catch {
       setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenirken hata oluştu</div>')
     } finally {
       setPreviewLoading(false)

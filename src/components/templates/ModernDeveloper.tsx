@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { TemplateProps } from '@/types/templates'
 
 export function ModernDeveloper({ data }: TemplateProps) {
@@ -433,7 +434,13 @@ export function ModernDeveloper({ data }: TemplateProps) {
             <h2 className="section-title">Hakkımda</h2>
             <div className="about-content">
               <div className="about-image">
-                <img src={data.USER_AVATAR} alt={data.USER_NAME} className="profile-img" />
+                <Image 
+                  src={data.USER_AVATAR} 
+                  alt={data.USER_NAME} 
+                  width={200}
+                  height={200}
+                  className="profile-img" 
+                />
               </div>
               <div className="about-text">
                 <p>{data.USER_BIO}</p>

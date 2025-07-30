@@ -19,7 +19,7 @@ export async function GET() {
     const result = await Promise.race([
       dbPromise,
       timeoutPromise
-    ]) as { data: any; error: any }
+    ]) as { data: unknown; error: unknown }
     
     const { data, error } = result
 
@@ -27,17 +27,17 @@ export async function GET() {
       console.log('❌ Supabase bağlantı hatası:', error)
       
       // Eğer tablo yoksa, bu normal bir durum
-      if (error.code === '42P01') { // undefined_table
+      if ((error as { code?: string }).code === '42P01') { // undefined_table
         return NextResponse.json({
           status: 'warning',
           message: 'Database connected but portfolios table not found. Please run database/schema.sql in Supabase SQL Editor.',
-          error: error.message
+          error: (error as Error).message
         }, { status: 200 })
       }
       
       return NextResponse.json({
         status: 'error',
-        error: error.message
+        error: (error as Error).message
       }, { status: 500 })
     }
 

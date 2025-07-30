@@ -37,10 +37,20 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  // PWA metadata
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/portfolyo-icon.svg',
+    apple: '/portfolyo-icon.svg',
+  },
   // Preload critical resources
   other: {
     'theme-color': '#2563EB',
     'color-scheme': 'light dark',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': 'PortfolYO',
+    'mobile-web-app-capable': 'yes',
   },
   // Performance optimizasyonları
   alternates: {

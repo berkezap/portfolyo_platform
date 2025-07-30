@@ -211,7 +211,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Canlı & SEO Dostu</h3>
               <p className="text-gray-600 leading-relaxed">
-                Statik siteler Google'da üst sıralarda. Portfolyonuz kolayca bulunabilir ve hızlı yüklenir.
+                Statik siteler Google&apos;da üst sıralarda. Portfolyonuz kolayca bulunabilir ve hızlı yüklenir.
               </p>
             </Card>
           </div>
@@ -245,7 +245,7 @@ export default function HomePage() {
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Projelerinizi Seçin</h3>
-              <p className="text-gray-600 leading-relaxed">Göstermek istediğiniz 4-6 projeyi seçin ve CV'nizi yükleyin</p>
+              <p className="text-gray-600 leading-relaxed">Göstermek istediğiniz 4-6 projeyi seçin ve CV&apos;nizi yükleyin</p>
             </Card>
             <Card variant="glass" className="text-center p-10 smooth-fade animation-delay-600">
               <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
