@@ -5,6 +5,12 @@ const fetchGitHubRepos = async (): Promise<GitHubRepo[]> => {
   const response = await fetch('/api/github/repos')
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
+    
+    // Rate limit hatası için özel mesaj
+    if (response.status === 429) {
+      throw new Error('GitHub API rate limit exceeded. Please wait a few minutes and try again.')
+    }
+    
     throw new Error(errorData.error || 'Failed to fetch GitHub repositories')
   }
   const data = await response.json()
@@ -15,11 +21,18 @@ export function useGitHubRepos() {
   return useQuery<GitHubRepo[], Error>({
     queryKey: ['githubRepos'],
     queryFn: fetchGitHubRepos,
-    staleTime: 30 * 60 * 1000, // 30 dakika boyunca fresh kabul et (10'dan 30'a çıkardık)
-    gcTime: 60 * 60 * 1000, // 1 saat cache'de tut (30'dan 60'a çıkardık)
+    staleTime: 5 * 60 * 1000, // 5 dakika boyunca fresh kabul et (cache ile uyumlu)
+    gcTime: 10 * 60 * 1000, // 10 dakika cache'de tut
     refetchOnWindowFocus: false, // Gereksiz refetch'i engelle
     refetchOnMount: false, // Component mount olduğunda refetch etme
-    retry: 1, // Sadece 1 kez retry et (varsayılan 3'ten 1'e düşürdük)
-    retryDelay: 1000, // 1 saniye bekle
+    retry: (failureCount, error) => {
+      // Rate limit hatası ise retry etme
+      if (error.message.includes('rate limit')) {
+        return false
+      }
+      // Diğer hatalar için sadece 1 kez retry et
+      return failureCount < 1
+    },
+    retryDelay: 2000, // 2 saniye bekle
   })
 } 

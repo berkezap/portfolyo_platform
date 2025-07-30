@@ -65,6 +65,16 @@ export default withAuth(
           pathname.startsWith(route)
         )
         
+        // Demo mode'da tüm route'lara erişim ver
+        if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+          return true
+        }
+        
+        // Ana sayfa her zaman erişilebilir olmalı
+        if (pathname === '/') {
+          return true
+        }
+        
         // Allow access if not a protected route OR if user has valid token
         return !isProtectedRoute || !!token
       },

@@ -99,10 +99,11 @@ export function usePortfolioEditor(portfolioId: string) {
       
       return { previousPortfolio }
     },
-    onError: (err, newData, context: any) => {
+    onError: (err, newData, context: unknown) => {
       // Hata durumunda önceki veriyi geri yükle
-      if (context?.previousPortfolio) {
-        queryClient.setQueryData(['portfolio', portfolioId], context.previousPortfolio)
+      const typedContext = context as { previousPortfolio?: Portfolio }
+      if (typedContext?.previousPortfolio) {
+        queryClient.setQueryData(['portfolio', portfolioId], typedContext.previousPortfolio)
       }
     },
     onSettled: () => {

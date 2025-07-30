@@ -2,8 +2,20 @@ import { CheckCircle2, ExternalLink, FolderOpen, Share2, Download } from 'lucide
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
+interface PortfolioResult {
+  success: boolean
+  html?: string
+  metadata?: {
+    user: string
+    repoCount: number
+    totalStars: number
+    template: string
+  }
+  error?: string
+}
+
 interface CompletedStepProps {
-  portfolioResult: any
+  portfolioResult: PortfolioResult | null
   demoMode: boolean
   userName?: string
   onNewPortfolio: () => void
@@ -12,11 +24,10 @@ interface CompletedStepProps {
 export function CompletedStep({ 
   portfolioResult, 
   demoMode, 
-  userName, 
   onNewPortfolio 
 }: CompletedStepProps) {
   const handleViewPortfolio = () => {
-    if (portfolioResult?.html) {
+    if (portfolioResult?.success && portfolioResult?.html) {
       const blob = new Blob([portfolioResult.html], { type: 'text/html' })
       const url = URL.createObjectURL(blob)
       window.open(url, '_blank')
@@ -24,7 +35,7 @@ export function CompletedStep({
   }
 
   const handleDownloadHTML = () => {
-    if (portfolioResult?.html) {
+    if (portfolioResult?.success && portfolioResult?.html) {
       const blob = new Blob([portfolioResult.html], { type: 'text/html' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')

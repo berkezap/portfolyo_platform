@@ -4,8 +4,22 @@ import { RepositoryGridSkeleton } from '@/components/ui/Skeleton'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 
+interface GitHubRepo {
+  id: number
+  name: string
+  description: string | null
+  language: string | null
+  stargazers_count: number
+  forks_count: number
+  html_url: string
+  created_at: string | null
+  updated_at: string | null
+  topics: string[]
+  homepage: string | null
+}
+
 interface RepositorySelectionProps {
-  repos: any[]
+  repos: GitHubRepo[]
   selectedRepos: number[]
   onToggleRepo: (repoId: number) => void
   onNext: () => void
@@ -123,25 +137,71 @@ export function RepositorySelection({
     )
   }
 
-  if (error)
+  if (error) {
     return (
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Projelerinizi Seçin</h1>
           <p className="text-gray-500">Portfolio sitenizde gösterilecek GitHub projelerini seçin</p>
         </div>
-        <Card className="bg-red-50 border border-red-200 rounded-lg p-8 mb-8 text-center">
-          <div className="flex items-center justify-center mb-4">
-            <AlertCircle className="h-6 w-6 text-red-600 mr-2" />
-            <span className="text-lg font-semibold text-red-800">GitHub Bağlantı Hatası</span>
+        <Card className="mb-8">
+          <div className="flex items-start gap-4">
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-red-800 font-semibold text-sm mb-1">
+                {error.includes('rate limit') ? 'GitHub API Rate Limit' : 'Hata'}
+              </h3>
+              <p className="text-red-700 text-sm mb-3">{error}</p>
+              {error.includes('rate limit') ? (
+                <div className="space-y-2">
+                  <p className="text-red-600 text-xs">
+                    GitHub API'ye çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onRefetch()
+                      }}
+                      variant="secondary"
+                      icon={RefreshCw}
+                      size="sm"
+                      disabled={loading}
+                    >
+                      Tekrar Dene
+                    </Button>
+                    <Button 
+                      onClick={(e) => {
+                        e.preventDefault()
+                        // Cache'i temizle ve tekrar dene
+                        window.location.reload()
+                      }}
+                      variant="secondary"
+                      size="sm"
+                    >
+                      Sayfayı Yenile
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button 
+                  onClick={(e) => {
+                    e.preventDefault()
+                    onRefetch()
+                  }}
+                  variant="secondary"
+                  icon={RefreshCw}
+                  size="sm"
+                >
+                  Tekrar Dene
+                </Button>
+              )}
+            </div>
           </div>
-          <p className="text-red-600 mb-6">{error}</p>
-          <Button onClick={onRefetch} disabled={loading} variant="destructive" size="md">
-            {loading ? 'Yeniden Deniyor...' : 'Tekrar Dene'}
-          </Button>
         </Card>
       </div>
     )
+  }
 
   // Empty State
   return (

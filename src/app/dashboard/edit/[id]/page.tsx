@@ -8,9 +8,7 @@ import { usePortfolioEditor } from '@/hooks/usePortfolioEditor'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
-import IconButton from '@/components/ui/IconButton'
 import { 
-  Edit3, 
   Eye, 
   ArrowLeft, 
   Save, 
@@ -18,9 +16,7 @@ import {
   Loader2, 
   CheckCircle2,
   Star,
-  GitBranch,
-  Calendar,
-  Palette
+  GitBranch
 } from 'lucide-react'
 import { GitHubRepo } from '@/types/github'
 import { TemplateSelection } from '@/components/dashboard/steps/TemplateSelection'

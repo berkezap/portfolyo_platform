@@ -1,31 +1,18 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'bcrypt'],
+    clientInstrumentationHook: true,
   },
   images: {
-    domains: ['avatars.githubusercontent.com', 'github.com'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'github.com',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    domains: ['avatars.githubusercontent.com'],
   },
-  // Performance optimizations
-  swcMinify: true,
-  compress: true,
-  poweredByHeader: false,
-  generateEtags: false,
-  
+  // Production'da log'ları azalt
+  logging: {
+    fetches: {
+      fullUrl: false,
+    },
+  },
   // Security headers
   async headers() {
     return [
@@ -48,10 +35,21 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
+          // Production'da ek güvenlik
+          ...(process.env.NODE_ENV === 'production' ? [
+            {
+              key: 'Strict-Transport-Security',
+              value: 'max-age=31536000; includeSubDomains',
+            },
+            {
+              key: 'Content-Security-Policy',
+              value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;",
+            },
+          ] : []),
         ],
       },
-    ];
+    ]
   },
 }
 
-module.exports = nextConfig
+export default nextConfig

@@ -10,7 +10,7 @@ import * as Sentry from '@sentry/nextjs'
 export async function POST(request: NextRequest) {
   console.log('🚀 Portfolio Generate API çağrıldı!')
   
-  let session: any = null
+  let session: any = null // TODO: Proper type from next-auth
   
   try {
     // Demo mode kontrolü

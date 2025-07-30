@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
@@ -33,6 +33,13 @@ export default function MyPortfoliosPage() {
     isDeleting,
     refetch
   } = usePortfolioList()
+
+  // Eğer kullanıcının hiç portfolyosu yoksa ve veriler yüklendiyse dashboard'a yönlendir
+  useEffect(() => {
+    if (!isLoading && !error && portfolios.length === 0 && status === 'authenticated') {
+      router.push('/dashboard')
+    }
+  }, [isLoading, error, portfolios.length, status, router])
 
   // Redirect if not authenticated
   if (status === 'loading') {

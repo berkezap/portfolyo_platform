@@ -1,8 +1,9 @@
 import { useSession, signOut } from 'next-auth/react'
 import { Github, LogOut, Folder } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
+import { usePortfolioList } from '@/hooks/usePortfolioList'
 
 interface DashboardHeaderProps {
   demoMode: boolean
@@ -11,17 +12,36 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
   const { data: session } = useSession()
   const pathname = usePathname()
+  const router = useRouter()
+  const { portfolios, isLoading } = usePortfolioList()
+
+  // Portfolyo sayısına göre link metnini belirle
+  const getPortfolioLinkText = () => {
+    if (isLoading) return 'Portfolyolarım'
+    if (portfolios.length === 0) return 'Portfolyo Yok'
+    return `Portfolyolarım (${portfolios.length})`
+  }
+
+  const getPortfolioLinkDisabled = () => {
+    return !isLoading && portfolios.length === 0
+  }
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm">
+    <header className="bg-white border-b border-gray-200 shadow-sm relative z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group focus:outline-none">
+          <a 
+            href="/my-portfolios"
+            className="flex items-center gap-2 group focus:outline-none"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <span className="bg-blue-600 rounded-lg p-2 transition-transform group-hover:scale-105 group-active:scale-95">
               <Github className="h-6 w-6 text-white" />
             </span>
             <span className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">PortfolYO</span>
-          </Link>
+          </a>
           {/* Navigation Links */}
           <nav className="flex items-center gap-2 md:gap-4">
             <Link href="/dashboard" className="relative flex items-center gap-2 group">
@@ -36,17 +56,28 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                 <span className="sm:hidden">Yeni</span>
               </span>
             </Link>
-            <Link href="/my-portfolios" className="relative flex items-center gap-2 group">
+            <Link 
+              href={getPortfolioLinkDisabled() ? "#" : "/my-portfolios"} 
+              className={`relative flex items-center gap-2 group ${getPortfolioLinkDisabled() ? 'cursor-not-allowed' : ''}`}
+              onClick={(e) => {
+                if (getPortfolioLinkDisabled()) {
+                  e.preventDefault()
+                  router.push('/dashboard')
+                }
+              }}
+            >
               <span
                 className={`px-3 py-1 rounded-md font-medium text-sm transition-all duration-150 flex items-center
                   ${pathname === '/my-portfolios'
                     ? 'text-blue-700 after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-blue-600 after:rounded-full'
+                    : getPortfolioLinkDisabled()
+                    ? 'text-gray-400 cursor-not-allowed'
                     : 'text-gray-600 hover:text-blue-700 hover:bg-blue-50'}
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400`}
               >
                 <Folder className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Portfolyolarım</span>
-                <span className="sm:hidden">Listele</span>
+                <span className="hidden sm:inline">{getPortfolioLinkText()}</span>
+                <span className="sm:hidden">{portfolios.length === 0 ? 'Yok' : `${portfolios.length}`}</span>
               </span>
             </Link>
           </nav>

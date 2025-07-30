@@ -69,16 +69,20 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async redirect({ url, baseUrl }: { url: any; baseUrl: any }) {
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+      // GitHub girişi sonrası /my-portfolios'a yönlendir
+      if (url === baseUrl || url === `${baseUrl}/`) {
+        return `${baseUrl}/my-portfolios`
+      }
       if (url.startsWith('/')) return `${baseUrl}${url}`
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     }
   },
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/',
     error: '/auth/error',
-    signOut: '/auth/signout'
+    signOut: '/'
   },
   // Güvenlik ayarları
   secret: process.env.NEXTAUTH_SECRET,

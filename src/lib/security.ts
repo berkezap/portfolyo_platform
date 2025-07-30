@@ -23,7 +23,7 @@ export async function requireAuth(request: NextRequest) {
 }
 
 // Portfolyo sahipliği kontrolü
-export async function requirePortfolioOwnership(portfolioId: string, userId: string) {
+export async function requirePortfolioOwnership(_portfolioId: string, _userId: string) {
   // Bu fonksiyon Supabase'den portfolyo bilgisini alıp sahiplik kontrolü yapar
   // Şimdilik basit bir kontrol yapıyoruz
   return true
@@ -50,7 +50,7 @@ export function getClientIP(request: NextRequest): string {
 }
 
 // Güvenli response oluşturma
-export function createSecureResponse(data: any, status: number = 200) {
+export function createSecureResponse(data: unknown, status: number = 200) {
   return NextResponse.json(data, {
     status,
     headers: {

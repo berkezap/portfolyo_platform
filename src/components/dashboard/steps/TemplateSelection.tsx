@@ -17,8 +17,7 @@ export function TemplateSelection({
   selectedTemplate,
   onSelectTemplate,
   onNext,
-  onBack,
-  onPreview
+  onBack
 }: TemplateSelectionProps) {
   return (
     <div className="max-w-6xl mx-auto">

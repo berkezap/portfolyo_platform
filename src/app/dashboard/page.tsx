@@ -13,9 +13,7 @@ import { GenerateStep } from '@/components/dashboard/steps/GenerateStep'
 import { CompletedStep } from '@/components/dashboard/steps/CompletedStep'
 import { StepType, PortfolioTemplate } from '@/types/dashboard'
 import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary'
-import Button from '@/components/ui/Button'
-import Card from '@/components/ui/Card'
-import { Github, Zap, FolderOpen, FileText, CheckCircle2 } from 'lucide-react'
+// Kullanılmayan import'lar kaldırıldı
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -236,7 +234,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
 
 export default function DashboardPage() {
   const { data: session } = useSession()
-  const { data: realRepos, isLoading: reposLoading, error: reposError, refetch } = useGitHubRepos()
+  const { data: realRepos, isLoading: reposLoading, error: _reposError, refetch } = useGitHubRepos()
   const { generatePortfolio, result: portfolioResult, loading: portfolioLoading, error: portfolioError, clearResult } = usePortfolioGenerator()
   
   // Demo mode kontrolü
@@ -342,14 +340,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleGoToDashboard = () => {
-    setStep('repos')
-    clearResult()
-    setSelectedRepos([])
-    setSelectedTemplate(1)
-    setCvUrl(null)
-    setCvError(null)
-  }
+  // handleGoToDashboard kaldırıldı - kullanılmıyor
 
   const handlePreview = async (templateId: number) => {
     setPreviewModal({ isOpen: true, templateId })
@@ -388,7 +379,7 @@ export default function DashboardPage() {
               onNext={() => setStep('template')}
               demoMode={demoMode}
               loading={reposLoading}
-              error={reposError?.message || null}
+              error={_reposError?.message || null}
               onRefetch={refetch}
             />
           )}
@@ -407,7 +398,7 @@ export default function DashboardPage() {
 
           {/* Template Preview Modal */}
           {previewModal.isOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
               <div className="bg-white rounded-lg w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between p-4 border-b">
                   <h3 className="text-lg font-semibold">

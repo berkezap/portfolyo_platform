@@ -2,13 +2,42 @@ import fs from 'fs'
 import path from 'path'
 import { TemplateData } from '@/types/templates'
 
-export function formatUserDataForTemplate(userData: any, repos: any[], selectedRepos: string[]): TemplateData {
+interface GitHubUser {
+  name?: string | null
+  login: string
+  bio?: string | null
+  avatar_url: string
+  email?: string | null
+  html_url: string
+  public_repos: number
+}
+
+interface GitHubRepository {
+  name: string
+  description?: string | null
+  html_url: string
+  language?: string | null
+  stargazers_count: number
+  forks_count: number
+  created_at: string | null
+  topics?: string[]
+  homepage?: string | null
+}
+
+export function formatUserDataForTemplate(userData: GitHubUser, repos: GitHubRepository[], selectedRepos: string[]): TemplateData {
   const selectedRepoObjects = repos.filter(repo => selectedRepos.includes(repo.name));
   const totalStars = selectedRepoObjects.reduce((sum, repo) => sum + repo.stargazers_count, 0);
-  const oldestRepo = selectedRepoObjects.length > 0
-    ? selectedRepoObjects.reduce((oldest, repo) => new Date(repo.created_at) < new Date(oldest.created_at) ? repo : oldest)
+  
+  // created_at null olabileceği için güvenli bir şekilde işle
+  const reposWithValidDates = selectedRepoObjects.filter(repo => repo.created_at !== null);
+  const oldestRepo = reposWithValidDates.length > 0
+    ? reposWithValidDates.reduce((oldest, repo) => {
+        const repoDate = new Date(repo.created_at!);
+        const oldestDate = new Date(oldest.created_at!);
+        return repoDate < oldestDate ? repo : oldest;
+      })
     : null;
-  const yearsExperience = oldestRepo ? Math.max(1, new Date().getFullYear() - new Date(oldestRepo.created_at).getFullYear()) : 1;
+  const yearsExperience = oldestRepo ? Math.max(1, new Date().getFullYear() - new Date(oldestRepo.created_at!).getFullYear()) : 1;
 
   return {
     USER_NAME: userData.name || userData.login,
@@ -16,7 +45,7 @@ export function formatUserDataForTemplate(userData: any, repos: any[], selectedR
     USER_BIO: userData.bio || 'A passionate developer building modern web applications.',
     USER_MISSION_STATEMENT: 'Crafting elegant solutions to complex problems.', // Placeholder
     USER_AVATAR: userData.avatar_url,
-    USER_EMAIL: userData.email,
+    USER_EMAIL: userData.email || '',
     GITHUB_URL: userData.html_url,
     LINKEDIN_URL: '#', // Placeholder
     TWITTER_URL: '#', // Placeholder

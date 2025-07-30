@@ -5,7 +5,7 @@ import { GitHubService } from '@/lib/github'
 import * as Sentry from '@sentry/nextjs'
 
 export async function GET() {
-  let session: any = null
+  let session: any = null // TODO: Proper type from next-auth
   
   try {
     session = await getServerSession(authOptions)
@@ -42,26 +42,49 @@ export async function GET() {
     
     // Handle specific GitHub API errors
     if (error instanceof Error) {
-      if (error.message.includes('401')) {
+      const errorMessage = error.message.toLowerCase()
+      
+      if (errorMessage.includes('401') || errorMessage.includes('authentication failed')) {
         return NextResponse.json(
-          { error: 'GitHub token expired - Please sign out and sign in again' },
+          { 
+            error: 'GitHub token expired - Please sign out and sign in again',
+            code: 'AUTH_EXPIRED'
+          },
           { status: 401 }
         )
-      } else if (error.message.includes('403')) {
+      } else if (errorMessage.includes('403') || errorMessage.includes('rate limit')) {
         return NextResponse.json(
-          { error: 'GitHub API rate limit exceeded - Please try again later' },
-          { status: 403 }
+          { 
+            error: 'GitHub API rate limit exceeded - Please wait a few minutes and try again',
+            code: 'RATE_LIMIT',
+            retryAfter: 300 // 5 dakika
+          },
+          { status: 429 } // 429 Too Many Requests
         )
-      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
         return NextResponse.json(
-          { error: 'Network error - Please check your connection' },
+          { 
+            error: 'Network error - Please check your connection',
+            code: 'NETWORK_ERROR'
+          },
           { status: 503 }
+        )
+      } else if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+        return NextResponse.json(
+          { 
+            error: 'GitHub user not found or no access to repositories',
+            code: 'NOT_FOUND'
+          },
+          { status: 404 }
         )
       }
     }
     
     return NextResponse.json(
-      { error: 'Failed to fetch repositories from GitHub' }, 
+      { 
+        error: 'Failed to fetch repositories from GitHub',
+        code: 'UNKNOWN_ERROR'
+      }, 
       { status: 500 }
     )
   }
