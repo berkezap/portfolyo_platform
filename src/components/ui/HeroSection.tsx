@@ -26,7 +26,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   }
 
   return (
-    <section className={`relative overflow-hidden py-16 ${backgroundClasses[background]} ${className}`}>
+    <section className={`relative overflow-hidden pt-20 pb-16 mt-8 ${backgroundClasses[background]} ${className}`}>
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
@@ -34,7 +34,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center">
           {/* Sparkle Icon */}
           <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-full mb-8 backdrop-blur-sm">

@@ -98,7 +98,7 @@ export function CompletedStep({
 
           <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
             <Button 
-              variant="primary" 
+              variant="gradient-blue" 
               size="lg" 
               onClick={handleViewPortfolio}
               className="flex-1"
@@ -121,7 +121,7 @@ export function CompletedStep({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <Button 
-          variant="primary" 
+          variant="gradient-blue" 
           onClick={handleManagePortfolios}
           className="w-full"
         >
@@ -141,7 +141,7 @@ export function CompletedStep({
 
       <div className="flex justify-center">
         <Button 
-          variant="secondary" 
+          variant="gradient-blue" 
           onClick={onNewPortfolio}
         >
           Yeni Portfolyo Oluştur

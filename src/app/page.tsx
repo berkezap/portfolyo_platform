@@ -87,9 +87,9 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col">
       {/* Header */}
-      <header className="glass border-b border-white/20 shadow-glass sticky top-0 z-50 backdrop-blur-xl">
+      <header className="glass-warm border-b border-white/20 shadow-glass sticky top-0 z-50 backdrop-blur-xl">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3 group focus:outline-none hover-lift">
             <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-2.5 shadow-lg transition-all duration-300 group-hover:scale-105 group-active:scale-95">

@@ -111,7 +111,7 @@ export function RepositorySelection({
             </div>
           ))}
         </div>
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 mt-12 mb-8">
           {selectedRepos.length === 0 && (
             <div className="flex items-center gap-2 text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 text-sm font-medium">
               <AlertCircle className="h-5 w-5" /> En az bir proje seçmelisiniz
@@ -121,6 +121,7 @@ export function RepositorySelection({
             onClick={onNext}
             disabled={selectedRepos.length === 0}
             size="lg"
+            variant="gradient-blue"
             className="w-full max-w-xs"
           >
             Devam Et ({selectedRepos.length} proje)

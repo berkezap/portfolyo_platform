@@ -27,14 +27,14 @@ export function GenerateStep({ loading, error, onGenerate, onBack }: GenerateSte
               <span className="text-red-700 text-sm font-medium">{error}</span>
             </div>
           ) : (
-            <Button variant="primary" size="lg" onClick={onGenerate}>
+            <Button variant="gradient-blue" size="lg" onClick={onGenerate}>
               Portfolyo Oluştur
             </Button>
           )}
         </div>
       </Card>
-      <div className="flex justify-between mt-6">
-        <Button variant="secondary" onClick={onBack}>Geri</Button>
+      <div className="flex justify-between mt-12 mb-8">
+        <Button variant="gradient-blue" onClick={onBack}>Geri</Button>
       </div>
     </div>
   )

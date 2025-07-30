@@ -2,7 +2,7 @@ import React from 'react'
 import { LucideIcon } from 'lucide-react'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'destructive' | 'gradient' | 'glass'
+  variant?: 'primary' | 'secondary' | 'destructive' | 'gradient' | 'gradient-blue' | 'glass'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   icon?: LucideIcon
   iconPosition?: 'left' | 'right'
@@ -21,14 +21,15 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed hover-lift'
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
   
   const variantClasses = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl',
-    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 shadow-sm hover:shadow-md',
+    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl hover-lift',
+    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 shadow-sm hover:shadow-md hover-lift',
     destructive: 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-600 focus:ring-red-500',
-    gradient: 'gradient-brand text-white shadow-lg hover:shadow-xl focus:ring-blue-500',
-    glass: 'glass text-gray-900 hover:bg-white/20 focus:ring-blue-500'
+    gradient: 'gradient-brand text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover-lift',
+    'gradient-blue': 'bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover-lift',
+    glass: 'glass-button text-gray-900 hover:bg-white/20 focus:ring-blue-500'
   }
   
   const sizeClasses = {

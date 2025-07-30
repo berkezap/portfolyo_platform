@@ -19,9 +19,7 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
 
   // Portfolyo sayısına göre link metnini belirle
   const getPortfolioLinkText = () => {
-    if (isLoading) return 'Portfolyolarım'
-    if (portfolios.length === 0) return 'Portfolyo Yok'
-    return `Portfolyolarım (${portfolios.length})`
+    return 'Portfolyo Yönetimi'
   }
 
   const getPortfolioLinkDisabled = () => {
@@ -69,7 +67,7 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                 }
               }}
             >
-              <div className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 flex items-center gap-2 hover-lift
+              <div className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 hover-lift
                 ${pathname === '/my-portfolios'
                   ? 'bg-blue-600/20 text-blue-700 border border-blue-200/50 shadow-sm'
                   : getPortfolioLinkDisabled()
@@ -77,9 +75,8 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                   : 'text-gray-700 hover:text-blue-700 hover:bg-blue-50/50'}
                 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400`}
               >
-                <Folder className="h-4 w-4" />
                 <span className="hidden sm:inline">{getPortfolioLinkText()}</span>
-                <span className="sm:hidden">{portfolios.length === 0 ? 'Yok' : `${portfolios.length}`}</span>
+                <span className="sm:hidden">Yönetim</span>
               </div>
             </Link>
           </nav>
@@ -101,7 +98,7 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                     variant="glass"
                     size="sm"
                     icon={LogOut}
-                    className="bg-white/20 hover:bg-white/30 text-gray-700 border-white/30"
+                    className="bg-white/20 hover:bg-white/30 text-gray-700 border-white/30 shadow-none hover:ring-2 hover:ring-blue-400/50"
                   >
                     Ana Sayfa
                   </Button>
@@ -132,7 +129,7 @@ export function DashboardHeader({ demoMode }: DashboardHeaderProps) {
                   size="sm"
                   icon={LogOut}
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="bg-white/20 hover:bg-white/30 text-gray-700 border-white/30"
+                  className="bg-white/20 hover:bg-white/30 text-gray-700 border-white/30 shadow-none hover:ring-2 hover:ring-blue-400/50"
                 >
                   Çıkış
                 </Button>
