@@ -1,4 +1,4 @@
-import { GitHubRepo } from './github'
+
 
 export type StepType = 'repos' | 'template' | 'cv' | 'generate' | 'completed'
 

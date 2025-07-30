@@ -5,6 +5,12 @@ import { GitHubService } from '@/lib/github'
 import * as Sentry from '@sentry/nextjs'
 import { Session } from 'next-auth'
 
+interface SessionUser {
+  email?: string;
+  accessToken?: string;
+  [key: string]: any;
+}
+
 export async function GET() {
   let session: Session | null = null
   
@@ -53,14 +59,15 @@ export async function GET() {
     // Gerçek mode - session kontrolü
     session = await getServerSession(authOptions)
     
-    if (!session || !session.user?.accessToken) {
+    const user = session?.user as SessionUser | undefined
+    if (!session || !user?.accessToken) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in again' }, 
         { status: 401 }
       )
     }
 
-    const githubService = new GitHubService((session.user as any).accessToken)
+    const githubService = new GitHubService(user.accessToken)
     const repos = await githubService.getUserRepos()
     
     return NextResponse.json({ 
@@ -77,8 +84,8 @@ export async function GET() {
         endpoint: '/api/github/repos'
       },
       extra: {
-        userEmail: (session as any)?.user?.email,
-        hasAccessToken: !!(session as any)?.user?.accessToken,
+        userEmail: (session?.user as SessionUser)?.email,
+        hasAccessToken: !!(session?.user as SessionUser)?.accessToken,
         timestamp: new Date().toISOString()
       }
     })

@@ -155,8 +155,10 @@ export const useServiceWorker = () => {
   }
 }
 
+type SWMessage = { type: string; [key: string]: unknown }
+
 // Service Worker mesajları için yardımcı fonksiyonlar
-export const sendMessageToSW = (message: any) => {
+export const sendMessageToSW = (message: SWMessage) => {
   if (navigator.serviceWorker.controller) {
     navigator.serviceWorker.controller.postMessage(message)
   }

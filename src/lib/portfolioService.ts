@@ -7,7 +7,7 @@ export interface CreatePortfolioData {
   selected_template: string
   selected_repos: string[]
   cv_url?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, string | number | boolean>
 }
 
 // Portfolio servisi - Database CRUD operasyonları
@@ -181,7 +181,7 @@ export class PortfolioService {
   /**
    * Template data'sından metadata oluştur
    */
-  static createMetadataFromTemplateData(templateData: TemplateData, templateName: string): Record<string, any> {
+  static createMetadataFromTemplateData(templateData: TemplateData, templateName: string): Record<string, string | number | boolean> {
     return {
       user: templateData.USER_NAME,
       repoCount: templateData.projects.length,
@@ -192,7 +192,7 @@ export class PortfolioService {
       user_email: templateData.USER_EMAIL,
       github_url: templateData.GITHUB_URL,
       total_repos: templateData.TOTAL_REPOS,
-      years_experience: templateData.YEARS_EXPERIENCE,
+      years_experience: templateData.YEARS_EXPERIENCE || 0,
       generated_at: new Date().toISOString()
     }
   }

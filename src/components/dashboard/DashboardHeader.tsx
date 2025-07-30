@@ -1,5 +1,5 @@
 import { useSession, signOut } from 'next-auth/react'
-import { Github, LogOut, Folder } from 'lucide-react'
+import { Github, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
@@ -34,7 +34,7 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
   const [error, setError] = useState<string | null>(null)
   const [notFoundError, setNotFoundError] = useState(false)
 
-  const fetchPortfolio = async () => {
+  const fetchPortfolio = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -57,11 +57,11 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoading(false)
     }
-  }
+  }, [id]);
 
   useEffect(() => {
-    fetchPortfolio()
-  }, [id])
+    fetchPortfolio();
+  }, [fetchPortfolio]);
 
   if (notFoundError) {
     return (

@@ -76,6 +76,7 @@ export function CVUpload({
               <span className="text-red-700 text-sm font-medium">{error}</span>
             </div>
           )}
+          <span className="text-gray-500 text-xs mt-2">CV dosyanız sadece sizin tarafınızdan görüntülenir ve asla üçüncü kişilerle paylaşılmaz. Dosya boyutu 5MB&apos;ı geçmemelidir.</span>
         </div>
       </Card>
       

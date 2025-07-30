@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { BarChart3, Users, Clock, TrendingUp, MessageCircle, Star, Activity } from 'lucide-react'
 import Card from '@/components/ui/Card'
@@ -32,11 +32,7 @@ export default function UXResearchPage() {
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('7d')
 
-  useEffect(() => {
-    fetchAnalyticsData()
-  }, [timeRange])
-
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     try {
       const response = await fetch(`/api/analytics?days=${timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90}`)
       if (response.ok) {
@@ -48,7 +44,11 @@ export default function UXResearchPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [fetchAnalyticsData]);
 
   if (!session) {
     return (

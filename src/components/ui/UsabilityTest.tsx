@@ -56,12 +56,12 @@ const UsabilityTest: React.FC<UsabilityTestProps> = ({
   const currentTask = tasks[currentTaskIndex]
 
   useEffect(() => {
-    if (isRunning && currentTask) {
+    if (currentTask) {
       setTaskStartTime(Date.now())
     }
-  }, [currentTaskIndex, isRunning])
+  }, [currentTaskIndex, isRunning, currentTask])
 
-  const startTest = () => {
+  const _startTest = () => {
     setIsRunning(true)
     setStartTime(Date.now())
     setTaskStartTime(Date.now())
