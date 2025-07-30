@@ -1,54 +1,68 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  experimental: {
-    clientInstrumentationHook: true,
+  // Basit konfigürasyon
+  compress: true,
+  poweredByHeader: false,
+  
+  // Webpack optimizasyonları - minimal
+  webpack: (config, { dev, isServer }) => {
+    // Critical dependency uyarılarını azalt
+    config.ignoreWarnings = [
+      /Critical dependency: the request of a dependency is an expression/,
+      /Module not found: Can't resolve 'encoding'/,
+      /Module not found: Can't resolve 'fs'/,
+      /Module not found: Can't resolve 'path'/,
+      /Module not found: Can't resolve 'os'/,
+    ];
+
+    // Webpack resolve ayarları - minimal
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+        crypto: false,
+        stream: false,
+        util: false,
+        buffer: false,
+        process: false,
+      },
+    };
+
+    // Development'ta daha basit konfigürasyon
+    if (dev) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: false,
+        minimize: false,
+      }
+    }
+    
+    return config
   },
+  
+  // Image optimizasyonu
   images: {
     domains: ['avatars.githubusercontent.com'],
+    dangerouslyAllowSVG: true,
   },
-  // Production'da log'ları azalt
-  logging: {
-    fetches: {
-      fullUrl: false,
-    },
+
+  // Experimental özellikler - minimal
+  experimental: {
+    reactCompiler: false,
   },
-  // Security headers
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          // Production'da ek güvenlik
-          ...(process.env.NODE_ENV === 'production' ? [
-            {
-              key: 'Strict-Transport-Security',
-              value: 'max-age=31536000; includeSubDomains',
-            },
-            {
-              key: 'Content-Security-Policy',
-              value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;",
-            },
-          ] : []),
-        ],
-      },
-    ]
+
+  // TypeScript ayarları
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+  // ESLint ayarları
+  eslint: {
+    ignoreDuringBuilds: false,
   },
 }
 

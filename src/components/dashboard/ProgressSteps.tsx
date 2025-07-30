@@ -27,7 +27,7 @@ export function ProgressSteps({ currentStep }: ProgressStepsProps) {
   }
 
   return (
-    <div className="mb-8">
+    <div className="mb-4 pt-4">
       <div className="flex items-center justify-center space-x-2 md:space-x-4 overflow-x-auto px-4">
         {steps.map((step, index) => {
           const status = getStepStatus(step.id)

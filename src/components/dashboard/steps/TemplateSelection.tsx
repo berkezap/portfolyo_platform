@@ -1,12 +1,13 @@
-import { Check, Globe } from 'lucide-react'
-import { PortfolioTemplate } from '@/types/dashboard'
+import React from 'react'
+import { Check, Eye, Star } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import { PortfolioTemplate } from '@/types/dashboard'
 
 interface TemplateSelectionProps {
   templates: PortfolioTemplate[]
   selectedTemplate: number
-  onSelectTemplate: (templateId: number) => void
+  onSelectTemplate: (id: number) => void
   onNext: () => void
   onBack: () => void
   onPreview: (templateId: number) => void
@@ -20,68 +21,132 @@ export function TemplateSelection({
   onBack
 }: TemplateSelectionProps) {
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">Şablonunuzu Seçin</h1>
-        <p className="text-gray-500 text-base">Portfolyonuz için modern ve profesyonel şablonlardan birini seçin.</p>
+    <div className="max-w-7xl mx-auto">
+      {/* Hero Section */}
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
+          <Star className="w-8 h-8 text-white" />
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          Şablonunuzu Seçin
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          Portfolyonuz için modern ve profesyonel şablonlardan birini seçin. Her şablon özenle tasarlanmış ve optimize edilmiştir.
+        </p>
       </div>
-      <div className="grid md:grid-cols-3 gap-8 mb-12">
-        {templates.map((template) => (
+
+      {/* Template Grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        {templates.map((template, index) => (
           <Card
             key={template.id}
-            variant="portfolio"
-            className={`transition-all duration-200 border-none shadow-sm hover:shadow-lg rounded-2xl p-6 bg-white flex flex-col gap-4 ${selectedTemplate === template.id ? 'ring-2 ring-blue-500' : ''}`}
+            variant={selectedTemplate === template.id ? 'gradient' : 'glass'}
+            className={`transition-all duration-500 smooth-fade animation-delay-${index * 200} ${
+              selectedTemplate === template.id 
+                ? 'ring-4 ring-blue-500/30 scale-105' 
+                : 'hover:scale-102'
+            }`}
+            onClick={() => onSelectTemplate(template.id)}
           >
-            <div 
-              className="cursor-pointer"
-              onClick={() => onSelectTemplate(template.id)}
-            >
-              <div className="aspect-video bg-gray-50 rounded-xl mb-4 border overflow-hidden flex items-center justify-center">
+            {/* Template Preview */}
+            <div className="relative mb-6">
+              <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-200/50 shadow-sm">
                 <iframe
                   srcDoc={template.previewHtml}
                   className="w-full h-full border-0"
                   title={`${template.name} Preview`}
                 />
               </div>
-              <h3 className="font-semibold text-gray-900 text-lg mb-1 truncate">{template.name}</h3>
-              <p className="text-sm text-gray-500 mb-2 line-clamp-2">{template.description}</p>
-              <div className="space-y-1 mb-2">
-                {template.features.map((feature) => (
-                  <div key={feature} className="flex items-center text-xs text-gray-500">
-                    <Check className="h-4 w-4 text-green-500 mr-2" />
-                    {feature}
+              
+              {/* Selection Indicator */}
+              {selectedTemplate === template.id && (
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <Check className="w-5 h-5 text-white" />
+                </div>
+              )}
+            </div>
+
+            {/* Template Info */}
+            <div className="space-y-4">
+              <div>
+                <h3 className={`font-bold text-xl mb-2 ${
+                  selectedTemplate === template.id ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {template.name}
+                </h3>
+                <p className={`text-sm leading-relaxed ${
+                  selectedTemplate === template.id ? 'text-white/90' : 'text-gray-600'
+                }`}>
+                  {template.description}
+                </p>
+              </div>
+
+              {/* Features */}
+              <div className="space-y-2">
+                {template.features.map((feature, _featureIndex) => (
+                  <div key={feature} className="flex items-center text-sm">
+                    <Check className={`h-4 w-4 mr-3 ${
+                      selectedTemplate === template.id ? 'text-white' : 'text-green-500'
+                    }`} />
+                    <span className={
+                      selectedTemplate === template.id ? 'text-white/90' : 'text-gray-600'
+                    }>
+                      {feature}
+                    </span>
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="flex gap-2 mt-auto">
-              <Button
-                variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
-                size="sm"
-                className="flex-1"
-                onClick={() => onSelectTemplate(template.id)}
-              >
-                {selectedTemplate === template.id ? 'Seçili' : 'Seç'}
-              </Button>
-              {/* Önizleme butonu geçici olarak devre dışı - güvenlik nedeniyle */}
-              <Button
-                variant="secondary"
-                size="sm"
-                className="flex-1 opacity-50 cursor-not-allowed"
-                disabled
-                title="Önizleme özelliği geçici olarak devre dışı"
-              >
-                <Globe className="h-4 w-4 mr-1 inline text-gray-400" /> Önizleme
-              </Button>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant={selectedTemplate === template.id ? 'glass' : 'secondary'}
+                  size="sm"
+                  className="flex-1"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelectTemplate(template.id)
+                  }}
+                >
+                  {selectedTemplate === template.id ? 'Seçildi' : 'Seç'}
+                </Button>
+                
+                <Button
+                  variant="glass"
+                  size="sm"
+                  icon={Eye}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    // Preview functionality
+                  }}
+                  className="bg-white/20 hover:bg-white/30"
+                >
+                  Önizle
+                </Button>
+              </div>
             </div>
           </Card>
         ))}
       </div>
-      <div className="flex justify-center gap-4">
-        <Button variant="secondary" onClick={onBack} size="lg">
+
+      {/* Navigation */}
+      <div className="flex justify-between items-center">
+        <Button
+          variant="secondary"
+          size="lg"
+          onClick={onBack}
+          className="hover-lift"
+        >
           Geri
         </Button>
-        <Button onClick={onNext} size="lg">
+
+        <Button
+          variant="gradient"
+          size="lg"
+          onClick={onNext}
+          disabled={!selectedTemplate}
+          className="hover-lift shadow-xl"
+        >
           Devam Et
         </Button>
       </div>

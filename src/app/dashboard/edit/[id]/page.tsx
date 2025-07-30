@@ -298,7 +298,12 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                   <div className="flex flex-col space-y-2">
                     <span className="text-gray-600 font-medium text-xs uppercase tracking-wide">Template:</span>
                     <span className="text-gray-900 font-semibold">
-                      {templateDisplayNames[templateNameToId[portfolio.selected_template]]}
+                      {(() => {
+                        const templateId = portfolio.selected_template && templateNameToId[portfolio.selected_template];
+                        return templateId && templateDisplayNames[templateId] 
+                          ? templateDisplayNames[templateId]
+                          : 'Modern Developer';
+                      })()}
                     </span>
                   </div>
                   <div className="flex flex-col space-y-2">

@@ -9,7 +9,7 @@ const RATE_LIMIT_CONFIG = {
   skipFailedRequests: false,
   keyGenerator: (req: NextRequest) => {
     // Use IP address as key, fallback to user agent
-    return req.ip || req.headers.get('x-forwarded-for') || req.headers.get('user-agent') || 'unknown'
+    return req.headers.get('x-forwarded-for') || req.headers.get('user-agent') || 'unknown'
   }
 }
 
@@ -76,7 +76,8 @@ export function getRateLimitConfig(pathname: string) {
 export function withRateLimit(handler: Function, customConfig?: any) {
   return async (request: NextRequest, ...args: any[]) => {
     const config = customConfig || getRateLimitConfig(request.nextUrl.pathname)
-    const key = `${request.ip || 'unknown'}:${request.nextUrl.pathname}`
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('user-agent') || 'unknown'
+    const key = `${ip}:${request.nextUrl.pathname}`
     const cacheKey = `rate_limit:${key}`
     
     try {

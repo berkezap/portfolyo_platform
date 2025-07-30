@@ -1,8 +1,96 @@
+/* Critical CSS - Above the fold styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Manual Tailwind classes for gradients and effects */
+/* Performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f9fafb;
+  color: #111827;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Optimized glass effects with reduced backdrop-filter usage */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Optimized gradients - reduced complexity */
+.gradient-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-brand {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Optimized animations with will-change */
+.float-card {
+  transform: translateY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.float-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Optimized micro-interactions */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.hover-lift:hover {
+  transform: scale(1.02);
+}
+
+/* Optimized animations */
+.smooth-fade {
+  animation: fadeInUp 0.6s ease-out;
+  will-change: opacity, transform;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optimized utility classes - reduced redundancy */
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
@@ -22,10 +110,13 @@
   --tw-gradient-to: #eff6ff;
 }
 
+/* Optimized backdrop blur */
 .backdrop-blur-xl {
   backdrop-filter: blur(24px);
+  will-change: backdrop-filter;
 }
 
+/* Optimized shadows */
 .shadow-lg {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
@@ -48,16 +139,20 @@
   --tw-gradient-to: #9333ea;
 }
 
+/* Optimized text effects */
 .bg-clip-text {
   background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .text-transparent {
   color: transparent;
 }
 
+/* Optimized transforms */
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+  will-change: transform;
 }
 
 .hover\:scale-105:hover {
@@ -66,6 +161,7 @@
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+/* Optimized transitions */
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -81,6 +177,7 @@
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
+/* Optimized borders and backgrounds */
 .border-gray-200\/50 {
   border-color: rgb(229 231 235 / 0.5);
 }
@@ -93,34 +190,30 @@
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+  
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Custom styles for better design */
+/* Optimized container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* Button styles */
+/* Optimized button styles */
 .btn {
   @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  will-change: transform, box-shadow;
 }
 
 .btn-primary {
@@ -131,12 +224,53 @@ body {
   @apply bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500;
 }
 
-/* Header styles */
+/* Optimized header styles */
 .header {
   @apply border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50;
+  will-change: backdrop-filter;
 }
 
-/* Card styles */
+/* Optimized card styles */
 .card {
   @apply bg-white border border-gray-200 rounded-lg transition-all duration-200 p-6 shadow-sm;
+  will-change: transform, box-shadow;
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Performance states */
+.perf-loading {
+  opacity: 0;
+}
+
+.perf-loaded {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Optimized focus styles */
+.focus-visible:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Optimized selection */
+::selection {
+  background-color: #3b82f6;
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #3b82f6;
+  color: white;
 }

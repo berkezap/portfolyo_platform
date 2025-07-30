@@ -1,71 +1,77 @@
-import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
-import { rateLimitMiddleware } from '@/lib/rateLimit'
+import type { NextRequest } from 'next/server'
 
-export default withAuth(
-  async function middleware(req) {
-    const { pathname } = req.nextUrl
-    
-    // API rotaları için rate limiting uygula (sadece Redis varsa)
-    if (pathname.startsWith('/api/') && process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-      try {
-        const rateLimitResponse = await rateLimitMiddleware(req)
-        
-        if (rateLimitResponse) {
-          return rateLimitResponse
-        }
-      } catch (error) {
-        console.error('Rate limiting error:', error)
-        // Rate limiting hatası durumunda isteği geçir
-        return NextResponse.next()
-      }
-    }
-    
-    // Middleware runs after auth check
-    return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const { pathname } = req.nextUrl
-        
-        // Protect these routes - require authentication
-        const protectedRoutes = [
-          '/dashboard',
-          '/my-portfolios',
-          '/dashboard/edit'
-        ]
-        
-        // Check if current path is protected
-        const isProtectedRoute = protectedRoutes.some(route => 
-          pathname.startsWith(route)
-        )
-        
-        // Demo mode'da tüm route'lara erişim ver
-        if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
-          return true
-        }
-        
-        // Ana sayfa her zaman erişilebilir olmalı
-        if (pathname === '/') {
-          return true
-        }
-        
-        // Allow access if not a protected route OR if user has valid token
-        return !isProtectedRoute || !!token
-      },
-    },
-    pages: {
-      signIn: '/',  // Redirect unauthorized users to home page
-    },
+export function middleware(request: NextRequest) {
+  const response = NextResponse.next()
+
+  // Performance headers
+  response.headers.set('X-DNS-Prefetch-Control', 'on')
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'origin-when-cross-origin')
+  response.headers.set('X-XSS-Protection', '1; mode=block')
+
+  // Cache optimization for static assets
+  if (request.nextUrl.pathname.startsWith('/_next/static/') || 
+      request.nextUrl.pathname.startsWith('/static/') ||
+      request.nextUrl.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
   }
-)
+
+  // API routes caching
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    // Short cache for API responses
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300')
+  }
+
+  // HTML pages caching
+  if (request.nextUrl.pathname === '/' || 
+      request.nextUrl.pathname.startsWith('/portfolio/') ||
+      request.nextUrl.pathname.startsWith('/dashboard/')) {
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600')
+  }
+
+  // Compression headers
+  response.headers.set('Accept-Encoding', 'gzip, deflate, br')
+
+  // Security headers for production
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    
+    // Content Security Policy
+    const csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://api.github.com https://supabase.co",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'"
+    ].join('; ')
+    
+    response.headers.set('Content-Security-Policy', csp)
+  }
+
+  // Performance monitoring
+  const start = Date.now()
+  
+  // Add performance header
+  response.headers.set('Server-Timing', `total;dur=${Date.now() - start}`)
+
+  return response
+}
 
 export const config = {
   matcher: [
-    // Match all request paths except static files and API routes
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$).*)',
-    // API rotaları için de matcher ekle
-    '/api/:path*'
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 } 

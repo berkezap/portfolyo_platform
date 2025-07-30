@@ -130,10 +130,12 @@ export async function POST(request: NextRequest) {
         githubService.getUserRepos()
       ])
       
-      const [userDataResult, reposResult] = await Promise.race([
+      const result = await Promise.race([
         githubPromise,
         timeoutPromise
-      ])
+      ]) as [any, any]
+      
+      const [userDataResult, reposResult] = result
       
       userData = userDataResult
       repos = reposResult

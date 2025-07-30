@@ -77,16 +77,19 @@ export function RepositorySelection({
             </div>
           )}
         </div>
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-12">
           {repos.map((repo) => (
-            <Card
+            <div
               key={repo.id}
-              variant="portfolio"
-              className={`group transition-all duration-200 border-none shadow-sm hover:shadow-lg rounded-2xl p-8 bg-white flex flex-col gap-4 cursor-pointer ${selectedRepos.includes(repo.id) ? 'ring-2 ring-blue-500' : ''}`}
+              className={`group transition-all duration-200 shadow-sm hover:shadow-lg rounded-xl p-6 bg-white flex flex-col gap-3 cursor-pointer ${
+                selectedRepos.includes(repo.id) 
+                  ? 'border-2 border-blue-500' 
+                  : 'border border-gray-200'
+              }`}
               onClick={() => onToggleRepo(repo.id)}
             >
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg font-semibold text-gray-900 truncate">{repo.name}</span>
+                <span className="text-base font-semibold text-gray-900 truncate">{repo.name}</span>
                 <span className="ml-auto text-xs text-gray-400">{repo.language || 'Unknown'}</span>
               </div>
               <p className="text-sm text-gray-500 line-clamp-2 mb-2">{repo.description || 'No description available'}</p>
@@ -97,9 +100,15 @@ export function RepositorySelection({
                 <span className="text-xs text-gray-400 flex items-center gap-1">
                   <GitBranch className="w-4 h-4" /> {repo.forks_count}
                 </span>
-                <span className={`ml-auto text-xs px-2 py-1 rounded-full font-medium ${selectedRepos.includes(repo.id) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'}`}>{selectedRepos.includes(repo.id) ? 'Seçili' : ''}</span>
+                <span className={`ml-auto text-xs px-3 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                  selectedRepos.includes(repo.id) 
+                    ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-700' 
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  {selectedRepos.includes(repo.id) ? '✓ Seçili' : ''}
+                </span>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
         <div className="flex flex-col items-center gap-4">

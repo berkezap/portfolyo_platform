@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useGitHubRepos } from '@/hooks/useGitHubRepos'
 import { usePortfolioGenerator } from '@/hooks/usePortfolioGenerator'
+import { usePortfolioList } from '@/hooks/usePortfolioList'
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
 import { ProgressSteps } from '@/components/dashboard/ProgressSteps'
 import { RepositorySelection } from '@/components/dashboard/steps/RepositorySelection'
@@ -237,6 +238,9 @@ export default function DashboardPage() {
   const { data: realRepos, isLoading: reposLoading, error: _reposError, refetch } = useGitHubRepos()
   const { generatePortfolio, result: portfolioResult, loading: portfolioLoading, error: portfolioError, clearResult } = usePortfolioGenerator()
   
+  // Portfolio listesini yenilemek için refetch fonksiyonu
+  const { portfolios: _portfolios, isLoading: _portfoliosLoading, refetch: refetchPortfolios } = usePortfolioList(Boolean(session))
+  
   // Demo mode kontrolü
   const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
   
@@ -331,10 +335,13 @@ export default function DashboardPage() {
       
       await generatePortfolio(templateName, selectedRepoNames, cvUrl || undefined)
       
+      // Portfolio listesini yenile
+      await refetchPortfolios()
+      
       // Portfolyo başarıyla oluşturulduysa completed adımına geç
       setStep('completed')
-    } catch (error) {
-      console.error('Portfolio generation failed:', error)
+    } catch (_error) {
+      console.error('Portfolio generation failed:', _error)
       // Hata durumunda geri dön
       setStep('cv')
     }
@@ -354,7 +361,7 @@ export default function DashboardPage() {
       } else {
         setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>')
       }
-    } catch (error) {
+    } catch (_error) {
       setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenirken hata oluştu</div>')
     } finally {
       setPreviewLoading(false)
@@ -366,8 +373,10 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gray-50">
         <DashboardHeader demoMode={demoMode} />
 
-        <div className="container mx-auto px-4 py-8">
-          <ProgressSteps currentStep={step} />
+        <div className="container mx-auto px-4 py-4">
+          <div className="pt-2">
+            <ProgressSteps currentStep={step} />
+          </div>
 
           {/* Step 1: Repository Selection */}
           {step === 'repos' && (

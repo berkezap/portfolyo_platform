@@ -16,10 +16,12 @@ export async function GET() {
       .limit(1)
       .maybeSingle() // Daha hızlı query
     
-    const { data, error } = await Promise.race([
+    const result = await Promise.race([
       dbPromise,
       timeoutPromise
-    ])
+    ]) as { data: any; error: any }
+    
+    const { data, error } = result
 
     if (error) {
       console.log('❌ Supabase bağlantı hatası:', error)

@@ -101,7 +101,7 @@ export class MonitoringService {
   }
 
   // Get performance statistics
-  async getPerformanceStats(date: string = new Date().toISOString().split('T')[0]): Promise<{
+  async getPerformanceStats(date: string = new Date().toISOString().split('T')[0] || new Date().toISOString().slice(0, 10)): Promise<{
     totalRequests: number
     avgResponseTime: number
     successRate: number
@@ -163,7 +163,7 @@ export class MonitoringService {
   }
 
   // Get error statistics
-  async getErrorStats(date: string = new Date().toISOString().split('T')[0]): Promise<{
+  async getErrorStats(date: string = new Date().toISOString().split('T')[0] || new Date().toISOString().slice(0, 10)): Promise<{
     totalErrors: number
     topErrors: Array<{ error: string; count: number; endpoint: string }>
   }> {
