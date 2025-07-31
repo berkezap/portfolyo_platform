@@ -381,4 +381,4 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
       {/* Preview modal'ı kaldırıldı - güvenlik nedeniyle */}
     </div>
   )
-} 
+}

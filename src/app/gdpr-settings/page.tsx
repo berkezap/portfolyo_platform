@@ -395,4 +395,4 @@ export default function GDPRSettingsPage() {
       </div>
     </div>
   )
-} 
+}

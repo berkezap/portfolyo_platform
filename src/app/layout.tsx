@@ -5,7 +5,6 @@ import { AuthProvider } from '@/components/auth-provider'
 import { QueryProvider } from '@/components/query-provider'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import CookieConsentWrapper from '@/components/CookieConsentWrapper'
-import FeedbackWidget from '@/components/ui/FeedbackWidget'
 
 // Font optimizasyonu - display swap ve preload
 const inter = Inter({ 
@@ -27,7 +26,6 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'tr_TR',
   },
-  // Performance metadata
   robots: {
     index: true,
     follow: true,
@@ -39,13 +37,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  // PWA metadata
   manifest: '/manifest.json',
   icons: {
     icon: '/portfolyo-icon.svg',
     apple: '/portfolyo-icon.svg',
   },
-  // Preload critical resources
   other: {
     'theme-color': '#2563EB',
     'color-scheme': 'light dark',
@@ -54,7 +50,6 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-title': 'PortfolYO',
     'mobile-web-app-capable': 'yes',
   },
-  // Performance optimizasyonları
   alternates: {
     canonical: 'https://portfolyo.com',
   },
@@ -66,49 +61,36 @@ export const viewport: Viewport = {
   maximumScale: 1,
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={inter.variable}>
+    <html lang="tr">
       <head>
-        {/* Critical resource preloading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://avatars.githubusercontent.com" />
         <link rel="dns-prefetch" href="https://api.github.com" />
         <link rel="dns-prefetch" href="https://supabase.co" />
-        
-        {/* Resource hints for external domains */}
-        <link rel="preconnect" href="https://api.github.com" />
-        <link rel="preconnect" href="https://supabase.co" />
-        
-        {/* Critical inline CSS for above-the-fold content */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            /* Critical CSS for initial render */
             body { 
               margin: 0; 
-              font-family: 'Inter', 'Inter Fallback', system-ui, arial, system-ui, sans-serif;
+              font-family: ${inter.style.fontFamily}, system-ui, sans-serif;
               background: #f9fafb;
               color: #111827;
             }
           `
         }} />
       </head>
-            <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-screen`}>
+      <body className={`${inter.className} bg-gray-50 text-gray-900 antialiased min-h-screen`}>
         <ErrorBoundary>
           <QueryProvider>
             <AuthProvider>
               {children}
               <CookieConsentWrapper />
-              <FeedbackWidget />
             </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>
       </body>
     </html>
-  );
+  )
 }

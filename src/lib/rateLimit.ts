@@ -73,9 +73,20 @@ export function getRateLimitConfig(pathname: string) {
 }
 
 // Rate limit decorator for API routes
-export function withRateLimit(handler: Function, customConfig?: any) {
-  return async (request: NextRequest, ...args: any[]) => {
-    const config = customConfig || getRateLimitConfig(request.nextUrl.pathname)
+export interface RateLimitConfig {
+  windowMs: number
+  maxRequests: number
+  skipSuccessfulRequests?: boolean
+  skipFailedRequests?: boolean
+  keyGenerator?: (req: NextRequest) => string
+}
+
+export function withRateLimit(
+  handler: (request: NextRequest, ...args: unknown[]) => Promise<NextResponse | unknown>,
+  customConfig?: RateLimitConfig
+) {
+  return async (request: NextRequest, ...args: unknown[]) => {
+    const config: RateLimitConfig = customConfig || getRateLimitConfig(request.nextUrl.pathname)
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('user-agent') || 'unknown'
     const key = `${ip}:${request.nextUrl.pathname}`
     const cacheKey = `rate_limit:${key}`
@@ -105,4 +116,4 @@ export function withRateLimit(handler: Function, customConfig?: any) {
       return handler(request, ...args)
     }
   }
-} 
+}

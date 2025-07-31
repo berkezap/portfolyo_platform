@@ -165,7 +165,7 @@ export function RepositorySelection({
               {error.includes('rate limit') ? (
                 <div className="space-y-2">
                   <p className="text-red-600 text-xs">
-                    GitHub API'ye çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin.
+                    GitHub API&apos;ye çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin.
                   </p>
                   <div className="flex gap-2">
                     <Button 
@@ -242,4 +242,4 @@ export function RepositorySelection({
       </Card>
     </div>
   )
-} 
+}

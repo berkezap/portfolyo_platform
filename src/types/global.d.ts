@@ -6,7 +6,7 @@ declare global {
     gtag?: (
       command: 'config' | 'event' | 'js' | 'set',
       targetId: string,
-      config?: Record<string, any>
+      config?: Record<string, unknown>
     ) => void
   }
 }
@@ -14,7 +14,7 @@ declare global {
 // Google Tag Manager
 declare global {
   interface Window {
-    dataLayer?: any[]
+    dataLayer?: unknown[]
   }
 }
 
@@ -24,7 +24,7 @@ declare global {
     fbq?: (
       command: 'init' | 'track' | 'trackCustom',
       eventName?: string,
-      parameters?: Record<string, any>
+      parameters?: Record<string, unknown>
     ) => void
   }
 }
@@ -32,7 +32,7 @@ declare global {
 // Hotjar
 declare global {
   interface Window {
-    hj?: (command: string, ...args: any[]) => void
+    hj?: (command: string, ...args: unknown[]) => void
   }
 }
 
@@ -47,4 +47,4 @@ declare global {
   }
 }
 
-export {} 
+export {}

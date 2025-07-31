@@ -1,9 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Star, MessageCircle, X, Send, Smile, Meh, Frown } from 'lucide-react'
 import Button from './Button'
 import Card from './Card'
+
+
+/**
+ * FeedbackWidget - Kullanıcıdan geri bildirim almak için widget.
+ * @component
+ * @param {FeedbackWidgetProps} props - Kapatma fonksiyonu ve ek className.
+ * @returns {JSX.Element} Geri bildirim widget UI.
+ */
 
 interface FeedbackWidgetProps {
   onClose?: () => void
@@ -17,19 +25,13 @@ interface FeedbackData {
   page: string
 }
 
+/**
+ * FeedbackWidget ana componenti. Kullanıcıdan rating ve metin geri bildirim alır, API'ye gönderir.
+ * @param {FeedbackWidgetProps} props
+ */
 const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = '' }) => {
   const [isOpen, setIsOpen] = useState(false)
-  
-  // Feedback consent kontrolü
-  const hasFeedbackConsent = () => {
-    if (typeof window === 'undefined') return false
-    const consent = localStorage.getItem('cookie-consent')
-    if (consent) {
-      const consentData = JSON.parse(consent)
-      return consentData.feedback
-    }
-    return false
-  }
+  const [isClient, setIsClient] = useState(false)
   const [step, setStep] = useState<'initial' | 'rating' | 'feedback' | 'thanks'>('initial')
   const [feedbackData, setFeedbackData] = useState<FeedbackData>({
     rating: 0,
@@ -38,11 +40,27 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
     page: typeof window !== 'undefined' ? window.location.pathname : '/'
   })
 
+
+  /**
+   * Component mount olduğunda client ortamını işaretler.
+   */
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+
+  /**
+   * Kullanıcı rating seçtiğinde feedbackData'yı günceller ve bir sonraki adıma geçer.
+   * @param {number} rating - Kullanıcıdan alınan rating (1-5)
+   */
   const handleRating = (rating: number) => {
     setFeedbackData(prev => ({ ...prev, rating }))
     setStep('feedback')
   }
 
+  /**
+   * Feedback formunu submit eder, API'ye gönderir ve teşekkür adımına geçer.
+   */
   const handleSubmit = async () => {
     try {
       const response = await fetch('/api/feedback', {
@@ -78,9 +96,26 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
   }
 
   // Feedback consent yoksa widget'ı gösterme
-  if (!hasFeedbackConsent()) {
-    return null
-  }
+  const hasFeedbackConsent = () => {
+    if (typeof window === 'undefined') return false;
+    const consent = localStorage.getItem('cookie-consent');
+    if (consent) {
+      try {
+        const consentData = JSON.parse(consent);
+        return consentData.feedback === true; // Ensure feedback consent is explicitly checked
+      } catch (error) {
+        console.error('Error parsing cookie-consent:', error);
+        return false;
+      }
+    }
+    return false;
+  };
+
+  // Only render widget UI on client to avoid hydration mismatch
+  if (!isClient) return null
+
+  // Widget'ı sadece feedback consent varsa render et
+  if (!hasFeedbackConsent()) return null;
 
   if (!isOpen) {
     return (
@@ -222,4 +257,4 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
   )
 }
 
-export default FeedbackWidget 
+export default FeedbackWidget

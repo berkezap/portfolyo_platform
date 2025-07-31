@@ -9,7 +9,7 @@ interface SecurityEvent {
   path: string
   method: string
   userId?: string
-  details: Record<string, any>
+  details: Record<string, unknown>
 }
 
 // Güvenlik event'lerini loglama
@@ -123,4 +123,4 @@ export function isSuspiciousUserAgent(userAgent: string): boolean {
   ]
   
   return suspiciousPatterns.some(pattern => pattern.test(userAgent))
-} 
+}

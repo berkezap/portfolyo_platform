@@ -72,4 +72,4 @@ export function useConsent() {
     hasConsent,
     resetConsent
   }
-} 
+}

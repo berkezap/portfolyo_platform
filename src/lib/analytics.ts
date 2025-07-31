@@ -4,7 +4,7 @@ export interface UserEvent {
   userId?: string
   sessionId: string
   timestamp: number
-  properties: Record<string, any>
+  properties: Record<string, unknown>
   page: string
   userAgent: string
 }
@@ -88,7 +88,7 @@ class Analytics {
     this.track('user_identified', { userId })
   }
 
-  track(event: string, properties: Record<string, any> = {}) {
+  track(event: string, properties: Record<string, unknown> = {}) {
     // Consent kontrolü
     if (typeof window !== 'undefined') {
       const consent = localStorage.getItem('cookie-consent')
@@ -145,7 +145,7 @@ class Analytics {
     })
   }
 
-  trackError(error: Error, context?: Record<string, any>) {
+  trackError(error: Error, context?: Record<string, unknown>) {
     this.track('error_occurred', {
       errorMessage: error.message,
       errorStack: error.stack,
@@ -266,7 +266,7 @@ export function getAnalytics(): Analytics | null {
   return analyticsInstance
 }
 
-export function trackEvent(event: string, properties?: Record<string, any>) {
+export function trackEvent(event: string, properties?: Record<string, unknown>) {
   analyticsInstance?.track(event, properties)
 }
 
@@ -274,7 +274,7 @@ export function trackPageView() {
   analyticsInstance?.trackPageView()
 }
 
-export function trackError(error: Error, context?: Record<string, any>) {
+export function trackError(error: Error, context?: Record<string, unknown>) {
   analyticsInstance?.trackError(error, context)
 }
 
@@ -296,4 +296,4 @@ export function trackCvUpload(success: boolean, fileSize?: number, error?: strin
 
 export function trackUserJourney(step: string, duration?: number) {
   analyticsInstance?.trackUserJourney(step, duration)
-} 
+}

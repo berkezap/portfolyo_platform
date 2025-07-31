@@ -148,19 +148,19 @@ export const analyzePerformanceTrends = () => {
   const recent = history.slice(-5) // Son 5 ölçüm
   const older = history.slice(-10, -5) // Önceki 5 ölçüm
 
-  const recentAvg = recent.reduce((sum: number, entry: any) => {
-    const avg = entry.metrics.reduce((mSum: number, m: any) => {
+  const recentAvg = recent.reduce((sum: number, entry: unknown) => {
+    const avg = (entry as { metrics: WebVitalsData[] }).metrics.reduce((mSum: number, m: WebVitalsData) => {
       const score = m.rating === 'good' ? 100 : m.rating === 'needs-improvement' ? 50 : 0
       return mSum + score
-    }, 0) / entry.metrics.length
+    }, 0) / (entry as { metrics: WebVitalsData[] }).metrics.length
     return sum + avg
   }, 0) / recent.length
 
-  const olderAvg = older.reduce((sum: number, entry: any) => {
-    const avg = entry.metrics.reduce((mSum: number, m: any) => {
+  const olderAvg = older.reduce((sum: number, entry: unknown) => {
+    const avg = (entry as { metrics: WebVitalsData[] }).metrics.reduce((mSum: number, m: WebVitalsData) => {
       const score = m.rating === 'good' ? 100 : m.rating === 'needs-improvement' ? 50 : 0
       return mSum + score
-    }, 0) / entry.metrics.length
+    }, 0) / (entry as { metrics: WebVitalsData[] }).metrics.length
     return sum + avg
   }, 0) / older.length
 
@@ -175,4 +175,4 @@ export const analyzePerformanceTrends = () => {
   }
 }
 
-export default useWebVitals 
+export default useWebVitals

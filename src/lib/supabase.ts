@@ -45,7 +45,7 @@ export interface Portfolio {
   selected_repos: string[]
   cv_url?: string
   generated_html?: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   created_at: string
   updated_at: string
-} 
+}

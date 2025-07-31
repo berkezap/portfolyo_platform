@@ -64,7 +64,7 @@ export function register() {
   }
 }
 
-export const onRequestError = (error: Error | unknown) => {
+export const onRequestError = (error: unknown) => {
   Sentry.captureException(error);
   console.error('🔴 Request Error:', error);
 };

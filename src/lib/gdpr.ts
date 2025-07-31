@@ -96,7 +96,7 @@ export async function deleteUserData(userId: string): Promise<{ success: boolean
 }
 
 // Veri düzeltme (Right to rectification)
-export async function updateUserData(userId: string, updates: Record<string, any>): Promise<{ success: boolean; updatedRecords: number }> {
+export async function updateUserData(userId: string, updates: Record<string, unknown>): Promise<{ success: boolean; updatedRecords: number }> {
   try {
     console.log(`[GDPR] Kullanıcı verisi güncelleniyor: ${userId}`)
     
@@ -135,7 +135,7 @@ export async function updateUserData(userId: string, updates: Record<string, any
 }
 
 // Veri portability (Right to data portability)
-export async function exportUserData(userId: string): Promise<{ success: boolean; data: any }> {
+export async function exportUserData(userId: string): Promise<{ success: boolean; data: unknown }> {
   try {
     console.log(`[GDPR] Kullanıcı verisi export ediliyor: ${userId}`)
     
@@ -285,4 +285,4 @@ export async function getUserConsent(userId: string): Promise<ConsentData | null
     console.error('[GDPR] Consent getirme hatası:', error)
     return null
   }
-} 
+}

@@ -9,7 +9,7 @@ export const csrfTokenSchema = z.object({
 })
 
 // Kullanıcı yetkilendirme kontrolü
-export async function requireAuth(request: NextRequest) {
+export async function requireAuth(_request: NextRequest) {
   const session = await getServerSession(authOptions)
   
   if (!session?.user?.id) {
@@ -123,4 +123,4 @@ export function isSafeString(input: string): boolean {
   ]
   
   return !dangerousPatterns.some(pattern => pattern.test(input))
-} 
+}

@@ -4,7 +4,7 @@ console.log('⚠️ Using in-memory cache (Redis disabled)')
 // Cache service class
 export class CacheService {
   private static instance: CacheService
-  private memoryCache = new Map<string, { value: any; expiry: number }>()
+  private memoryCache = new Map<string, { value: unknown; expiry: number }>()
 
   constructor() {
     // In-memory cache only
@@ -18,7 +18,7 @@ export class CacheService {
   }
 
   // Set cache with TTL
-  async set(key: string, value: any, ttlSeconds: number = 300): Promise<void> {
+  async set(key: string, value: unknown, ttlSeconds: number = 300): Promise<void> {
     try {
       this.memoryCache.set(key, {
         value,
@@ -87,4 +87,4 @@ export class CacheService {
 export const cacheService = CacheService.getInstance()
 
 // Export empty redis for compatibility
-export const redis = null 
+export const redis = null

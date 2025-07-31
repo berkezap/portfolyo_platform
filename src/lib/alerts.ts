@@ -1,8 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
 import { monitoringService } from './monitoring'
 
+
+import { STATUS, COLORS } from '@/constants/appConstants'
+
 // Alert thresholds
-const ALERT_THRESHOLDS = {
+export const ALERT_THRESHOLDS = {
   errorRate: 5, // 5% error rate
   responseTime: 5000, // 5 seconds
   healthCheckFailure: 3, // 3 consecutive failures
@@ -11,14 +14,15 @@ const ALERT_THRESHOLDS = {
 }
 
 // Alert types
-export enum AlertType {
-  HIGH_ERROR_RATE = 'high_error_rate',
-  SLOW_RESPONSE_TIME = 'slow_response_time',
-  SERVICE_DOWN = 'service_down',
-  HIGH_MEMORY_USAGE = 'high_memory_usage',
-  HIGH_DISK_USAGE = 'high_disk_usage',
-  RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
-}
+export type AlertType =
+  | 'HIGH_ERROR_RATE'
+  | 'SLOW_RESPONSE_TIME'
+  | 'SERVICE_DOWN'
+  | 'HIGH_MEMORY_USAGE'
+  | 'HIGH_DISK_USAGE'
+  | 'RATE_LIMIT_EXCEEDED';
+
+
 
 // Alert interface
 export interface Alert {
@@ -26,7 +30,7 @@ export interface Alert {
   message: string
   severity: 'low' | 'medium' | 'high' | 'critical'
   timestamp: string
-  data?: any
+  data?: unknown
 }
 
 // Alert service class
@@ -56,7 +60,7 @@ export class AlertService {
         const errorRate = (errorStats.totalErrors / performanceStats.totalRequests) * 100
         if (errorRate > ALERT_THRESHOLDS.errorRate) {
           alerts.push({
-            type: AlertType.HIGH_ERROR_RATE,
+            type: 'HIGH_ERROR_RATE',
             message: `High error rate detected: ${errorRate.toFixed(2)}%`,
             severity: errorRate > 20 ? 'critical' : errorRate > 10 ? 'high' : 'medium',
             timestamp: new Date().toISOString(),
@@ -68,7 +72,7 @@ export class AlertService {
       // Check response time
       if (performanceStats.avgResponseTime > ALERT_THRESHOLDS.responseTime) {
         alerts.push({
-          type: AlertType.SLOW_RESPONSE_TIME,
+          type: 'SLOW_RESPONSE_TIME',
           message: `Slow response time detected: ${performanceStats.avgResponseTime.toFixed(2)}ms`,
           severity: performanceStats.avgResponseTime > 10000 ? 'critical' : 'high',
           timestamp: new Date().toISOString(),
@@ -79,7 +83,7 @@ export class AlertService {
       // Check service health
       if (!healthCheck.overall) {
         alerts.push({
-          type: AlertType.SERVICE_DOWN,
+          type: 'SERVICE_DOWN',
           message: 'One or more services are down',
           severity: 'critical',
           timestamp: new Date().toISOString(),
@@ -92,7 +96,7 @@ export class AlertService {
       const memoryPercent = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100
       if (memoryPercent > ALERT_THRESHOLDS.memoryUsage) {
         alerts.push({
-          type: AlertType.HIGH_MEMORY_USAGE,
+          type: 'HIGH_MEMORY_USAGE',
           message: `High memory usage detected: ${memoryPercent.toFixed(2)}%`,
           severity: memoryPercent > 95 ? 'critical' : 'high',
           timestamp: new Date().toISOString(),
@@ -130,7 +134,7 @@ export class AlertService {
           service: 'portfolyo'
         },
         extra: {
-          ...alert.data,
+          ...(typeof alert.data === 'object' && alert.data !== null ? alert.data : {}),
           timestamp: alert.timestamp
         }
       })
@@ -174,7 +178,7 @@ export class AlertService {
   }
 
   // Manual alert creation
-  createAlert(type: AlertType, message: string, severity: Alert['severity'], data?: any): void {
+  createAlert(type: AlertType, message: string, severity: Alert['severity'], data?: unknown): void {
     const alert: Alert = {
       type,
       message,
@@ -196,4 +200,4 @@ export function startAlertMonitoring(): void {
   setInterval(async () => {
     await alertService.checkAlerts()
   }, 5 * 60 * 1000) // 5 minutes
-} 
+}

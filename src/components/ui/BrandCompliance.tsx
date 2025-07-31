@@ -1,48 +1,58 @@
 import React from 'react'
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react'
+import { STATUS, StatusType, STATUS_COLORS } from '../../constants/brandCompliance'
 
+/**
+ * BrandComplianceProps arayüzü
+ */
 interface BrandComplianceProps {
   componentName: string
   checks: {
     name: string
-    status: 'pass' | 'warning' | 'fail'
+    status: StatusType
     description: string
   }[]
   className?: string
 }
 
+/**
+ * BrandCompliance componenti, bir bileşenin marka uyumluluğu checklistini gösterir.
+ * @param componentName - Bileşen adı
+ * @param checks - Kontrol listesi
+ * @param className - Ekstra stil sınıfı
+ */
 const BrandCompliance: React.FC<BrandComplianceProps> = ({
   componentName,
   checks,
   className = ''
 }) => {
-  const getStatusIcon = (status: string) => {
+  /**
+   * Duruma göre uygun ikonu döndürür.
+   * @param status - Kontrol durumu
+   */
+  const getStatusIcon = (status: StatusType) => {
     switch (status) {
-      case 'pass':
+      case STATUS.PASS:
         return <CheckCircle className="h-4 w-4 text-green-600" />
-      case 'warning':
+      case STATUS.WARNING:
         return <AlertCircle className="h-4 w-4 text-yellow-600" />
-      case 'fail':
+      case STATUS.FAIL:
         return <XCircle className="h-4 w-4 text-red-600" />
       default:
         return null
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pass':
-        return 'text-green-600 bg-green-50 border-green-200'
-      case 'warning':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-      case 'fail':
-        return 'text-red-600 bg-red-50 border-red-200'
-      default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
-    }
+  /**
+   * Duruma göre uygun renk sınıflarını döndürür.
+   * @param status - Kontrol durumu
+   */
+  const getStatusColor = (status: StatusType) => {
+    const color = STATUS_COLORS[status] || STATUS_COLORS.default
+    return `${color.text} ${color.bg} ${color.border}`
   }
 
-  const passCount = checks.filter(check => check.status === 'pass').length
+  const passCount = checks.filter(check => check.status === STATUS.PASS).length
   const totalCount = checks.length
   const complianceRate = Math.round((passCount / totalCount) * 100)
 
@@ -59,8 +69,11 @@ const BrandCompliance: React.FC<BrandComplianceProps> = ({
           <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
             <div 
               className={`h-full transition-all duration-300 ${
-                complianceRate >= 80 ? 'bg-green-500' : 
-                complianceRate >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                complianceRate >= 80
+                  ? STATUS_COLORS[STATUS.PASS].bar
+                  : complianceRate >= 60
+                  ? STATUS_COLORS[STATUS.WARNING].bar
+                  : STATUS_COLORS[STATUS.FAIL].bar
               }`}
               style={{ width: `${complianceRate}%` }}
             />
@@ -103,17 +116,17 @@ export const brandComplianceChecks = {
   colors: [
     {
       name: 'Primary Color Usage',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Ana marka rengi (Blue-600) doğru kullanılıyor'
     },
     {
       name: 'Semantic Colors',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Success, warning, error renkleri doğru kullanılıyor'
     },
     {
       name: 'Contrast Ratios',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'WCAG AA standartlarına uygun kontrast oranları'
     }
   ],
@@ -122,17 +135,17 @@ export const brandComplianceChecks = {
   typography: [
     {
       name: 'Font Family',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Inter font ailesi kullanılıyor'
     },
     {
       name: 'Font Weights',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Doğru font ağırlıkları kullanılıyor'
     },
     {
       name: 'Type Scale',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Tutarlı tipografi ölçeği kullanılıyor'
     }
   ],
@@ -141,12 +154,12 @@ export const brandComplianceChecks = {
   spacing: [
     {
       name: 'Spacing System',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: '4px base unit spacing sistemi kullanılıyor'
     },
     {
       name: 'Consistent Margins',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Tutarlı margin ve padding değerleri'
     }
   ],
@@ -155,17 +168,17 @@ export const brandComplianceChecks = {
   components: [
     {
       name: 'Button Hierarchy',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Primary, secondary, destructive button hiyerarşisi'
     },
     {
       name: 'Card Design',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Tutarlı card tasarımı ve hover efektleri'
     },
     {
       name: 'Icon Usage',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Lucide React ikonları kullanılıyor'
     }
   ],
@@ -174,20 +187,20 @@ export const brandComplianceChecks = {
   accessibility: [
     {
       name: 'Focus States',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Tüm interactive elementlerde focus states var'
     },
     {
       name: 'Keyboard Navigation',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Keyboard ile navigasyon mümkün'
     },
     {
       name: 'Screen Reader Support',
-      status: 'pass' as const,
+      status: STATUS.PASS,
       description: 'Screen reader uyumlu alt text ve labels'
     }
   ]
 }
 
-export default BrandCompliance 
+export default BrandCompliance

@@ -47,6 +47,6 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN && hasThirdPartyConsent) {
   console.log('⚠️ Sentry DSN bulunamadı, client monitoring devre dışı');
 }
 
-export const onRouterTransitionStart = () => {
+export const onRouterTransitionStart = (): void => {
   console.log('🔄 Router transition started');
 };

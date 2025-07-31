@@ -1,3 +1,8 @@
+/**
+ * UXResearchPage - Kullanıcı deneyimi dashboard'u.
+ * @returns {JSX.Element} UX araştırma ve analiz dashboard'u.
+ */
+
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
@@ -205,10 +210,10 @@ export default function UXResearchPage() {
             <div className="flex items-center space-x-2">
               <Star className="w-5 h-5 text-yellow-500 fill-current" />
               <span className="text-lg font-bold text-gray-900">
-                {analyticsData?.feedback.averageRating.toFixed(1) || '0.0'}
+                {analyticsData?.feedback?.averageRating !== undefined ? analyticsData.feedback.averageRating.toFixed(1) : '0.0'}
               </span>
               <span className="text-sm text-gray-600">
-                / 5 ({analyticsData?.feedback.totalFeedback || 0} değerlendirme)
+                / 5 ({analyticsData?.feedback?.totalFeedback !== undefined ? analyticsData.feedback.totalFeedback : 0} değerlendirme)
               </span>
             </div>
           </div>
@@ -218,7 +223,7 @@ export default function UXResearchPage() {
             <div>
               <h4 className="text-md font-medium text-gray-900 mb-3">Son Geri Bildirimler</h4>
               <div className="space-y-3">
-                {analyticsData?.feedback.recentFeedback.slice(0, 5).map((feedback, index) => (
+                {analyticsData?.feedback?.recentFeedback?.slice(0, 5)?.map((feedback, index) => (
                   <div key={index} className="p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-1">
@@ -251,19 +256,19 @@ export default function UXResearchPage() {
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                   <span className="text-sm text-gray-700">Pozitif (4-5 yıldız)</span>
                   <span className="text-sm font-medium text-green-700">
-                    {analyticsData?.feedback.recentFeedback.filter(f => f.rating >= 4).length || 0}
+                    {analyticsData?.feedback?.recentFeedback?.filter(f => f.rating >= 4)?.length || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
                   <span className="text-sm text-gray-700">Nötr (3 yıldız)</span>
                   <span className="text-sm font-medium text-yellow-700">
-                    {analyticsData?.feedback.recentFeedback.filter(f => f.rating === 3).length || 0}
+                    {analyticsData?.feedback?.recentFeedback?.filter(f => f.rating === 3)?.length || 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                   <span className="text-sm text-gray-700">Negatif (1-2 yıldız)</span>
                   <span className="text-sm font-medium text-red-700">
-                    {analyticsData?.feedback.recentFeedback.filter(f => f.rating <= 2).length || 0}
+                    {analyticsData?.feedback?.recentFeedback?.filter(f => f.rating <= 2)?.length || 0}
                   </span>
                 </div>
               </div>
@@ -292,4 +297,4 @@ export default function UXResearchPage() {
       <FeedbackWidget />
     </div>
   )
-} 
+}

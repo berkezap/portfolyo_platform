@@ -5,10 +5,19 @@ import { GitHubService } from '@/lib/github'
 import * as Sentry from '@sentry/nextjs'
 import { Session } from 'next-auth'
 
+/**
+ * SessionUser tipi, NextAuth session'dan dönen kullanıcı objesini temsil eder.
+ * Ek alanlar için union veya unknown tip kullanılabilir.
+ */
 interface SessionUser {
   email?: string;
   accessToken?: string;
-  [key: string]: any;
+  name?: string;
+  image?: string;
+  // Ek alanlar için aşağıdaki gibi tanımlanabilir
+  // customField?: string | number | boolean;
+  // Eğer dinamik alanlar gerekiyorsa:
+  // [key: string]: unknown;
 }
 
 export async function GET() {

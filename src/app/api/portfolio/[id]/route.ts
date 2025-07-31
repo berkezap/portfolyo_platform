@@ -6,6 +6,7 @@ import { portfolioUpdateSchema, validateRequest } from '@/lib/validation'
 import * as Sentry from '@sentry/nextjs'
 import { GitHubService } from '@/lib/github'
 import { formatUserDataForTemplate, renderTemplate } from '@/lib/templateEngine'
+import type { GitHubUser, GitHubRepo } from '@/types/github' // tipler buradan import edildi
 
 // GET - Portfolio detayını getir (public access)
 export async function GET(
@@ -58,7 +59,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let id: string = ''
+  let id = '';
   
   try {
     id = (await params).id
@@ -100,21 +101,23 @@ export async function PATCH(
     };
     
     // Template render işlemini optimize et - sadece gerekli olduğunda yap
-    const needsTemplateRender = template || selectedRepos || cvUrl !== undefined || userBio !== undefined;
+    const needsTemplateRender = !!template || !!selectedRepos || cvUrl !== undefined || userBio !== undefined;
     
     if (needsTemplateRender) {
       try {
         const githubService = new GitHubService(session.user.accessToken)
         
         // Paralel veri çekme - daha hızlı
-        const [userData, allRepos] = await Promise.all([
+        const [userDataRaw, allReposRaw] = await Promise.all([
           githubService.getUserData(),
           githubService.getUserRepos()
         ]);
+        const userData = userDataRaw as GitHubUser;
+        const allRepos = allReposRaw as GitHubRepo[];
 
         const finalTemplateName = template || existingPortfolio.selected_template;
         const finalSelectedRepos = selectedRepos || existingPortfolio.selected_repos;
-        const finalCvUrl = cvUrl !== undefined ? cvUrl : existingPortfolio.cv_url;
+        const finalCvUrl = typeof cvUrl === 'string' ? cvUrl : (existingPortfolio.cv_url ?? ''); // tip hatası giderildi
         const finalUserBio = userBio !== undefined ? userBio : existingPortfolio.metadata?.user_bio;
 
         console.log('🔄 Template verisi hazırlanıyor...', {
@@ -127,7 +130,7 @@ export async function PATCH(
         const templateData = formatUserDataForTemplate(userData, allRepos, finalSelectedRepos);
 
         if (finalCvUrl) templateData.CV_URL = finalCvUrl;
-        if (finalUserBio) templateData.USER_BIO = finalUserBio;
+        if (finalUserBio && typeof finalUserBio === 'string') templateData.USER_BIO = finalUserBio;
         
         console.log('🎨 Template render ediliyor...');
         const newGeneratedHtml = renderTemplate(finalTemplateName, templateData);

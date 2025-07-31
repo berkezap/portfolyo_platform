@@ -1,3 +1,9 @@
+/**
+ * ModernDeveloper portfolio template component.
+ * @param {TemplateProps} props - Portfolio template data and user info.
+ * @returns {JSX.Element} Modern developer portfolio UI.
+ */
+
 import React from 'react'
 import Image from 'next/image'
 import { TemplateProps } from '@/types/templates'
@@ -577,4 +583,4 @@ export function ModernDeveloper({ data }: TemplateProps) {
       </body>
     </>
   )
-} 
+}

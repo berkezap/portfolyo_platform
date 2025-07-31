@@ -85,8 +85,8 @@ export const authOptions: NextAuthOptions = {
     signOut: '/'
   },
   // Güvenlik ayarları
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'default_secret', // fallback eklendi
   debug: process.env.NODE_ENV === 'development',
   // CSRF koruması aktif
   useSecureCookies: process.env.NODE_ENV === 'production',
-} 
+}

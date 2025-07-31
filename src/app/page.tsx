@@ -47,6 +47,7 @@ export default function HomePage() {
                 PortfolYO
               </span>
             </Link>
+            {/* SSR'da sadece statik loading göster */}
             <div className="h-10 w-32 bg-white/20 rounded-lg animate-pulse"></div>
           </div>
         </header>
@@ -74,6 +75,7 @@ export default function HomePage() {
                 PortfolYO
               </span>
             </Link>
+            {/* SSR'da sadece statik loading göster */}
             <div className="h-10 w-32 bg-white/20 rounded-lg animate-pulse"></div>
           </div>
         </header>
@@ -96,36 +98,41 @@ export default function HomePage() {
             <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-2.5 shadow-lg transition-all duration-300 group-hover:scale-105 group-active:scale-95">
               <Code2 className="h-7 w-7 text-white" />
             </div>
-                          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
               PortfolYO
             </span>
           </Link>
-          {demoMode ? (
-            <Link href="/dashboard">
-              <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
-                Demo&apos;yu Dene
-              </Button>
-            </Link>
-          ) : session ? (
-            portfoliosLoading ? (
-              <div className="h-10 w-40 bg-white/20 rounded-lg animate-pulse"></div>
-            ) : portfolios.length === 0 ? (
-              <Link href="/dashboard">
-                <Button variant="primary" size="md" icon={Plus} className="shadow-lg hover-lift">
-                  İlk Portfolyonuzu Oluşturun
+          {/* Tüm session/dynamic UI sadece client'ta render edilir */}
+          {isClient && (
+            <>
+              {demoMode ? (
+                <Link href="/dashboard">
+                  <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
+                    Demo&apos;yu Dene
+                  </Button>
+                </Link>
+              ) : session ? (
+                portfoliosLoading ? (
+                  <div className="h-10 w-40 bg-white/20 rounded-lg animate-pulse"></div>
+                ) : portfolios.length === 0 ? (
+                  <Link href="/dashboard">
+                    <Button variant="primary" size="md" icon={Plus} className="shadow-lg hover-lift">
+                      İlk Portfolyonuzu Oluşturun
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/my-portfolios">
+                    <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
+                      Portfolyolarım ({portfolios.length})
+                    </Button>
+                  </Link>
+                )
+              ) : (
+                <Button variant="primary" size="md" icon={Github} onClick={() => signIn('github')} className="shadow-lg hover-lift">
+                  GitHub ile Giriş
                 </Button>
-              </Link>
-            ) : (
-              <Link href="/my-portfolios">
-                <Button variant="primary" size="md" icon={Code2} className="shadow-lg hover-lift">
-                  Portfolyolarım ({portfolios.length})
-                </Button>
-              </Link>
-            )
-          ) : (
-            <Button variant="primary" size="md" icon={Github} onClick={() => signIn('github')} className="shadow-lg hover-lift">
-              GitHub ile Giriş
-            </Button>
+              )}
+            </>
           )}
         </div>
       </header>
@@ -135,7 +142,7 @@ export default function HomePage() {
         <HeroSection
           title="GitHub Projelerinizden 5 Dakikada Portfolyo"
           subtitle="Kod yazmadan, GitHub projelerinizi kullanarak profesyonel bir portfolyo sitesi oluşturun. Sadece projelerinizi seçin, şablonunuzu belirleyin ve hazır!"
-          ctaText={demoMode ? "Demo'yu Dene" : session ? "Portfolyolarım" : "Ücretsiz Başla"}
+          ctaText={demoMode ? "Demo&apos;yu Dene" : session ? "Portfolyolarım" : "Ücretsiz Başla"}
           ctaAction={demoMode ? () => router.push('/dashboard') : session ? () => router.push('/my-portfolios') : () => signIn('github')}
           background="gradient"
         />

@@ -23,5 +23,5 @@ export default function CookieConsentWrapper() {
     console.log('Only essential cookies accepted')
   }
 
-  return <CookieConsent onAccept={handleAccept} onDecline={handleDecline} />
-} 
+  return <CookieConsent onAcceptAction={handleAccept} onDeclineAction={handleDecline} />
+}

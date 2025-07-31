@@ -4,7 +4,7 @@ import { RestEndpointMethodTypes } from '@octokit/rest';
 type OctokitRepo = RestEndpointMethodTypes["repos"]["listForAuthenticatedUser"]["response"]["data"][number];
 
 // Rate limiting için basit bir cache
-const requestCache = new Map<string, { data: any; timestamp: number }>()
+const requestCache = new Map<string, { data: unknown; timestamp: number }>()
 const CACHE_DURATION = 5 * 60 * 1000 // 5 dakika
 
 // Retry mekanizması
@@ -63,7 +63,7 @@ export class GitHubService {
     // Cache kontrolü
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       console.log('Returning cached repos data')
-      return cached.data
+      return cached.data as GitHubRepo[]
     }
 
     try {
@@ -184,4 +184,4 @@ export class GitHubService {
   clearCache() {
     requestCache.clear()
   }
-} 
+}

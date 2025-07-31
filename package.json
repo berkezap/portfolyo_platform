@@ -17,7 +17,8 @@
     "performance:budget": "npx webpack-bundle-analyzer .next/static/chunks/*.js",
     "performance:optimize": "npm run build && npm run performance:lighthouse",
     "setup:gdpr": "node scripts/setup-gdpr-db.js",
-    "postinstall": "npm run security:audit"
+    "postinstall": "npm run security:audit",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@auth/core": "^0.34.2",
@@ -51,9 +52,19 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^9.32.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "15.3.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "husky": "^8.0.0",
     "lighthouse": "^11.6.0",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.2",
     "typescript": "^5",
     "webpack-bundle-analyzer": "^4.10.2"
   },

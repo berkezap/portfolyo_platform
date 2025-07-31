@@ -9,7 +9,7 @@ interface ErrorBoundaryState {
 
 interface ErrorBoundaryProps {
   children: React.ReactNode
-  fallback?: React.ComponentType<{ error?: Error; resetError: () => void }>
+  fallback?: React.ComponentType<{ error?: Error; resetErrorAction: () => void }>
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -28,7 +28,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     console.error('🔥 Error Boundary yakaladı:', error, errorInfo)
   }
 
-  resetError = () => {
+  resetErrorAction = () => {
     this.setState({ hasError: false, error: undefined })
   }
 
@@ -37,11 +37,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       // Custom fallback UI varsa onu kullan
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback
-        return <FallbackComponent error={this.state.error} resetError={this.resetError} />
+        return <FallbackComponent error={this.state.error} resetErrorAction={this.resetErrorAction} />
       }
 
       // Default fallback UI
-      return <DefaultErrorFallback error={this.state.error} resetError={this.resetError} />
+      return <DefaultErrorFallback error={this.state.error} resetErrorAction={this.resetErrorAction} />
     }
 
     return this.props.children
@@ -49,7 +49,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 }
 
 // Default Error Fallback Component
-function DefaultErrorFallback({ error, resetError }: { error?: Error; resetError: () => void }) {
+function DefaultErrorFallback({ error, resetErrorAction }: { error?: Error; resetErrorAction: () => void }) {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="text-center max-w-md mx-auto">
@@ -76,7 +76,7 @@ function DefaultErrorFallback({ error, resetError }: { error?: Error; resetError
         
         <div className="mt-8 space-y-4">
           <button
-            onClick={resetError}
+            onClick={resetErrorAction}
             className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
           >
             Tekrar Dene
@@ -106,7 +106,7 @@ function DefaultErrorFallback({ error, resetError }: { error?: Error; resetError
 }
 
 // Specific Error Fallbacks for different contexts
-export function DashboardErrorFallback({ resetError }: { error?: Error; resetError: () => void }) {
+export function DashboardErrorFallback({ resetErrorAction }: { error?: Error; resetErrorAction: () => void }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-red-200">
       <div className="text-center">
@@ -123,7 +123,7 @@ export function DashboardErrorFallback({ resetError }: { error?: Error; resetErr
         
         <div className="flex gap-3 justify-center">
           <button
-            onClick={resetError}
+            onClick={resetErrorAction}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
           >
             Tekrar Dene
@@ -140,7 +140,7 @@ export function DashboardErrorFallback({ resetError }: { error?: Error; resetErr
   )
 }
 
-export function PortfolioErrorFallback({ resetError }: { error?: Error; resetError: () => void }) {
+export function PortfolioErrorFallback({ resetErrorAction }: { error?: Error; resetErrorAction: () => void }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-red-200">
       <div className="text-center">
@@ -157,7 +157,7 @@ export function PortfolioErrorFallback({ resetError }: { error?: Error; resetErr
         
         <div className="flex gap-3 justify-center">
           <button
-            onClick={resetError}
+            onClick={resetErrorAction}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
           >
             Tekrar Dene
@@ -174,4 +174,4 @@ export function PortfolioErrorFallback({ resetError }: { error?: Error; resetErr
   )
 }
 
-export default ErrorBoundary 
+export default ErrorBoundary

@@ -6,8 +6,8 @@ import Button from './Button'
 import Card from './Card'
 
 interface CookieConsentProps {
-  onAccept: (consent: ConsentData) => void
-  onDecline: () => void
+  onAcceptAction: (consent: ConsentData) => void
+  onDeclineAction: () => void
 }
 
 export interface ConsentData {
@@ -17,7 +17,7 @@ export interface ConsentData {
   thirdParty: boolean
 }
 
-export default function CookieConsent({ onAccept, onDecline }: CookieConsentProps) {
+export default function CookieConsent({ onAcceptAction, onDeclineAction }: CookieConsentProps) {
   const [showBanner, setShowBanner] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [consent, setConsent] = useState<ConsentData>({
@@ -44,14 +44,14 @@ export default function CookieConsent({ onAccept, onDecline }: CookieConsentProp
     }
     localStorage.setItem('cookie-consent', JSON.stringify(allConsent))
     setShowBanner(false)
-    onAccept(allConsent)
+    onAcceptAction(allConsent)
   }
 
   const handleAcceptSelected = () => {
     localStorage.setItem('cookie-consent', JSON.stringify(consent))
     setShowBanner(false)
     setShowSettings(false)
-    onAccept(consent)
+    onAcceptAction(consent)
   }
 
   const handleDecline = () => {
@@ -63,7 +63,7 @@ export default function CookieConsent({ onAccept, onDecline }: CookieConsentProp
     }
     localStorage.setItem('cookie-consent', JSON.stringify(noConsent))
     setShowBanner(false)
-    onDecline()
+    onDeclineAction()
   }
 
   const updateConsent = (type: keyof ConsentData, value: boolean) => {
@@ -95,7 +95,7 @@ export default function CookieConsent({ onAccept, onDecline }: CookieConsentProp
                   <a href="/privacy-policy" className="text-blue-600 hover:underline">
                     Gizlilik Politikası
                   </a>
-                  'nı inceleyebilirsiniz.
+                  &apos;nı inceleyebilirsiniz.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -241,4 +241,4 @@ export default function CookieConsent({ onAccept, onDecline }: CookieConsentProp
       </Card>
     </div>
   )
-} 
+}
