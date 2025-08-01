@@ -33,33 +33,7 @@ export default function HomePage() {
     setIsClient(true);
   }, []);
 
-  // ANINDA YÖNLENDİRME - Giriş yapan kullanıcıyı ana sayfada tutma!
-  useEffect(() => {
-    if (status === 'authenticated' && session && isClient) {
-      // Portfolio loading'i bekle
-      if (!portfoliosLoading) {
-        if (portfolios && portfolios.length > 0) {
-          // Portfolyo varsa yönetim sayfasına git
-          router.replace('/my-portfolios');
-        } else {
-          // Portfolyo yoksa oluşturma sayfasına git
-          router.replace('/dashboard');
-        }
-      }
-    }
-  }, [status, session, portfolios, portfoliosLoading, router, isClient]);
-
-  // Eğer kullanıcı giriş yapmışsa loading göster (yönlendirme beklerken)
-  if (status === 'authenticated' && session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Yönlendiriliyor...</p>
-        </div>
-      </div>
-    );
-  }
+  // Artık otomatik yönlendirme yapmıyoruz - kullanıcı landing page'de kalabilir
 
   // İlk yükleme sırasında minimal loading göster
   if (!isClient) {
@@ -102,8 +76,14 @@ export default function HomePage() {
           <HeroSection
             title="GitHub Projelerinizden 5 Dakikada Portfolyo"
             subtitle="Kod yazmadan, GitHub projelerinizi kullanarak profesyonel bir portfolyo sitesi oluşturun. Sadece projelerinizi seçin, şablonunuzu belirleyin ve hazır!"
-            ctaText={demoMode ? "Demo'yu Dene" : 'Ücretsiz Başla'}
-            ctaAction={demoMode ? () => router.push('/dashboard') : () => signIn('github')}
+            ctaText={demoMode ? "Demo'yu Dene" : session ? "Dashboard'a Git" : 'Ücretsiz Başla'}
+            ctaAction={
+              demoMode
+                ? () => router.push('/dashboard')
+                : session
+                  ? () => router.push('/dashboard')
+                  : () => signIn('github')
+            }
             background="gradient"
           />
         </Suspense>
@@ -242,7 +222,17 @@ export default function HomePage() {
             GitHub projelerinizi birkaç tıkla etkileyici bir portfolyoya dönüştürün. Ücretsiz ve
             hızlı!
           </p>
-          {!session && (
+          {session ? (
+            <Button
+              variant="glass"
+              size="xl"
+              icon={Github}
+              onClick={() => router.push('/dashboard')}
+              className="bg-white/20 hover:bg-white/30 text-white border-white/30 shadow-xl hover-lift"
+            >
+              Dashboard'a Git
+            </Button>
+          ) : (
             <Button
               variant="glass"
               size="xl"
