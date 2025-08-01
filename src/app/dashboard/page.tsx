@@ -1,48 +1,77 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useGitHubRepos } from '@/hooks/useGitHubRepos'
-import { usePortfolioGenerator } from '@/hooks/usePortfolioGenerator'
-import { usePortfolioList } from '@/hooks/usePortfolioList'
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader'
-import { ProgressSteps } from '@/components/dashboard/ProgressSteps'
-import { StepType, PortfolioTemplate } from '@/types/dashboard'
-import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary'
-import dynamic from 'next/dynamic'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useGitHubRepos } from '@/hooks/useGitHubRepos';
+import { usePortfolioGenerator } from '@/hooks/usePortfolioGenerator';
+import { usePortfolioList } from '@/hooks/usePortfolioList';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeaderNew';
+import { ProgressSteps } from '@/components/dashboard/ProgressStepsNew';
+import { StepType, PortfolioTemplate } from '@/types/dashboard';
+import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary';
+import dynamic from 'next/dynamic';
 
 // Dinamik import'lar - sadece ihtiyaç anında yüklenecek
-const RepositorySelection = dynamic(() => import('@/components/dashboard/steps/RepositorySelection').then(mod => ({ default: mod.RepositorySelection })), {
-  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
-  ssr: false
-})
+const RepositorySelection = dynamic(
+  () =>
+    import('@/components/dashboard/steps/RepositorySelection').then((mod) => ({
+      default: mod.RepositorySelection,
+    })),
+  {
+    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
+    ssr: false,
+  },
+);
 
-const TemplateSelection = dynamic(() => import('@/components/dashboard/steps/TemplateSelection').then(mod => ({ default: mod.TemplateSelection })), {
-  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
-  ssr: false
-})
+const TemplateSelection = dynamic(
+  () =>
+    import('@/components/dashboard/steps/TemplateSelection').then((mod) => ({
+      default: mod.TemplateSelection,
+    })),
+  {
+    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
+    ssr: false,
+  },
+);
 
-const CVUpload = dynamic(() => import('@/components/dashboard/steps/CVUpload').then(mod => ({ default: mod.CVUpload })), {
-  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
-  ssr: false
-})
+const CVUpload = dynamic(
+  () => import('@/components/dashboard/steps/CVUpload').then((mod) => ({ default: mod.CVUpload })),
+  {
+    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
+    ssr: false,
+  },
+);
 
-const GenerateStep = dynamic(() => import('@/components/dashboard/steps/GenerateStep').then(mod => ({ default: mod.GenerateStep })), {
-  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
-  ssr: false
-})
+const GenerateStep = dynamic(
+  () =>
+    import('@/components/dashboard/steps/GenerateStep').then((mod) => ({
+      default: mod.GenerateStep,
+    })),
+  {
+    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
+    ssr: false,
+  },
+);
 
-const CompletedStep = dynamic(() => import('@/components/dashboard/steps/CompletedStep').then(mod => ({ default: mod.CompletedStep })), {
-  loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded-lg"></div>,
-  ssr: false
-})
+const CompletedStep = dynamic(
+  () =>
+    import('@/components/dashboard/steps/CompletedStep').then((mod) => ({
+      default: mod.CompletedStep,
+    })),
+  {
+    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
+    ssr: false,
+  },
+);
 
 // Mock GitHub repositories data
 const mockRepos = [
   {
     id: 1,
     name: 'e-commerce-app',
-    description: 'Modern React e-commerce application with Next.js, TypeScript and Stripe integration',
+    description:
+      'Modern React e-commerce application with Next.js, TypeScript and Stripe integration',
     html_url: 'https://github.com/user/e-commerce-app',
     language: 'TypeScript',
     stargazers_count: 42,
@@ -50,7 +79,7 @@ const mockRepos = [
     created_at: '2024-01-15T10:30:00Z',
     updated_at: '2024-12-20T15:45:00Z',
     topics: ['react', 'nextjs', 'ecommerce', 'typescript'],
-    homepage: 'https://my-shop.vercel.app'
+    homepage: 'https://my-shop.vercel.app',
   },
   {
     id: 2,
@@ -63,7 +92,7 @@ const mockRepos = [
     created_at: '2024-02-10T08:20:00Z',
     updated_at: '2024-11-30T12:15:00Z',
     topics: ['nodejs', 'express', 'mongodb', 'api'],
-    homepage: null
+    homepage: null,
   },
   {
     id: 3,
@@ -76,7 +105,7 @@ const mockRepos = [
     created_at: '2024-03-05T14:10:00Z',
     updated_at: '2024-10-15T09:30:00Z',
     topics: ['portfolio', 'website', 'responsive'],
-    homepage: 'https://johndoe.dev'
+    homepage: 'https://johndoe.dev',
   },
   {
     id: 4,
@@ -89,7 +118,7 @@ const mockRepos = [
     created_at: '2024-04-20T11:45:00Z',
     updated_at: '2024-12-01T16:20:00Z',
     topics: ['d3js', 'react', 'dataviz', 'dashboard'],
-    homepage: 'https://dataviz-demo.netlify.app'
+    homepage: 'https://dataviz-demo.netlify.app',
   },
   {
     id: 5,
@@ -102,7 +131,7 @@ const mockRepos = [
     created_at: '2024-05-12T13:25:00Z',
     updated_at: '2024-12-18T10:45:00Z',
     topics: ['react-native', 'chat', 'realtime', 'firebase'],
-    homepage: null
+    homepage: null,
   },
   {
     id: 6,
@@ -115,9 +144,9 @@ const mockRepos = [
     created_at: '2024-06-08T09:15:00Z',
     updated_at: '2024-12-22T14:30:00Z',
     topics: ['ai', 'machine-learning', 'image-generation', 'openai'],
-    homepage: 'https://ai-img-gen.herokuapp.com'
-  }
-]
+    homepage: 'https://ai-img-gen.herokuapp.com',
+  },
+];
 
 const portfolioTemplates: PortfolioTemplate[] = [
   {
@@ -132,7 +161,6 @@ const portfolioTemplates: PortfolioTemplate[] = [
           <div style="display: flex; gap: 8px; justify-content: center;">
             <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; font-size: 12px;">React</div>
             <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; font-size: 12px;">Node.js</div>
-          </div>
         </div>
         <div style="margin-top: 20px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
           <h3 style="margin-bottom: 8px; font-size: 14px;">Modern E-commerce</h3>
@@ -140,7 +168,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
         </div>
       </div>
     `,
-    features: ['Dark/Light Mode', 'Responsive Design', 'Project Showcase', 'CV Section']
+    features: ['Dark/Light Mode', 'Responsive Design', 'Project Showcase', 'CV Section'],
   },
   {
     id: 2,
@@ -162,7 +190,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
         </div>
       </div>
     `,
-    features: ['Animations', 'Grid Layout', 'Image Gallery', 'Contact Form']
+    features: ['Animations', 'Grid Layout', 'Image Gallery', 'Contact Form'],
   },
   {
     id: 3,
@@ -189,7 +217,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
         </div>
       </div>
     `,
-    features: ['Timeline View', 'Skill Bars', 'Testimonials', 'Blog Section']
+    features: ['Timeline View', 'Skill Bars', 'Testimonials', 'Blog Section'],
   },
   // YENİ TEMPLATE'LER
   {
@@ -210,7 +238,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
         </div>
       </div>
     `,
-    features: ['Strict Grid', 'Monochrome', 'Minimal Accent', 'Professional']
+    features: ['Strict Grid', 'Monochrome', 'Minimal Accent', 'Professional'],
   },
   {
     id: 5,
@@ -230,7 +258,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
         </div>
       </div>
     `,
-    features: ['Dark Mode', 'Neon Accent', 'Micro-interactions', 'Animated']
+    features: ['Dark Mode', 'Neon Accent', 'Micro-interactions', 'Animated'],
   },
   {
     id: 6,
@@ -250,22 +278,38 @@ const portfolioTemplates: PortfolioTemplate[] = [
         </div>
       </div>
     `,
-    features: ['Timeline', 'Serif Headings', 'Case Study', 'Warm Colors']
+    features: ['Timeline', 'Serif Headings', 'Case Study', 'Warm Colors'],
   },
-]
+];
 
 export default function DashboardPage() {
-  const { data: session } = useSession()
-  const { data: realRepos, isLoading: reposLoading, error: _reposError, refetch } = useGitHubRepos()
-  const { generatePortfolio, result: portfolioResult, loading: portfolioLoading, error: portfolioError, clearResult } = usePortfolioGenerator()
-  
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const {
+    data: realRepos,
+    isLoading: reposLoading,
+    error: _reposError,
+    refetch,
+  } = useGitHubRepos();
+  const {
+    generatePortfolio,
+    result: portfolioResult,
+    loading: portfolioLoading,
+    error: portfolioError,
+    clearResult,
+  } = usePortfolioGenerator();
+
   // Portfolio listesini yenilemek için refetch fonksiyonu
-  const { portfolios: _portfolios, isLoading: _portfoliosLoading, refetch: refetchPortfolios } = usePortfolioList(Boolean(session))
-  
+  const {
+    portfolios,
+    isLoading: portfoliosLoading,
+    refetch: refetchPortfolios,
+  } = usePortfolioList(Boolean(session));
+
   // Demo mode kontrolü
-  const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
-  
-  const repos = demoMode ? mockRepos : realRepos || []
+  const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
+  const repos = demoMode ? mockRepos : realRepos || [];
 
   // Template ID'lerini şablon isimlerine çevir
   const templateIdToName = {
@@ -275,51 +319,52 @@ export default function DashboardPage() {
     4: 'minimalist-professional',
     5: 'creative-technologist',
     6: 'storyteller',
-  }
-  
-  const [selectedRepos, setSelectedRepos] = useState<number[]>([])
-  const [selectedTemplate, setSelectedTemplate] = useState<number>(1)
-  const [cvUrl, setCvUrl] = useState<string | null>(null)
-  const [cvUploading, setCvUploading] = useState(false)
-  const [cvError, setCvError] = useState<string | null>(null)
-  const [step, setStep] = useState<StepType>('repos')
-  const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({ isOpen: false, templateId: null })
-  const [previewHtml, setPreviewHtml] = useState<string>('')
-  const [previewLoading, setPreviewLoading] = useState(false)
+  };
+
+  const [selectedRepos, setSelectedRepos] = useState<number[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<number>(1);
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [cvUploading, setCvUploading] = useState(false);
+  const [cvError, setCvError] = useState<string | null>(null);
+  const [step, setStep] = useState<StepType>('repos');
+  const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({
+    isOpen: false,
+    templateId: null,
+  });
+  const [previewHtml, setPreviewHtml] = useState<string>('');
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const toggleRepo = (repoId: number) => {
-    setSelectedRepos(prev => 
-      prev.includes(repoId) 
-        ? prev.filter(id => id !== repoId)
-        : [...prev, repoId]
-    )
-  }
+    setSelectedRepos((prev) =>
+      prev.includes(repoId) ? prev.filter((id) => id !== repoId) : [...prev, repoId],
+    );
+  };
 
   const handleCvUpload = async (file: File) => {
-    setCvUploading(true)
-    setCvError(null)
-    
+    setCvUploading(true);
+    setCvError(null);
+
     try {
-      const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
-      const ALLOWED_TYPES = ['application/pdf']
-      
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+      const ALLOWED_TYPES = ['application/pdf'];
+
       if (!ALLOWED_TYPES.includes(file.type)) {
-        throw new Error('Sadece PDF formatındaki dosyalar kabul edilmektedir.')
+        throw new Error('Sadece PDF formatındaki dosyalar kabul edilmektedir.');
       }
-      
+
       if (file.size > MAX_FILE_SIZE) {
-        throw new Error(`Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.`)
+        throw new Error(`Dosya boyutu çok büyük. Maksimum 10MB olmalıdır.`);
       }
 
       // 1) Get signed URL
       const res = await fetch('/api/upload/cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName: file.name, fileType: file.type })
-      })
-      
-      if (!res.ok) throw new Error('Signed URL alınamadı')
-      const { uploadUrl, publicUrl } = await res.json()
+        body: JSON.stringify({ fileName: file.name, fileType: file.type }),
+      });
+
+      if (!res.ok) throw new Error('Signed URL alınamadı');
+      const { uploadUrl, publicUrl } = await res.json();
 
       // 2) Upload file
       const putRes = await fetch(uploadUrl, {
@@ -327,154 +372,210 @@ export default function DashboardPage() {
         body: file,
         headers: {
           'Content-Type': file.type,
-          'x-upsert': 'true'
-        }
-      })
-      
-      if (!putRes.ok) throw new Error('Dosya yüklenemedi')
+          'x-upsert': 'true',
+        },
+      });
 
-      setCvUrl(publicUrl)
+      if (!putRes.ok) throw new Error('Dosya yüklenemedi');
+
+      setCvUrl(publicUrl);
     } catch (err: unknown) {
-      setCvError(err instanceof Error ? err.message : 'Dosya yüklenirken hata')
+      setCvError(err instanceof Error ? err.message : 'Dosya yüklenirken hata');
     } finally {
-      setCvUploading(false)
+      setCvUploading(false);
     }
-  }
+  };
 
   const handleGenerate = async () => {
     // Demo mode'da da gerçek portfolio oluştur ama mock verilerle
-    setStep('generate')
-    clearResult()
-    
+    setStep('generate');
+    clearResult();
+
     try {
-      const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName]
-      
+      const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName];
+
       // Selected repo ID'lerini isimlere çevir
       const selectedRepoNames = selectedRepos
-        .map(repoId => repos.find(repo => repo.id === repoId)?.name)
-        .filter(Boolean) as string[]
-      
-      await generatePortfolio(templateName, selectedRepoNames, cvUrl || undefined)
-      
-      // Portfolio listesini yenile
-      await refetchPortfolios()
-      
-      // Portfolyo başarıyla oluşturulduysa completed adımına geç
-      setStep('completed')
-    } catch (_error) {
-      console.error('Portfolio generation failed:', _error)
-      // Hata durumunda geri dön
-      setStep('cv')
-    }
-  }
+        .map((repoId) => repos.find((repo) => repo.id === repoId)?.name)
+        .filter(Boolean) as string[];
 
-  // handleGoToDashboard kaldırıldı - kullanılmıyor
+      await generatePortfolio(templateName, selectedRepoNames, cvUrl || undefined);
+
+      // Portfolio listesini yenile
+      await refetchPortfolios();
+
+      // Portfolyo başarıyla oluşturulduysa completed adımına geç
+      setStep('completed');
+    } catch (_error) {
+      console.error('Portfolio generation failed:', _error);
+      // Hata durumunda geri dön
+      setStep('cv');
+    }
+  }; // handleGoToDashboard kaldırıldı - kullanılmıyor
 
   const handlePreview = async (templateId: number) => {
-    setPreviewModal({ isOpen: true, templateId })
-    setPreviewLoading(true)
-    
+    setPreviewModal({ isOpen: true, templateId });
+    setPreviewLoading(true);
+
     try {
-      const response = await fetch(`/api/templates/preview/${templateId}`)
+      const response = await fetch(`/api/templates/preview/${templateId}`);
       if (response.ok) {
-        const html = await response.text()
-        setPreviewHtml(html)
+        const html = await response.text();
+        setPreviewHtml(html);
       } else {
-        setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>')
+        setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>');
       }
     } catch {
-      setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenirken hata oluştu</div>')
+      setPreviewHtml(
+        '<div class="p-8 text-center text-red-600">Template yüklenirken hata oluştu</div>',
+      );
     } finally {
-      setPreviewLoading(false)
+      setPreviewLoading(false);
     }
-  }
+  };
 
   return (
     <ErrorBoundary fallback={DashboardErrorFallback}>
-      <div className="min-h-screen bg-gray-50">
+      {/* Ana Konteynır - Header için yer bırak */}
+      <div className="min-h-screen" style={{ backgroundColor: '#F7F8FA', paddingTop: '64px' }}>
         <DashboardHeader demoMode={demoMode} />
 
-        <div className="container mx-auto px-4 py-4">
-          <div className="pt-2">
+        {/* Geniş sayfa konteyneri - cömert kenar boşlukları */}
+        <div className="max-w-screen-2xl mx-auto px-8 lg:px-16 xl:px-24 py-16">
+          {/* Progress Steps - Header'a daha yakın */}
+          <div className="mt-4 mb-8">
             <ProgressSteps currentStep={step} />
           </div>
 
-          {/* Step 1: Repository Selection */}
-          {step === 'repos' && (
-            <RepositorySelection
-              key={`repos-${repos.length}-${reposLoading}`} // Force re-mount when data changes
-              repos={repos}
-              selectedRepos={selectedRepos}
-              onToggleRepo={toggleRepo}
-              onNext={() => setStep('template')}
-              demoMode={demoMode}
-              loading={reposLoading}
-              error={_reposError?.message || null}
-              onRefetch={refetch}
-            />
-          )}
+          {/* Ana içerik alanı - merkezde ama geniş */}
+          <div className="max-w-6xl mx-auto">
+            {/* Step 1: Repository Selection - Daha az iç padding */}
+            {step === 'repos' && (
+              <div className="px-120 py-8">
+                <RepositorySelection
+                  key={`repos-${repos.length}-${reposLoading}`}
+                  repos={repos}
+                  selectedRepos={selectedRepos}
+                  onToggleRepo={toggleRepo}
+                  onNext={() => setStep('template')}
+                  demoMode={demoMode}
+                  loading={reposLoading}
+                  error={_reposError?.message || null}
+                  onRefetch={refetch}
+                />
+              </div>
+            )}
 
-          {/* Step 2: Template Selection */}
-          {step === 'template' && (
-            <TemplateSelection
-              templates={portfolioTemplates}
-              selectedTemplate={selectedTemplate}
-              onSelectTemplate={setSelectedTemplate}
-              onNext={() => setStep('cv')}
-              onBack={() => setStep('repos')}
-              onPreview={handlePreview}
-            />
-          )}
+            {/* Step 2: Template Selection - Geniş iç padding */}
+            {step === 'template' && (
+              <div className="px-12 py-8">
+                <TemplateSelection
+                  templates={portfolioTemplates}
+                  selectedTemplate={selectedTemplate}
+                  onSelectTemplate={setSelectedTemplate}
+                  onNext={() => setStep('cv')}
+                  onBack={() => setStep('repos')}
+                  onPreview={handlePreview}
+                />
+              </div>
+            )}
 
-          {/* Template Preview Modal */}
+            {/* Step 3: CV Upload - Geniş iç padding */}
+            {step === 'cv' && (
+              <div className="px-12 py-8">
+                <CVUpload
+                  cvUrl={cvUrl || undefined}
+                  uploading={cvUploading}
+                  error={cvError}
+                  onUpload={handleCvUpload}
+                  onNext={handleGenerate}
+                  onBack={() => setStep('template')}
+                />
+              </div>
+            )}
+
+            {/* Step 4: Generate - Geniş iç padding */}
+            {step === 'generate' && (
+              <div className="px-12 py-8">
+                <GenerateStep
+                  loading={portfolioLoading}
+                  error={portfolioError}
+                  onGenerate={handleGenerate}
+                  onBack={() => setStep('cv')}
+                />
+              </div>
+            )}
+
+            {/* Step 5: Completed - Geniş iç padding */}
+            {step === 'completed' && (
+              <div className="px-12 py-8">
+                <CompletedStep
+                  portfolioResult={portfolioResult}
+                  demoMode={demoMode}
+                  userName={session?.user?.name || undefined}
+                  onNewPortfolio={() => {
+                    setStep('repos');
+                    clearResult();
+                    setSelectedRepos([]);
+                    setSelectedTemplate(1);
+                    setCvUrl(null);
+                    setCvError(null);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Template Preview Modal - Geniş padding ve boşluklar */}
           {previewModal.isOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-4">
-              <div className="bg-white rounded-lg w-full max-w-6xl h-full max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between p-4 border-b">
-                  <h3 className="text-lg font-semibold">
-                    {portfolioTemplates.find(t => t.id === previewModal.templateId)?.name} - Önizleme
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 p-8">
+              <div className="bg-white rounded-2xl w-full max-w-7xl h-full max-h-[90vh] flex flex-col shadow-2xl">
+                <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {portfolioTemplates.find((t) => t.id === previewModal.templateId)?.name} -
+                    Önizleme
                   </h3>
                   <button
                     onClick={() => {
-                      setPreviewModal({ isOpen: false, templateId: null })
-                      setPreviewHtml('')
+                      setPreviewModal({ isOpen: false, templateId: null });
+                      setPreviewHtml('');
                     }}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
                   >
-                    ✕
+                    <span className="text-2xl">✕</span>
                   </button>
                 </div>
-                
-                <div className="flex-1 p-4 overflow-auto">
+
+                <div className="flex-1 p-8 overflow-auto">
                   {previewLoading ? (
                     <div className="flex items-center justify-center h-full">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
                     </div>
                   ) : (
-                    <div 
-                      className="w-full h-full border border-gray-300 rounded-lg overflow-auto bg-white"
+                    <div
+                      className="w-full h-full border border-gray-200 rounded-xl overflow-auto bg-white shadow-inner"
                       dangerouslySetInnerHTML={{ __html: previewHtml }}
                     />
                   )}
                 </div>
-                
-                <div className="p-4 border-t flex justify-end space-x-3">
+
+                <div className="px-8 py-6 border-t border-gray-100 flex justify-end space-x-4">
                   <button
                     onClick={() => {
-                      setSelectedTemplate(previewModal.templateId!)
-                      setPreviewModal({ isOpen: false, templateId: null })
-                      setPreviewHtml('')
+                      setSelectedTemplate(previewModal.templateId!);
+                      setPreviewModal({ isOpen: false, templateId: null });
+                      setPreviewHtml('');
                     }}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium shadow-sm"
                   >
                     Şablonu Seç
                   </button>
                   <button
                     onClick={() => {
-                      setPreviewModal({ isOpen: false, templateId: null })
-                      setPreviewHtml('')
+                      setPreviewModal({ isOpen: false, templateId: null });
+                      setPreviewHtml('');
                     }}
-                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-8 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                   >
                     Kapat
                   </button>
@@ -482,47 +583,8 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-
-          {/* Step 3: CV Upload */}
-          {step === 'cv' && (
-            <CVUpload
-              cvUrl={cvUrl || undefined}
-              uploading={cvUploading}
-              error={cvError}
-              onUpload={handleCvUpload}
-              onNext={handleGenerate}
-              onBack={() => setStep('template')}
-            />
-          )}
-
-          {/* Step 4: Generate */}
-          {step === 'generate' && (
-            <GenerateStep
-              loading={portfolioLoading}
-              error={portfolioError}
-              onGenerate={handleGenerate}
-              onBack={() => setStep('cv')}
-            />
-          )}
-
-          {/* Step 5: Completed */}
-          {step === 'completed' && (
-            <CompletedStep
-              portfolioResult={portfolioResult}
-              demoMode={demoMode}
-              userName={session?.user?.name || undefined}
-              onNewPortfolio={() => {
-                setStep('repos')
-                clearResult()
-                setSelectedRepos([])
-                setSelectedTemplate(1)
-                setCvUrl(null)
-                setCvError(null)
-              }}
-            />
-          )}
         </div>
       </div>
     </ErrorBoundary>
-  )
-} 
+  );
+}

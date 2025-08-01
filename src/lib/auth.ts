@@ -1,5 +1,5 @@
-import { type NextAuthOptions } from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
+import { type NextAuthOptions } from 'next-auth';
+import GitHubProvider from 'next-auth/providers/github';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -8,10 +8,10 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
       authorization: {
         params: {
-          scope: 'read:user user:email public_repo'
-        }
-      }
-    })
+          scope: 'read:user user:email public_repo',
+        },
+      },
+    }),
   ],
   session: {
     strategy: 'jwt',
@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
         path: '/',
         secure: process.env.NODE_ENV === 'production', // Sadece HTTPS'te gönder
         maxAge: 24 * 60 * 60, // 24 saat
-      }
+      },
     },
     callbackUrl: {
       name: `next-auth.callback-url`,
@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-      }
+      },
     },
     csrfToken: {
       name: `next-auth.csrf-token`,
@@ -48,8 +48,8 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-      }
-    }
+      },
+    },
   },
   callbacks: {
     async jwt({ token, user, account }) {
@@ -70,23 +70,34 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
-      // GitHub girişi sonrası /my-portfolios'a yönlendir
-      if (url === baseUrl || url === `${baseUrl}/`) {
-        return `${baseUrl}/my-portfolios`
+      // Logout durumunda ana sayfaya yönlendir
+      if (url === `${baseUrl}/` || url === baseUrl) {
+        return baseUrl;
       }
-      if (url.startsWith('/')) return `${baseUrl}${url}`
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
-    }
+
+      // Diğer durumlar için
+      if (url.startsWith('/') && !url.includes('auth')) {
+        return `${baseUrl}${url}`;
+      } else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
+  },
+  events: {
+    async signOut() {
+      console.log('🚪 User signed out');
+    },
+    async signIn({ user }) {
+      console.log('👋 User signed in:', user.email);
+    },
   },
   pages: {
     signIn: '/',
     error: '/auth/error',
-    signOut: '/'
+    signOut: '/',
   },
   // Güvenlik ayarları
   secret: process.env.NEXTAUTH_SECRET || 'default_secret', // fallback eklendi
   debug: process.env.NODE_ENV === 'development',
   // CSRF koruması aktif
   useSecureCookies: process.env.NODE_ENV === 'production',
-}
+};

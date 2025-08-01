@@ -1,11 +1,45 @@
 interface SkeletonProps {
-  className?: string
+  className?: string;
+  variant?: 'text' | 'circular' | 'rectangular' | 'rounded';
+  animation?: 'pulse' | 'wave' | 'none';
+  width?: string | number;
+  height?: string | number;
 }
 
-export function Skeleton({ className = "" }: SkeletonProps) {
-  return (
-    <div className={`animate-pulse bg-gray-200 rounded ${className}`} />
-  )
+export function Skeleton({
+  className = '',
+  variant = 'rectangular',
+  animation = 'pulse',
+  width,
+  height,
+}: SkeletonProps) {
+  const baseClasses = 'bg-gray-200';
+
+  const variantClasses = {
+    text: 'h-4 rounded',
+    circular: 'rounded-full',
+    rectangular: 'rounded',
+    rounded: 'rounded-lg',
+  };
+
+  const animationClasses = {
+    pulse: 'animate-pulse',
+    wave: 'animate-wave',
+    none: '',
+  };
+
+  const style: React.CSSProperties = {};
+  if (width) style.width = typeof width === 'number' ? `${width}px` : width;
+  if (height) style.height = typeof height === 'number' ? `${height}px` : height;
+
+  const classes = [
+    baseClasses,
+    variantClasses[variant],
+    animationClasses[animation],
+    className,
+  ].join(' ');
+
+  return <div className={classes} style={style} />;
 }
 
 // Repository Card Skeleton
@@ -28,7 +62,7 @@ export function RepositoryCardSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Portfolio Card Skeleton
@@ -51,7 +85,7 @@ export function PortfolioCardSkeleton() {
         </div>
         <Skeleton className="h-12 w-12 rounded" />
       </div>
-      
+
       <div className="pt-4 border-t border-gray-100">
         <div className="flex gap-3">
           <Skeleton className="flex-1 h-10 rounded-lg" />
@@ -60,7 +94,7 @@ export function PortfolioCardSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Repository Grid Skeleton
@@ -71,10 +105,10 @@ export function RepositoryGridSkeleton({ count = 6 }: { count?: number }) {
         <RepositoryCardSkeleton key={i} />
       ))}
     </div>
-  )
+  );
 }
 
-// Portfolio Grid Skeleton  
+// Portfolio Grid Skeleton
 export function PortfolioGridSkeleton({ count = 3 }: { count?: number }) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -82,5 +116,5 @@ export function PortfolioGridSkeleton({ count = 3 }: { count?: number }) {
         <PortfolioCardSkeleton key={i} />
       ))}
     </div>
-  )
-} 
+  );
+}

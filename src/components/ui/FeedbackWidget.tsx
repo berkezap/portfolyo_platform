@@ -1,10 +1,9 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { Star, MessageCircle, X, Send, Smile, Meh, Frown } from 'lucide-react'
-import Button from './Button'
-import Card from './Card'
-
+import React, { useState, useEffect } from 'react';
+import { Star, MessageCircle, X, Send, Smile, Meh, Frown } from 'lucide-react';
+import Button from './Button';
+import Card from './Card';
 
 /**
  * FeedbackWidget - Kullanıcıdan geri bildirim almak için widget.
@@ -14,15 +13,15 @@ import Card from './Card'
  */
 
 interface FeedbackWidgetProps {
-  onClose?: () => void
-  className?: string
+  onClose?: () => void;
+  className?: string;
 }
 
 interface FeedbackData {
-  rating: number
-  feedback: string
-  type: 'general' | 'usability' | 'feature'
-  page: string
+  rating: number;
+  feedback: string;
+  type: 'general' | 'usability' | 'feature';
+  page: string;
 }
 
 /**
@@ -30,33 +29,31 @@ interface FeedbackData {
  * @param {FeedbackWidgetProps} props
  */
 const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = '' }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isClient, setIsClient] = useState(false)
-  const [step, setStep] = useState<'initial' | 'rating' | 'feedback' | 'thanks'>('initial')
+  const [isOpen, setIsOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [step, setStep] = useState<'initial' | 'rating' | 'feedback' | 'thanks'>('initial');
   const [feedbackData, setFeedbackData] = useState<FeedbackData>({
     rating: 0,
     feedback: '',
     type: 'general',
-    page: typeof window !== 'undefined' ? window.location.pathname : '/'
-  })
-
+    page: typeof window !== 'undefined' ? window.location.pathname : '/',
+  });
 
   /**
    * Component mount olduğunda client ortamını işaretler.
    */
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
+    setIsClient(true);
+  }, []);
 
   /**
    * Kullanıcı rating seçtiğinde feedbackData'yı günceller ve bir sonraki adıma geçer.
    * @param {number} rating - Kullanıcıdan alınan rating (1-5)
    */
   const handleRating = (rating: number) => {
-    setFeedbackData(prev => ({ ...prev, rating }))
-    setStep('feedback')
-  }
+    setFeedbackData((prev) => ({ ...prev, rating }));
+    setStep('feedback');
+  };
 
   /**
    * Feedback formunu submit eder, API'ye gönderir ve teşekkür adımına geçer.
@@ -68,32 +65,32 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(feedbackData)
-      })
+        body: JSON.stringify(feedbackData),
+      });
 
       if (response.ok) {
-        setStep('thanks')
+        setStep('thanks');
         setTimeout(() => {
-          setIsOpen(false)
-          setStep('initial')
+          setIsOpen(false);
+          setStep('initial');
           setFeedbackData({
             rating: 0,
             feedback: '',
             type: 'general',
-            page: typeof window !== 'undefined' ? window.location.pathname : '/'
-          })
-        }, 3000)
+            page: typeof window !== 'undefined' ? window.location.pathname : '/',
+          });
+        }, 3000);
       }
     } catch (error) {
-      console.error('Feedback submission error:', error)
+      console.error('Feedback submission error:', error);
     }
-  }
+  };
 
   const getEmoji = (rating: number) => {
-    if (rating >= 4) return <Smile className="w-6 h-6 text-green-500" />
-    if (rating >= 3) return <Meh className="w-6 h-6 text-yellow-500" />
-    return <Frown className="w-6 h-6 text-red-500" />
-  }
+    if (rating >= 4) return <Smile className="w-6 h-6 text-green-500" />;
+    if (rating >= 3) return <Meh className="w-6 h-6 text-yellow-500" />;
+    return <Frown className="w-6 h-6 text-red-500" />;
+  };
 
   // Feedback consent yoksa widget'ı gösterme
   const hasFeedbackConsent = () => {
@@ -112,7 +109,7 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
   };
 
   // Only render widget UI on client to avoid hydration mismatch
-  if (!isClient) return null
+  if (!isClient) return null;
 
   // Widget'ı sadece feedback consent varsa render et
   if (!hasFeedbackConsent()) return null;
@@ -131,7 +128,7 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
           Geri Bildirim
         </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -145,14 +142,14 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
             size="sm"
             icon={X}
             onClick={() => {
-              setIsOpen(false)
-              setStep('initial')
-              onClose?.()
+              setIsOpen(false);
+              setStep('initial');
+              onClose?.();
             }}
             className="p-2"
           >
             {/* Sadece ikonlu buton için boş children */}
-            ""
+            &quot;&quot;
           </Button>
         </div>
 
@@ -167,11 +164,13 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
                   onClick={() => handleRating(rating)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <Star className={`w-8 h-8 ${
-                    rating <= feedbackData.rating 
-                      ? 'text-yellow-400 fill-current' 
-                      : 'text-gray-300'
-                  }`} />
+                  <Star
+                    className={`w-8 h-8 ${
+                      rating <= feedbackData.rating
+                        ? 'text-yellow-400 fill-current'
+                        : 'text-gray-300'
+                    }`}
+                  />
                 </button>
               ))}
             </div>
@@ -182,21 +181,21 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
           <div className="space-y-4">
             <div className="flex items-center justify-center space-x-2">
               {getEmoji(feedbackData.rating)}
-              <span className="text-lg font-medium">
-                {feedbackData.rating}/5 puan verdiniz
-              </span>
+              <span className="text-lg font-medium">{feedbackData.rating}/5 puan verdiniz</span>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Geri bildirim türü
               </label>
               <select
                 value={feedbackData.type}
-                onChange={(e) => setFeedbackData(prev => ({ 
-                  ...prev, 
-                  type: e.target.value as 'general' | 'usability' | 'feature' 
-                }))}
+                onChange={(e) =>
+                  setFeedbackData((prev) => ({
+                    ...prev,
+                    type: e.target.value as 'general' | 'usability' | 'feature',
+                  }))
+                }
                 className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="general">Genel Deneyim</option>
@@ -211,10 +210,12 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
               </label>
               <textarea
                 value={feedbackData.feedback}
-                onChange={(e) => setFeedbackData(prev => ({ 
-                  ...prev, 
-                  feedback: e.target.value 
-                }))}
+                onChange={(e) =>
+                  setFeedbackData((prev) => ({
+                    ...prev,
+                    feedback: e.target.value,
+                  }))
+                }
                 placeholder="Deneyiminizi paylaşın..."
                 rows={3}
                 className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
@@ -222,19 +223,10 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
             </div>
 
             <div className="flex space-x-3">
-              <Button
-                variant="secondary"
-                onClick={() => setStep('initial')}
-                className="flex-1"
-              >
+              <Button variant="secondary" onClick={() => setStep('initial')} className="flex-1">
                 Geri
               </Button>
-              <Button
-                variant="primary"
-                icon={Send}
-                onClick={handleSubmit}
-                className="flex-1"
-              >
+              <Button variant="primary" icon={Send} onClick={handleSubmit} className="flex-1">
                 Gönder
               </Button>
             </div>
@@ -254,7 +246,7 @@ const FeedbackWidget: React.FC<FeedbackWidgetProps> = ({ onClose, className = ''
         )}
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default FeedbackWidget
+export default FeedbackWidget;

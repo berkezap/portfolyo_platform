@@ -1,17 +1,13 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { useConsent } from '@/hooks/useConsent'
-import Button from '@/components/ui/Button'
-import Card from '@/components/ui/Card'
-import { trackEvent, trackPageView } from '@/lib/analytics'
-import FeedbackWidget from '@/components/ui/FeedbackWidget'
-
-type ConsentKey = 'analytics' | 'feedback' | 'marketing' | 'thirdParty';
+import React, { useState, useEffect } from 'react';
+import { useConsent } from '@/hooks/useConsent';
+import Card from '@/components/ui/Card';
+import { trackEvent, trackPageView } from '@/lib/analytics';
 
 export default function ConsentTestPage() {
-  const { consent, isLoading, hasConsent, resetConsent } = useConsent()
-  const [testResults, setTestResults] = useState<Record<string, boolean>>({})
+  const { consent, isLoading, hasConsent } = useConsent();
+  const [testResults, setTestResults] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!isLoading && consent) {
@@ -19,60 +15,60 @@ export default function ConsentTestPage() {
         analytics: consent.analytics || false,
         feedback: consent.feedback || false,
         marketing: consent.marketing || false,
-        thirdParty: consent.thirdParty || false
-      })
+        thirdParty: consent.thirdParty || false,
+      });
     }
-  }, [consent, isLoading])
+  }, [consent, isLoading]);
 
-  const testAnalytics = () => {
+  const _testAnalytics = () => {
     if (hasConsent('analytics')) {
-      console.log('✅ Analytics tracking aktif - test event gönderiliyor')
+      console.log('✅ Analytics tracking aktif - test event gönderiliyor');
       if (typeof window !== 'undefined') {
         if (window.gtag) {
           window.gtag('event', 'consent_test', {
             event_category: 'consent',
-            event_label: 'analytics_test'
-          })
+            event_label: 'analytics_test',
+          });
         }
         trackEvent('consent_test', {
           category: 'consent',
           action: 'analytics_test',
-          consent_given: true
-        })
-        trackPageView()
+          consent_given: true,
+        });
+        trackPageView();
       }
     } else {
-      console.log('❌ Analytics consent yok - tracking devre dışı')
+      console.log('❌ Analytics consent yok - tracking devre dışı');
     }
-  }
+  };
 
-  const testFeedback = () => {
+  const _testFeedback = () => {
     if (hasConsent('feedback')) {
-      const feedbackButton = document.querySelector('[data-feedback-widget]')
+      const feedbackButton = document.querySelector('[data-feedback-widget]');
       if (feedbackButton) {
-        feedbackButton.dispatchEvent(new Event('click'))
+        feedbackButton.dispatchEvent(new Event('click'));
       }
-      console.log('✅ Feedback widget aktif')
+      console.log('✅ Feedback widget aktif');
     } else {
-      console.log('❌ Feedback consent yok - widget gizli')
+      console.log('❌ Feedback consent yok - widget gizli');
     }
-  }
+  };
 
-  const testThirdParty = () => {
+  const _testThirdParty = () => {
     if (hasConsent('thirdParty')) {
-      console.log('✅ Third party servisler aktif (Sentry, GitHub OAuth)')
+      console.log('✅ Third party servisler aktif (Sentry, GitHub OAuth)');
     } else {
-      console.log('❌ Third party consent yok - servisler devre dışı')
+      console.log('❌ Third party consent yok - servisler devre dışı');
     }
-  }
+  };
 
-  const testMarketing = () => {
+  const _testMarketing = () => {
     if (hasConsent('marketing')) {
-      console.log('✅ Marketing consent var - e-posta gönderimi aktif')
+      console.log('✅ Marketing consent var - e-posta gönderimi aktif');
     } else {
-      console.log('❌ Marketing consent yok - e-posta gönderimi devre dışı')
+      console.log('❌ Marketing consent yok - e-posta gönderimi devre dışı');
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -89,37 +85,38 @@ export default function ConsentTestPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            🍪 Cookie Consent Test Sayfası
-          </h1>
-          <p className="text-gray-600">
-            Cookie consent ayarlarının nasıl çalıştığını test edin.
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">🍪 Cookie Consent Test Sayfası</h1>
+          <p className="text-gray-600">Cookie consent ayarlarının nasıl çalıştığını test edin.</p>
         </div>
         <Card className="mb-8 p-6">
           <h2 className="text-xl font-semibold mb-4">📊 Mevcut Consent Durumu</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(testResults).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div
+                key={key}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              >
                 <div>
                   <span className="font-medium capitalize">{key}</span>
                   <p className="text-sm text-gray-600">
                     {key === 'analytics' && 'Kullanım istatistikleri'}
-                    {key === 'feedback' && 'Geri bildirim widget\'ı'}
+                    {key === 'feedback' && "Geri bildirim widget'ı"}
                     {key === 'marketing' && 'E-posta bildirimleri'}
                     {key === 'thirdParty' && 'Harici servisler'}
                   </p>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
+                <div
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {value ? '✅ Aktif' : '❌ Pasif'}
                 </div>
               </div>
@@ -128,5 +125,5 @@ export default function ConsentTestPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
