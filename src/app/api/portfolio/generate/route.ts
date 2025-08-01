@@ -1,60 +1,58 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { GitHubService } from '@/lib/github'
-import { renderTemplate, formatUserDataForTemplate } from '@/lib/templateEngine'
-import { PortfolioService } from '@/lib/portfolioService'
-import { portfolioGenerationSchema, validateRequest, sanitizeString } from '@/lib/validation'
-import * as Sentry from '@sentry/nextjs'
-import { Session } from 'next-auth'
-import type { GitHubUser, GitHubRepo } from '@/types/github'
-import type { TemplateData } from '@/types/templates'
-
-interface SessionUser {
-  email?: string;
-  accessToken?: string;
-  [key: string]: string | undefined;
-}
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { GitHubService } from '@/lib/github';
+import { renderTemplate, formatUserDataForTemplate } from '@/lib/templateEngine';
+import { PortfolioService } from '@/lib/portfolioService';
+import { portfolioGenerationSchema, validateRequest, sanitizeString } from '@/lib/validation';
+import * as Sentry from '@sentry/nextjs';
+import { Session } from 'next-auth';
+import type { GitHubUser, GitHubRepo } from '@/types/github';
+import type { TemplateData } from '@/types/templates';
+import type { SessionUser } from '@/types/auth';
 
 export async function POST(request: NextRequest) {
-  console.log('🚀 Portfolio Generate API çağrıldı!')
-  
-  let session: Session | null = null // TODO: Proper type from next-auth
-  
+  console.log('🚀 Portfolio Generate API çağrıldı!');
+
+  let session: Session | null = null; // TODO: Proper type from next-auth
+
   try {
     // Demo mode kontrolü
-    const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
-    console.log('🎭 Demo mode:', demoMode)
+    const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+    console.log('🎭 Demo mode:', demoMode);
 
     // Request body al ve validate et
-    const requestBody = await request.json()
-    console.log('📥 Raw request:', requestBody)
-    
+    const requestBody = await request.json();
+    console.log('📥 Raw request:', requestBody);
+
     // Zod validation
     const validation = await validateRequest(portfolioGenerationSchema, {
       template: sanitizeString(requestBody.templateName || requestBody.template),
-      selectedRepos: Array.isArray(requestBody.selectedRepos) 
+      selectedRepos: Array.isArray(requestBody.selectedRepos)
         ? requestBody.selectedRepos.map((repo: string) => sanitizeString(repo))
         : [],
       cvUrl: requestBody.cvUrl ? sanitizeString(requestBody.cvUrl) : undefined,
       userBio: requestBody.userBio ? sanitizeString(requestBody.userBio) : undefined,
       userEmail: requestBody.userEmail ? sanitizeString(requestBody.userEmail) : undefined,
-      linkedinUrl: requestBody.linkedinUrl ? sanitizeString(requestBody.linkedinUrl) : undefined
-    })
-    
+      linkedinUrl: requestBody.linkedinUrl ? sanitizeString(requestBody.linkedinUrl) : undefined,
+    });
+
     if (!validation.success) {
-      console.log('❌ Validation failed:', validation.error)
-      return NextResponse.json({ 
-        error: 'Invalid request data', 
-        details: validation.error 
-      }, { status: 400 })
+      console.log('❌ Validation failed:', validation.error);
+      return NextResponse.json(
+        {
+          error: 'Invalid request data',
+          details: validation.error,
+        },
+        { status: 400 },
+      );
     }
-    
-    const { template: templateName, selectedRepos, cvUrl } = validation.data
-    console.log('✅ Validated data:', { templateName, selectedRepos: selectedRepos.length, cvUrl })
-    console.log('📂 Template name:', templateName)
-    console.log('📋 Selected repos:', selectedRepos)
-    console.log('📄 CV URL:', cvUrl)
+
+    const { template: templateName, selectedRepos, cvUrl } = validation.data;
+    console.log('✅ Validated data:', { templateName, selectedRepos: selectedRepos.length, cvUrl });
+    console.log('📂 Template name:', templateName);
+    console.log('📋 Selected repos:', selectedRepos);
+    console.log('📄 CV URL:', cvUrl);
 
     let userData: GitHubUser;
     let repos: GitHubRepo[];
@@ -62,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     if (demoMode) {
       // Demo mode - Mock data kullan
-      console.log('🎭 Demo mode: Mock data kullanılıyor')
+      console.log('🎭 Demo mode: Mock data kullanılıyor');
       userData = {
         login: 'mockuser',
         name: 'Mock User',
@@ -74,14 +72,15 @@ export async function POST(request: NextRequest) {
         blog: 'https://mockuser.dev',
         public_repos: 25,
         followers: 150,
-        following: 75
-      }
+        following: 75,
+      };
 
       repos = [
         {
           id: 1,
           name: 'e-commerce-app',
-          description: 'Modern React e-commerce application with Next.js, TypeScript and Stripe integration',
+          description:
+            'Modern React e-commerce application with Next.js, TypeScript and Stripe integration',
           html_url: 'https://github.com/mockuser/e-commerce-app',
           language: 'TypeScript',
           stargazers_count: 42,
@@ -89,7 +88,7 @@ export async function POST(request: NextRequest) {
           created_at: '2024-01-15T10:30:00Z',
           updated_at: '2024-12-20T15:45:00Z',
           topics: ['react', 'nextjs', 'ecommerce', 'typescript'],
-          homepage: 'https://my-shop.vercel.app'
+          homepage: 'https://my-shop.vercel.app',
         },
         {
           id: 2,
@@ -102,7 +101,7 @@ export async function POST(request: NextRequest) {
           created_at: '2024-02-10T08:20:00Z',
           updated_at: '2024-11-30T12:15:00Z',
           topics: ['nodejs', 'express', 'mongodb', 'api'],
-          homepage: null
+          homepage: null,
         },
         {
           id: 3,
@@ -115,123 +114,133 @@ export async function POST(request: NextRequest) {
           created_at: '2024-03-05T14:10:00Z',
           updated_at: '2024-10-15T09:30:00Z',
           topics: ['portfolio', 'website', 'responsive'],
-          homepage: 'https://mockuser.dev'
-        }
-      ]
+          homepage: 'https://mockuser.dev',
+        },
+      ];
     } else {
       // Gerçek mode - GitHub API kullan
-      session = await getServerSession(authOptions)
-      console.log('🔐 Session var mı?', !!session)
-      
-      if (!demoMode && session) {
+      session = await getServerSession(authOptions);
+      console.log('🔐 Session var mı?', !!session);
+
+      if (session) {
+        console.log('✅ Session bulundu:', {
+          userId: session.user?.email,
+          hasAccessToken: !!(session.user as SessionUser)?.accessToken,
+        });
         user = session.user as SessionUser;
+      } else {
+        console.log('❌ Session bulunamadı - cookies:', request.headers.get('cookie'));
       }
 
       if (!session || !user?.accessToken) {
-        console.log('❌ Session veya accessToken yok!')
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        console.log('❌ Session veya accessToken yok!', {
+          hasSession: !!session,
+          hasUser: !!user,
+          hasAccessToken: !!user?.accessToken,
+        });
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
       // GitHub servisini kullanarak kullanıcı verilerini al (timeout ile)
-      const githubService = new GitHubService(user.accessToken ?? '')
-      
+      const githubService = new GitHubService(user.accessToken ?? '');
+
       // Timeout ile GitHub API çağrıları (optimized)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('GitHub API timeout')), 8000)
-      })
-      
+        setTimeout(() => reject(new Error('GitHub API timeout')), 8000);
+      });
+
       const githubPromise = Promise.all([
         githubService.getUserData(),
-        githubService.getUserRepos()
-      ]) as Promise<[GitHubUser, GitHubRepo[]]>
-      
-      const result = await Promise.race([
-        githubPromise,
-        timeoutPromise
-      ]) as [GitHubUser, GitHubRepo[]]
-      
-      const [userDataResult, reposResult] = result
-      
-      userData = userDataResult
-      repos = reposResult
+        githubService.getUserRepos(),
+      ]) as Promise<[GitHubUser, GitHubRepo[]]>;
+
+      const result = (await Promise.race([githubPromise, timeoutPromise])) as [
+        GitHubUser,
+        GitHubRepo[],
+      ];
+
+      const [userDataResult, reposResult] = result;
+
+      userData = userDataResult;
+      repos = reposResult;
     }
 
     // 🗃️ 1. ADIM: Portfolio kaydını database'e kaydet
-    let savedPortfolio: { id: string; created_at?: string } | undefined
+    let savedPortfolio: { id: string; created_at?: string } | undefined;
     if (demoMode) {
       // Demo mode - Mock portfolio ID oluştur
       savedPortfolio = {
         id: 'demo-portfolio-' + Date.now(),
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      };
     } else {
       const portfolioData = {
-        user_id: demoMode ? userData.login : (user?.email || userData.login),
+        user_id: demoMode ? userData.login : user?.email || userData.login,
         selected_template: templateName,
         selected_repos: selectedRepos || [],
-        cv_url: cvUrl ?? ''
-      }
-      savedPortfolio = await PortfolioService.createPortfolio(portfolioData) as { id: string; created_at?: string }
+        cv_url: cvUrl ?? '',
+      };
+      savedPortfolio = (await PortfolioService.createPortfolio(portfolioData)) as {
+        id: string;
+        created_at?: string;
+      };
       if (!savedPortfolio) {
-        console.log('❌ Portfolio database\'e kaydedilemedi!')
-        return NextResponse.json({ error: 'Failed to save portfolio' }, { status: 500 })
+        console.log("❌ Portfolio database'e kaydedilemedi!");
+        return NextResponse.json({ error: 'Failed to save portfolio' }, { status: 500 });
       }
-      console.log('✅ Portfolio başarıyla kaydedildi:', savedPortfolio.id)
+      console.log('✅ Portfolio başarıyla kaydedildi:', savedPortfolio.id);
     }
 
     // 🎨 2. ADIM: Template data formatla ve HTML oluştur
-    console.log('🔄 formatUserDataForTemplate çağrılıyor...')
-    const templateData: TemplateData = formatUserDataForTemplate(userData, repos, selectedRepos)
-    
+    console.log('🔄 formatUserDataForTemplate çağrılıyor...');
+    const templateData: TemplateData = formatUserDataForTemplate(userData, repos, selectedRepos);
+
     // CV URL'i template data'ya ekle
     if (cvUrl) {
-      templateData.CV_URL = cvUrl
+      templateData.CV_URL = cvUrl;
     }
-    
+
     console.log('📊 Template data oluşturuldu:', {
       projectCount: templateData.projects?.length || 0,
       totalStars: templateData.TOTAL_STARS,
-      userName: templateData.USER_NAME
-    })
+      userName: templateData.USER_NAME,
+    });
 
     // HTML render et
-    console.log('🎨 renderTemplate çağrılıyor...')
-    console.log('🧪 Template data keys:', Object.keys(templateData))
-    
-    const generatedHTML = renderTemplate(templateName, templateData)
-    console.log('✅ Template render tamamlandı, HTML uzunluğu:', generatedHTML.length)
-    console.log('🧪 Render sonrası ilk 500 karakter:', generatedHTML.substring(0, 500))
+    console.log('🎨 renderTemplate çağrılıyor...');
+    console.log('🧪 Template data keys:', Object.keys(templateData));
+
+    const generatedHTML = renderTemplate(templateName, templateData);
+    console.log('✅ Template render tamamlandı, HTML uzunluğu:', generatedHTML.length);
+    console.log('🧪 Render sonrası ilk 500 karakter:', generatedHTML.substring(0, 500));
 
     // 🔗 3. ADIM: Metadata oluştur ve database'i güncelle
-    PortfolioService.createMetadataFromTemplateData(templateData, templateName)
-    
-    // Oluşturulan HTML'i veritabanına kaydet
-    await PortfolioService.updatePortfolioHtml(savedPortfolio.id, generatedHTML)
+    PortfolioService.createMetadataFromTemplateData(templateData, templateName);
 
-    return NextResponse.json({ 
+    // Oluşturulan HTML'i veritabanına kaydet
+    await PortfolioService.updatePortfolioHtml(savedPortfolio.id, generatedHTML);
+
+    return NextResponse.json({
       success: true,
       html: generatedHTML, // HTML'i frontend'e de gönderiyoruz
-      portfolioId: savedPortfolio.id
-    })
+      portfolioId: savedPortfolio.id,
+    });
   } catch (error) {
-    console.error('💥 Portfolio generation error:', error)
-    
+    console.error('💥 Portfolio generation error:', error);
+
     // Capture error in Sentry with context
     Sentry.captureException(error, {
       tags: {
         api: 'portfolio-generation',
-        endpoint: '/api/portfolio/generate'
+        endpoint: '/api/portfolio/generate',
       },
       extra: {
         userEmail: (session?.user as SessionUser)?.email,
         hasSession: !!session,
-        timestamp: new Date().toISOString()
-      }
-    })
-    
-    return NextResponse.json(
-      { error: 'Failed to generate portfolio' }, 
-      { status: 500 }
-    )
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    return NextResponse.json({ error: 'Failed to generate portfolio' }, { status: 500 });
   }
-} 
+}

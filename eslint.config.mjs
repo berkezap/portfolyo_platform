@@ -16,7 +16,13 @@ const eslintConfig = [
       '.next/**/*',
       'node_modules/**/*',
       'dist/**/*',
-      'build/**/*'
+      'build/**/*',
+      'public/**/*',
+      'docs/**/*',
+      '*.md',
+      'package-lock.json',
+      'yarn.lock',
+      'lighthouse-report.json'
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
