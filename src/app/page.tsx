@@ -6,7 +6,7 @@ import { Suspense, lazy, useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Footer from '@/components/ui/Footer';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { LiquidHeader } from '@/components/ui/LiquidHeader';
 import { Github, Zap, Globe, Sparkles } from 'lucide-react';
 import { usePortfolioList } from '@/hooks/usePortfolioList';
 
@@ -39,7 +39,7 @@ export default function HomePage() {
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col">
-        <DashboardHeader demoMode={demoMode} variant="transparent" />
+        <LiquidHeader demoMode={demoMode} variant="transparent" />
         <div className="flex-1 flex items-center justify-center" style={{ paddingTop: '64px' }}>
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -54,7 +54,7 @@ export default function HomePage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 flex flex-col">
-        <DashboardHeader demoMode={demoMode} variant="transparent" />
+        <LiquidHeader demoMode={demoMode} variant="transparent" />
         <div className="flex-1 flex items-center justify-center" style={{ paddingTop: '64px' }}>
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -68,7 +68,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex flex-col">
       {/* Header */}
-      <DashboardHeader demoMode={demoMode} variant="transparent" />
+      <LiquidHeader demoMode={demoMode} variant="transparent" />
 
       {/* Hero Section */}
       <div style={{ paddingTop: '64px' }}>
