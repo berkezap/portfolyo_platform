@@ -96,10 +96,11 @@ export default function MyPortfoliosPage() {
 
   const getTemplateDisplayName = (template: string) => {
     const templateNames: Record<string, string> = {
-      'modern-developer': 'Modern Developer',
-      'creative-portfolio': 'Creative Portfolio',
       'professional-tech': 'Professional Tech',
       'minimalist-professional': 'Minimalist Professional',
+      'creative-portfolio': 'Creative Portfolio',
+      // Legacy templates (keep for existing portfolios)
+      'modern-developer': 'Modern Developer',
       'creative-technologist': 'Creative Technologist',
       storyteller: 'Storyteller',
     };
@@ -108,10 +109,11 @@ export default function MyPortfoliosPage() {
 
   const getTemplateIcon = (template: string) => {
     const iconMap: Record<string, React.ReactNode> = {
-      'modern-developer': <Palette className="w-5 h-5" />,
-      'creative-portfolio': <Palette className="w-5 h-5" />,
       'professional-tech': <Palette className="w-5 h-5" />,
       'minimalist-professional': <Palette className="w-5 h-5" />,
+      'creative-portfolio': <Palette className="w-5 h-5" />,
+      // Legacy templates
+      'modern-developer': <Palette className="w-5 h-5" />,
       'creative-technologist': <Palette className="w-5 h-5" />,
       storyteller: <Palette className="w-5 h-5" />,
     };

@@ -51,11 +51,12 @@ export function TemplateSelection({
             )}
 
             {/* Template Preview */}
-            <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-4">
+            <div className="aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-4">
               <iframe
                 srcDoc={template.previewHtml}
-                className="w-full h-full border-0 pointer-events-none"
+                className="w-full h-full border-0 pointer-events-none transform scale-75 origin-top-left"
                 title={`${template.name} Preview`}
+                style={{ width: '133.33%', height: '133.33%' }}
               />
             </div>
 

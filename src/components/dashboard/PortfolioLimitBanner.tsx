@@ -25,8 +25,8 @@ export default function PortfolioLimitBanner({
         <div>
           <h3 className="text-sm font-medium text-gray-900">
             {isAtLimit
-              ? `Portfolio limit reached (${currentCount}/${maxAllowed})`
-              : `Almost at limit (${currentCount}/${maxAllowed})`}
+              ? `PortfolYO limitine ulaştınız (${currentCount}/${maxAllowed})`
+              : `PortfolYO limitine yaklaştınız (${currentCount}/${maxAllowed})`}
           </h3>
         </div>
       </div>

@@ -29,46 +29,51 @@ interface EditPortfolioPageProps {
 }
 
 const templateNameToId: { [key: string]: number } = {
-  'modern-developer': 1,
-  'creative-portfolio': 2,
-  'professional-tech': 3,
-  'minimalist-professional': 4,
+  'professional-tech': 1,
+  'minimalist-professional': 2,
+  'creative-portfolio': 3,
+  // Legacy templates
+  'modern-developer': 4,
   'creative-technologist': 5,
   storyteller: 6,
 };
 
 const templateIdToName: { [key: number]: string } = {
-  1: 'modern-developer',
-  2: 'creative-portfolio',
-  3: 'professional-tech',
-  4: 'minimalist-professional',
+  1: 'professional-tech',
+  2: 'minimalist-professional',
+  3: 'creative-portfolio',
+  // Legacy templates
+  4: 'modern-developer',
   5: 'creative-technologist',
   6: 'storyteller',
 };
 
 const templateDisplayNames: { [key: number]: string } = {
-  1: 'Modern Developer',
-  2: 'Creative Portfolio',
-  3: 'Professional Tech',
-  4: 'Minimalist Professional',
+  1: 'Professional Tech',
+  2: 'Minimalist Professional',
+  3: 'Creative Portfolio',
+  // Legacy templates
+  4: 'Modern Developer',
   5: 'Creative Technologist',
   6: 'Storyteller',
 };
 
-const templates = Object.entries(templateDisplayNames).map(([id, name]) => ({
-  id: Number(id),
-  name,
-  description: `${name} teması ile profesyonel portfolyo`,
-  features: ['Responsive tasarım', 'Hızlı yükleme', 'SEO optimizasyonu'],
-  previewHtml: `
-    <div style="padding: 20px; font-family: system-ui; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; height: 200px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-      <div style="text-align: center;">
-        <h1 style="margin: 0; font-size: 24px; font-weight: bold;">${name}</h1>
-        <p style="margin: 10px 0 0 0; opacity: 0.9;">Modern Portfolio Template</p>
+const templates = Object.entries(templateDisplayNames)
+  .filter(([id]) => Number(id) <= 3) // Only show the top 3 quality templates
+  .map(([id, name]) => ({
+    id: Number(id),
+    name,
+    description: `${name} teması ile profesyonel portfolyo`,
+    features: ['Responsive tasarım', 'Hızlı yükleme', 'SEO optimizasyonu'],
+    previewHtml: `
+      <div style="padding: 20px; font-family: system-ui; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; height: 200px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+        <div style="text-align: center;">
+          <h1 style="margin: 0; font-size: 24px; font-weight: bold;">${name}</h1>
+          <p style="margin: 10px 0 0 0; opacity: 0.9;">Modern Portfolio Template</p>
+        </div>
       </div>
-    </div>
-  `,
-}));
+    `,
+  }));
 
 export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
   const { status: sessionStatus } = useSession();

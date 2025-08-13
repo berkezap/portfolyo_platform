@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useGitHubRepos } from '@/hooks/useGitHubRepos';
@@ -14,61 +14,28 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { StepType, PortfolioTemplate } from '@/types/dashboard';
 import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary';
 import Button from '@/components/ui/Button';
-import { X } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import {
+  X,
+  Check,
+  Eye,
+  RefreshCw,
+  Github,
+  AlertCircle,
+  Star,
+  GitBranch,
+  UploadCloud,
+  FileText,
+  CheckCircle2,
+  Loader2,
+  ExternalLink,
+  FolderOpen,
+  Share2,
+  Download,
+} from 'lucide-react';
 
-// Dinamik import'lar - sadece ihtiyaç anında yüklenecek
-const RepositorySelection = dynamic(
-  () =>
-    import('@/components/dashboard/steps/RepositorySelection').then((mod) => ({
-      default: mod.RepositorySelection,
-    })),
-  {
-    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
-    ssr: false,
-  },
-);
-
-const TemplateSelection = dynamic(
-  () =>
-    import('@/components/dashboard/steps/TemplateSelection').then((mod) => ({
-      default: mod.TemplateSelection,
-    })),
-  {
-    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
-    ssr: false,
-  },
-);
-
-const CVUpload = dynamic(
-  () => import('@/components/dashboard/steps/CVUpload').then((mod) => ({ default: mod.CVUpload })),
-  {
-    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
-    ssr: false,
-  },
-);
-
-const GenerateStep = dynamic(
-  () =>
-    import('@/components/dashboard/steps/GenerateStep').then((mod) => ({
-      default: mod.GenerateStep,
-    })),
-  {
-    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
-    ssr: false,
-  },
-);
-
-const CompletedStep = dynamic(
-  () =>
-    import('@/components/dashboard/steps/CompletedStep').then((mod) => ({
-      default: mod.CompletedStep,
-    })),
-  {
-    loading: () => <div className="animate-pulse bg-transparent h-16 rounded-lg"></div>,
-    ssr: false,
-  },
-);
+// Import step components normally
+import { RepositorySelection } from '@/components/dashboard/steps/RepositorySelection';
+import { CompletedStep } from '@/components/dashboard/steps/CompletedStep';
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -156,134 +123,128 @@ const mockRepos = [
 const portfolioTemplates: PortfolioTemplate[] = [
   {
     id: 1,
-    name: 'Modern Developer',
-    description: 'Clean, minimal design with dark mode support',
+    name: 'Professional Tech',
+    description: 'Modern, clean design with dark/light mode toggle - perfect for developers',
     previewHtml: `
-      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; padding: 20px; color: white; font-family: Inter, sans-serif;">
-        <div style="text-align: center;">
-          <h1 style="font-size: 24px; margin-bottom: 8px;">John Doe</h1>
-          <p style="opacity: 0.8; margin-bottom: 16px;">Full Stack Developer</p>
-          <div style="display: flex; gap: 8px; justify-content: center;">
-            <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; font-size: 12px;">React</div>
-            <div style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; font-size: 12px;">Node.js</div>
+      <div style="background: #1C1C1E; height: 100%; padding: 20px; color: #F2F2F7; font-family: Inter, sans-serif; border-radius: 8px;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #2C2C2E;">
+          <div style="display: flex; gap: 16px; font-size: 11px; color: #8E8E93;">
+            <span>About</span>
+            <span>Projects</span>
+            <span>Contact</span>
+          </div>
+          <svg style="width: 14px; height: 14px; color: #8E8E93;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
         </div>
-        <div style="margin-top: 20px; background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px;">
-          <h3 style="margin-bottom: 8px; font-size: 14px;">Modern E-commerce</h3>
-          <p style="font-size: 12px; opacity: 0.8;">TypeScript, React, Next.js</p>
+        <!-- Hero -->
+        <div style="margin-bottom: 16px;">
+          <h1 style="font-size: 20px; margin-bottom: 4px; font-weight: 600;">Alex Johnson</h1>
+          <h2 style="font-size: 12px; color: #8E8E93; margin-bottom: 12px;">Senior Full Stack Developer</h2>
+          <p style="font-size: 10px; color: #8E8E93; margin-bottom: 12px; line-height: 1.4;">Passionate developer with 5+ years of experience building scalable web applications.</p>
+          <div style="display: flex; gap: 12px; font-size: 10px; color: #8E8E93;">
+            <span>GitHub</span>
+            <span>LinkedIn</span>
+            <span style="color: #0A84FF;">View CV</span>
+          </div>
+        </div>
+        <!-- Project Card -->
+        <div style="background: #1C1C1E; border: 1px solid #2C2C2E; border-radius: 6px; padding: 12px;">
+          <h3 style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">AI Dashboard Platform</h3>
+          <p style="font-size: 10px; color: #8E8E93; margin-bottom: 8px; line-height: 1.4;">Modern React dashboard with real-time analytics and AI-powered insights</p>
+          <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+            <span style="background: rgba(142, 142, 147, 0.12); color: #8E8E93; padding: 2px 6px; border-radius: 8px; font-size: 8px;">React</span>
+            <span style="background: rgba(142, 142, 147, 0.12); color: #8E8E93; padding: 2px 6px; border-radius: 8px; font-size: 8px;">TypeScript</span>
+            <span style="background: rgba(142, 142, 147, 0.12); color: #8E8E93; padding: 2px 6px; border-radius: 8px; font-size: 8px;">Node.js</span>
+          </div>
+          <div style="display: flex; gap: 8px; font-size: 9px;">
+            <span style="color: #0A84FF;">View Source</span>
+            <span style="color: #0A84FF;">Live Demo</span>
+          </div>
         </div>
       </div>
     `,
-    features: ['Dark/Light Mode', 'Responsive Design', 'Project Showcase', 'CV Section'],
+    features: ['Dark/Light Mode', 'Responsive Design', 'Professional', 'Modern CSS'],
   },
   {
     id: 2,
-    name: 'Creative Portfolio',
-    description: 'Colorful, creative layout perfect for frontend developers',
+    name: 'Minimalist Professional',
+    description: 'Clean, minimal design with perfect typography - ideal for all professions',
     previewHtml: `
-      <div style="background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab); background-size: 400% 400%; animation: gradient 3s ease infinite; height: 100%; padding: 20px; color: white; font-family: Poppins, sans-serif;">
-        <div style="text-align: center;">
-          <h1 style="font-size: 22px; margin-bottom: 8px; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Creative Dev</h1>
-          <p style="margin-bottom: 16px; font-size: 14px;">🎨 Frontend Wizard</p>
-          <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
-            <div style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); padding: 6px 12px; border-radius: 20px; font-size: 10px;">Vue.js</div>
-            <div style="background: linear-gradient(45deg, #4ecdc4, #45b7d1); padding: 6px 12px; border-radius: 20px; font-size: 10px;">Animation</div>
+      <div style="background: #F1F1F1; height: 100%; padding: 20px; color: #111; font-family: Inter, sans-serif; border-radius: 8px;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #E5E5E5;">
+          <div style="display: flex; gap: 16px; font-size: 11px; font-weight: 500;">
+            <span style="color: #2563eb;">About</span>
+            <span>Projects</span>
+            <span>Contact</span>
+          </div>
+          <div style="width: 20px; height: 20px; border: 1px solid #E5E5E5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <svg style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.95 7.07l-.71-.71M4.05 4.93l-.71-.71"/>
+            </svg>
           </div>
         </div>
-        <div style="margin-top: 16px; background: rgba(255,255,255,0.15); padding: 10px; border-radius: 12px; backdrop-filter: blur(10px);">
-          <h3 style="margin-bottom: 6px; font-size: 12px;">🚀 Cool Project</h3>
-          <p style="font-size: 10px; opacity: 0.9;">Creative animations & effects</p>
+        <!-- Hero -->
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Sarah Chen</h1>
+          <h2 style="font-size: 14px; color: #555; margin-bottom: 12px;">Product Designer & Developer</h2>
+          <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; font-size: 11px;">
+            <span style="color: #2563eb;">GitHub</span>
+            <span style="color: #2563eb;">LinkedIn</span>
+            <span style="color: #2563eb;">CV</span>
+          </div>
+        </div>
+        <!-- Project Card -->
+        <div style="background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+          <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Design System Platform</h3>
+          <p style="font-size: 11px; color: #555; margin-bottom: 8px; line-height: 1.4;">Comprehensive design system with component library and documentation</p>
+          <div style="display: flex; gap: 6px;">
+            <span style="background: #F1F1F1; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-size: 9px; border: 1px solid #E5E5E5;">Figma</span>
+            <span style="background: #F1F1F1; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-size: 9px; border: 1px solid #E5E5E5;">React</span>
+            <span style="background: #F1F1F1; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-size: 9px; border: 1px solid #E5E5E5;">Storybook</span>
+          </div>
         </div>
       </div>
     `,
-    features: ['Animations', 'Grid Layout', 'Image Gallery', 'Contact Form'],
+    features: ['Dark/Light Mode', 'Minimal Design', 'Perfect Typography', 'Clean Layout'],
   },
   {
     id: 3,
-    name: 'Professional Tech',
-    description: 'Corporate-style design ideal for senior developers',
+    name: 'Creative Portfolio',
+    description: 'Dark theme with electric accents - perfect for creative developers and designers',
     previewHtml: `
-      <div style="background: #2c3e50; height: 100%; padding: 20px; color: white; font-family: Roboto, sans-serif;">
-        <div style="text-align: center; border-bottom: 1px solid #34495e; padding-bottom: 16px;">
-          <h1 style="font-size: 20px; margin-bottom: 6px; font-weight: 700;">Senior Developer</h1>
-          <p style="color: #bdc3c7; font-size: 12px;">Technical Lead & Architect</p>
-        </div>
-        <div style="margin-top: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-size: 11px;">JavaScript</span>
-            <span style="font-size: 10px; color: #3498db;">95%</span>
-          </div>
-          <div style="background: #34495e; height: 4px; border-radius: 2px;">
-            <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 95%; height: 100%; border-radius: 2px;"></div>
+      <div style="background: #1A1A1A; height: 100%; padding: 20px; color: #E0E0E0; font-family: Satoshi, sans-serif; border-radius: 8px; position: relative;">
+        <!-- Hero Section -->
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="font-size: 24px; font-family: 'JetBrains Mono', monospace; background: linear-gradient(45deg, #F000B8, #32F5C8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">MAYA DEV</h1>
+          <p style="font-size: 11px; color: #32F5C8; margin-bottom: 12px;">Frontend • Designer • Creative Technologist</p>
+          <div style="display: flex; justify-content: center; gap: 12px; font-size: 10px; color: #808080;">
+            <span style="color: #32F5C8;">GitHub</span>
+            <span style="color: #F000B8;">LinkedIn</span>
+            <span style="color: #32F5C8;">Portfolio</span>
           </div>
         </div>
-        <div style="margin-top: 12px; background: #34495e; padding: 10px; border-radius: 6px; border-left: 3px solid #3498db;">
-          <h3 style="margin-bottom: 4px; font-size: 12px;">Enterprise Platform</h3>
-          <p style="font-size: 10px; color: #bdc3c7;">Microservices Architecture</p>
+        <!-- Project Card with 3D Effect -->
+        <div style="background: #212121; border: 1px solid #2A2A2A; border-radius: 12px; padding: 12px; transform: perspective(1000px) rotateX(2deg) rotateY(-2deg); transition: transform 0.3s ease;">
+          <h3 style="font-size: 14px; font-family: 'JetBrains Mono', monospace; background: linear-gradient(45deg, #F000B8, #32F5C8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; margin-bottom: 6px; font-weight: 700;">NEON UI KIT</h3>
+          <p style="font-size: 10px; color: #808080; margin-bottom: 8px; line-height: 1.4;">Futuristic UI components with glowing effects and smooth animations</p>
+          <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+            <span style="color: #808080; border: 1px solid #404040; border-radius: 12px; padding: 2px 6px; font-size: 8px;">React</span>
+            <span style="color: #808080; border: 1px solid #404040; border-radius: 12px; padding: 2px 6px; font-size: 8px;">Framer</span>
+            <span style="color: #808080; border: 1px solid #404040; border-radius: 12px; padding: 2px 6px; font-size: 8px;">CSS3</span>
+          </div>
+          <div style="display: flex; gap: 8px; font-size: 9px;">
+            <span style="color: #32F5C8;">View Source</span>
+            <span style="color: #32F5C8;">Live Demo</span>
+          </div>
         </div>
+        <!-- Subtle glow effect -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(240, 0, 184, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(50, 245, 200, 0.05) 0%, transparent 50%); border-radius: 8px; pointer-events: none;"></div>
       </div>
     `,
-    features: ['Timeline View', 'Skill Bars', 'Testimonials', 'Blog Section'],
-  },
-  // YENİ TEMPLATE'LER
-  {
-    id: 4,
-    name: 'Minimalist Professional',
-    description: 'Monokrom, grid tabanlı, tipografi odaklı minimalist portfolyo.',
-    previewHtml: `
-      <div style="background: #F1F1F1; color: #111; font-family: Inter, sans-serif; padding: 24px; border-radius: 12px; border: 1px solid #E5E5E5;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Minimalist Pro</h1>
-        <p style="font-size: 13px; color: #555; margin-bottom: 12px;">Senior Backend Engineer</p>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <span style="color: #2563eb;">GitHub</span>
-          <span style="color: #2563eb;">LinkedIn</span>
-        </div>
-        <div style="background: #fff; border-radius: 8px; padding: 10px;">
-          <h3 style="font-size: 14px; font-weight: 600;">Project Title</h3>
-          <p style="font-size: 12px; color: #555;">Short project description.</p>
-        </div>
-      </div>
-    `,
-    features: ['Strict Grid', 'Monochrome', 'Minimal Accent', 'Professional'],
-  },
-  {
-    id: 5,
-    name: 'Creative Technologist',
-    description: 'Koyu tema, neon vurgular, animasyonlu ve enerjik portfolyo.',
-    previewHtml: `
-      <div style="background: linear-gradient(90deg, #1A1A1A 60%, #F000B8 100%); color: #E0E0E0; font-family: Satoshi, sans-serif; padding: 24px; border-radius: 12px;">
-        <h1 style="font-size: 22px; font-family: 'JetBrains Mono', monospace; background: linear-gradient(45deg, #F000B8, #32F5C8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Creative Tech</h1>
-        <p style="font-size: 13px; color: #32F5C8; margin-bottom: 12px;">Frontend / Fullstack</p>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <span style="color: #32F5C8;">GitHub</span>
-          <span style="color: #F000B8;">LinkedIn</span>
-        </div>
-        <div style="background: #212121; border-radius: 8px; padding: 10px;">
-          <h3 style="font-size: 14px; font-weight: 600;">Project Name</h3>
-          <p style="font-size: 12px; color: #808080;">Energetic project card.</p>
-        </div>
-      </div>
-    `,
-    features: ['Dark Mode', 'Neon Accent', 'Micro-interactions', 'Animated'],
-  },
-  {
-    id: 6,
-    name: 'Storyteller',
-    description: 'Dikey zaman çizgisi, anlatı odaklı, sıcak renkli portfolyo.',
-    previewHtml: `
-      <div style="background: #FFF7ED; color: #B24536; font-family: Lora, serif; padding: 24px; border-radius: 12px; border: 1px solid #F2994A;">
-        <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">Storyteller</h1>
-        <p style="font-size: 13px; color: #B24536; margin-bottom: 12px;">A Narrative Journey</p>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-          <span style="color: #B24536;">GitHub</span>
-          <span style="color: #B24536;">LinkedIn</span>
-        </div>
-        <div style="background: #fff; border-radius: 8px; padding: 10px;">
-          <h3 style="font-size: 14px; font-weight: 600;">Case Study</h3>
-          <p style="font-size: 12px; color: #7C5E48;">Project as a story.</p>
-        </div>
-      </div>
-    `,
-    features: ['Timeline', 'Serif Headings', 'Case Study', 'Warm Colors'],
+    features: ['Dark Theme', 'Electric Accents', '3D Effects', 'Creative Design'],
   },
 ];
 
@@ -319,12 +280,9 @@ export default function DashboardPage() {
 
   // Template ID'lerini şablon isimlerine çevir
   const templateIdToName = {
-    1: 'modern-developer',
-    2: 'creative-portfolio',
-    3: 'professional-tech',
-    4: 'minimalist-professional',
-    5: 'creative-technologist',
-    6: 'storyteller',
+    1: 'professional-tech',
+    2: 'minimalist-professional',
+    3: 'creative-portfolio',
   };
 
   const [selectedRepos, setSelectedRepos] = useState<number[]>([]);
@@ -606,5 +564,263 @@ export default function DashboardPage() {
         </div>
       </div>
     </ErrorBoundary>
+  );
+}
+
+// Inline Step Components
+interface GenerateStepProps {
+  loading: boolean;
+  error: string | null;
+  onGenerate: () => void;
+  onBack: () => void;
+}
+
+function GenerateStep({ loading, error, onGenerate, onBack }: GenerateStepProps) {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="flex flex-col items-center text-center space-y-6 py-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-2">
+          <span className="text-2xl">🚀</span>
+        </div>
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Portfolyo Oluştur</h2>
+          <p className="text-sm text-gray-500 max-w-lg">
+            Seçtiğiniz bilgilerle portfolyonuz oluşturulacak
+          </p>
+        </div>
+        {loading ? (
+          <div className="flex flex-col items-center space-y-4 mt-4">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+            <span className="text-blue-700 font-medium text-sm">Portfolyo oluşturuluyor...</span>
+          </div>
+        ) : error ? (
+          <div className="flex items-center space-x-3 bg-red-50 border border-red-200 rounded-xl px-4 py-2 mt-2">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+            <span className="text-red-700 text-sm font-medium">{error}</span>
+          </div>
+        ) : (
+          <Button variant="primary" size="md" onClick={onGenerate} className="px-6 py-3 text-base">
+            Portfolyo Oluştur
+          </Button>
+        )}
+      </div>
+      <div className="flex justify-between mt-8 mb-8">
+        <Button variant="primary" onClick={onBack} className="px-6 py-2">
+          Geri
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface TemplateSelectionProps {
+  templates: PortfolioTemplate[];
+  selectedTemplate: number;
+  onSelectTemplate: (id: number) => void;
+  onNext: () => void;
+  onBack: () => void;
+  onPreview: (templateId: number) => void;
+}
+
+function TemplateSelection({
+  templates,
+  selectedTemplate,
+  onSelectTemplate,
+  onNext,
+  onBack,
+  onPreview,
+}: TemplateSelectionProps) {
+  return (
+    <div className="max-w-full mx-auto">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Şablonunuzu Seçin</h1>
+        <p className="text-sm text-gray-500">Portfolyonuz için bir şablon seçin</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {templates.map((template) => (
+          <div
+            key={template.id}
+            className={`
+              relative p-6 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col h-full
+              ${
+                selectedTemplate === template.id
+                  ? 'border-blue-300 bg-blue-50 shadow-md'
+                  : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+              }
+            `}
+            onClick={() => onSelectTemplate(template.id)}
+          >
+            {selectedTemplate === template.id && (
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                <Check className="w-4 h-4 text-white" />
+              </div>
+            )}
+
+            <div className="aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-4">
+              <iframe
+                srcDoc={template.previewHtml}
+                className="w-full h-full border-0 pointer-events-none transform scale-75 origin-top-left"
+                title={`${template.name} Preview`}
+                style={{ width: '133.33%', height: '133.33%' }}
+              />
+            </div>
+
+            <div className="space-y-3 flex-1 flex flex-col">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{template.name}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{template.description}</p>
+              </div>
+
+              <div className="h-16 flex flex-wrap gap-2 content-start">
+                {template.features.slice(0, 3).map((feature) => (
+                  <span
+                    key={feature}
+                    className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md h-fit"
+                  >
+                    {feature}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex gap-2 pt-2 mt-auto">
+                <Button
+                  variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
+                  size="sm"
+                  className="flex-1 text-sm"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    onSelectTemplate(template.id);
+                  }}
+                >
+                  {selectedTemplate === template.id ? 'Seçildi' : 'Seç'}
+                </Button>
+
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    onPreview(template.id);
+                  }}
+                  className="!px-3"
+                >
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-between items-center">
+        <Button variant="secondary" size="md" onClick={onBack} className="px-6 py-2">
+          Geri
+        </Button>
+
+        <Button
+          variant="primary"
+          size="md"
+          onClick={onNext}
+          disabled={!selectedTemplate}
+          className="px-6 py-2"
+        >
+          Devam Et
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+interface CVUploadProps {
+  cvUrl?: string;
+  uploading: boolean;
+  error: string | null;
+  onUpload: (file: File) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+function CVUpload({ cvUrl, uploading, error, onUpload, onNext, onBack }: CVUploadProps) {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && typeof onUpload === 'function') {
+      onUpload(file);
+    }
+  };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">CV Yükle (Opsiyonel)</h1>
+        <p className="text-sm text-gray-500">
+          CV dosyanızı yükleyerek portfolyonuza ekleyebilirsiniz
+        </p>
+      </div>
+
+      <div className="flex flex-col items-center space-y-6 py-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mb-2">
+          <UploadCloud className="w-6 h-6 text-white" />
+        </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        {cvUrl ? (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="flex items-center space-x-3 bg-green-50 border border-green-200 rounded-xl px-4 py-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+              <span className="text-green-700 text-sm font-medium">CV başarıyla yüklendi</span>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={handleClick}
+              disabled={uploading}
+              className="px-6 py-2"
+            >
+              Başka CV Yükle
+            </Button>
+          </div>
+        ) : (
+          <Button
+            variant="primary"
+            onClick={handleClick}
+            disabled={uploading}
+            className="px-6 py-2"
+          >
+            {uploading ? 'Yükleniyor...' : 'CV Yükle'}
+          </Button>
+        )}
+        {error && (
+          <div className="flex items-center space-x-3 bg-red-50 border border-red-200 rounded-xl px-4 py-2 mt-2">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+            <span className="text-red-700 text-sm font-medium">{error}</span>
+          </div>
+        )}
+        <span className="text-gray-500 text-xs mt-2 max-w-lg leading-relaxed">
+          CV dosyanız sadece sizin tarafınızdan görüntülenir ve asla üçüncü kişilerle paylaşılmaz.
+          Dosya boyutu 5MB&apos;ı geçmemelidir.
+        </span>
+      </div>
+      <div className="flex justify-between mt-8 mb-8">
+        <Button variant="primary" onClick={onBack} className="px-6 py-2">
+          Geri
+        </Button>
+        <Button variant="primary" onClick={onNext} disabled={!cvUrl} className="px-6 py-2">
+          Devam Et
+        </Button>
+      </div>
+    </div>
   );
 }

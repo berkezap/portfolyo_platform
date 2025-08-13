@@ -71,5 +71,58 @@
   <footer class="w-full max-w-5xl mx-auto py-8 px-4 text-center text-xs text-[#888] border-t border-[#E5E5E5] mt-auto">
     &copy; {{CURRENT_YEAR}} {{USER_NAME}}. All rights reserved.
   </footer>
+
+  <script>
+    // Dark mode toggle functionality
+    const themeToggle = document.querySelector('button[aria-label="Toggle dark mode"]');
+    const html = document.documentElement;
+    
+    // Check for saved theme preference or default to light mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    html.classList.toggle('dark', currentTheme === 'dark');
+    
+    themeToggle.addEventListener('click', () => {
+      const isDark = html.classList.contains('dark');
+      html.classList.toggle('dark', !isDark);
+      localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+    });
+  </script>
+
+  <style>
+    /* Dark mode styles */
+    html.dark {
+      background-color: #111111;
+      color: #E5E5E5;
+    }
+    html.dark body {
+      background-color: #111111;
+    }
+    html.dark header {
+      border-color: #333333;
+    }
+    html.dark button {
+      border-color: #333333;
+      color: #E5E5E5;
+    }
+    html.dark button:hover {
+      background-color: #333333;
+    }
+    html.dark .bg-white {
+      background-color: #1A1A1A !important;
+    }
+    html.dark .shadow-sm {
+      box-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.05);
+    }
+    html.dark .shadow-md {
+      box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1);
+    }
+    html.dark .border-\[\#E5E5E5\] {
+      border-color: #333333 !important;
+    }
+    html.dark .bg-\[\#F1F1F1\] {
+      background-color: #333333 !important;
+      color: #E5E5E5 !important;
+    }
+  </style>
 </body>
 </html> 
