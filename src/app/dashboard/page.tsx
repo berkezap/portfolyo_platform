@@ -13,6 +13,7 @@ import PortfolioLimitBanner from '@/components/dashboard/PortfolioLimitBanner';
 import { useSubscription } from '@/hooks/useSubscription';
 import { StepType, PortfolioTemplate } from '@/types/dashboard';
 import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary';
+import { PublishStep } from '@/components/dashboard/steps/PublishStep';
 import Button from '@/components/ui/Button';
 import {
   X,
@@ -260,7 +261,7 @@ export default function DashboardPage() {
   } = useGitHubRepos();
   const {
     generatePortfolio,
-    result: portfolioResult,
+    result,
     loading: portfolioLoading,
     error: portfolioError,
     clearResult,
@@ -291,6 +292,8 @@ export default function DashboardPage() {
   const [cvUploading, setCvUploading] = useState(false);
   const [cvError, setCvError] = useState<string | null>(null);
   const [step, setStep] = useState<StepType>('repos');
+  const [portfolioId, setPortfolioId] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({
     isOpen: false,
     templateId: null,
@@ -351,9 +354,9 @@ export default function DashboardPage() {
   };
 
   const handleGenerate = async () => {
-    // Demo mode'da da gerçek portfolio oluştur ama mock verilerle
-    setStep('generate');
-    clearResult();
+    // Portfolio oluştur ve publish step'ine geç
+    console.log('🚀 handleGenerate başladı');
+    setCvError(null);
 
     try {
       const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName];
@@ -363,11 +366,24 @@ export default function DashboardPage() {
         .map((repoId) => repos.find((repo) => repo.id === repoId)?.name)
         .filter(Boolean) as string[];
 
-      await generatePortfolio(templateName, selectedRepoNames, cvUrl || undefined);
+      console.log('📋 Portfolio generate çağrılacak:', { templateName, selectedRepoNames, cvUrl });
+      const generatedPortfolioId = await generatePortfolio(
+        templateName,
+        selectedRepoNames,
+        cvUrl || undefined,
+      );
 
-      // Portfolio listesini yenile ve finished adımına geç
-      await refetchPortfolios();
-      setStep('completed');
+      console.log('✅ Portfolio generate tamamlandı, portfolioId:', generatedPortfolioId);
+      console.log('✅ result state:', result);
+
+      // Portfolio ID'yi set et
+      if (generatedPortfolioId) {
+        setPortfolioId(generatedPortfolioId);
+        console.log('✅ PortfolioId state set edildi:', generatedPortfolioId);
+      }
+
+      // Publish step'ine geç - portfolio ID'yi result'tan alacağız
+      setStep('publish');
     } catch (genError) {
       console.error('Portfolio generation failed:', genError);
       // Hata mesajını kullanıcıya göster
@@ -375,6 +391,69 @@ export default function DashboardPage() {
       setStep('cv');
     }
   }; // handleGoToDashboard kaldırıldı - kullanılmıyor
+
+  const handlePublish = async (slug: string) => {
+    console.log('🚀 handlePublish çağrıldı:', { slug });
+    console.log('📋 portfolioId state:', portfolioId);
+    console.log('📋 result state:', result);
+    console.log('📋 portfolios listesi:', portfolios);
+
+    // Portfolio ID'yi farklı kaynaklardan almaya çalış
+    let currentPortfolioId = portfolioId || result?.portfolioId;
+
+    // Eğer hala bulamazsa, portfolios listesinden en son olanını al
+    if (!currentPortfolioId && portfolios && portfolios.length > 0) {
+      // Portfolios listesini tarihe göre sırala ve en son olanını al
+      const latestPortfolio = portfolios.sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )[0];
+      if (latestPortfolio) {
+        currentPortfolioId = latestPortfolio.id;
+        console.log('📋 En son portfolio listeden alındı:', currentPortfolioId);
+      }
+    }
+
+    console.log('📋 currentPortfolioId:', currentPortfolioId);
+
+    if (!currentPortfolioId) {
+      console.log('❌ Portfolio ID bulunamadı!');
+      setCvError('Portfolio ID bulunamadı - Lütfen önce portfolio oluşturun');
+      return;
+    }
+
+    setGenerating(true);
+    setCvError(null);
+
+    try {
+      const response = await fetch('/api/portfolio/publish', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          portfolioId: currentPortfolioId,
+          slug,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Yayınlama başarısız oldu');
+      }
+
+      console.log('✅ Portfolio yayınlandı:', data);
+
+      // Portfolio listesini yenile ve completed adımına geç
+      await refetchPortfolios();
+      setStep('completed');
+    } catch (error) {
+      console.error('❌ Portfolio yayınlama hatası:', error);
+      setCvError(error instanceof Error ? error.message : 'Yayınlama başarısız oldu');
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const handlePreview = async (templateId: number) => {
     setPreviewModal({ isOpen: true, templateId });
@@ -470,13 +549,13 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Step 4: Generate - Geniş iç padding */}
-            {step === 'generate' && (
+            {/* Step 4: Publish - Portfolio oluştur ve yayınla */}
+            {step === 'publish' && (
               <div className="px-12 py-8">
-                <GenerateStep
-                  loading={portfolioLoading}
-                  error={portfolioError}
-                  onGenerate={handleGenerate}
+                <PublishStep
+                  loading={generating}
+                  error={cvError}
+                  onPublish={handlePublish}
                   onBack={() => setStep('cv')}
                 />
               </div>
@@ -486,7 +565,7 @@ export default function DashboardPage() {
             {step === 'completed' && (
               <div className="px-12 py-8">
                 <CompletedStep
-                  portfolioResult={portfolioResult}
+                  portfolioResult={result}
                   demoMode={demoMode}
                   userName={session?.user?.name || undefined}
                   onNewPortfolio={() => {

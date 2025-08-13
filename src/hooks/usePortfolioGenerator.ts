@@ -3,6 +3,7 @@ import { useState } from 'react';
 interface PortfolioGenerationResult {
   success: boolean;
   html?: string;
+  portfolioId?: string;
   metadata?: {
     user: string;
     repoCount: number;
@@ -17,7 +18,7 @@ interface UsePortfolioGeneratorReturn {
     templateName: string,
     selectedRepos?: string[],
     cvUrl?: string,
-  ) => Promise<void>;
+  ) => Promise<string | null>;
   result: PortfolioGenerationResult | null;
   loading: boolean;
   error: string | null;
@@ -33,7 +34,7 @@ export function usePortfolioGenerator(): UsePortfolioGeneratorReturn {
     templateName: string,
     selectedRepos?: string[],
     cvUrl?: string,
-  ) => {
+  ): Promise<string | null> => {
     setLoading(true);
     setError(null);
     setResult(null);
@@ -60,6 +61,7 @@ export function usePortfolioGenerator(): UsePortfolioGeneratorReturn {
       }
 
       setResult(data);
+      return data.portfolioId || null;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);

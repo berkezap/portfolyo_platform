@@ -214,12 +214,12 @@ export async function POST(request: NextRequest) {
 
     // 🎨 2. ADIM: Template data formatla ve HTML oluştur
     console.log('🔄 formatUserDataForTemplate çağrılıyor...');
-    const templateData: TemplateData = formatUserDataForTemplate(userData, repos, selectedRepos);
-
-    // CV URL'i template data'ya ekle
-    if (cvUrl) {
-      templateData.CV_URL = cvUrl;
-    }
+    const templateData: TemplateData = formatUserDataForTemplate(
+      userData,
+      repos,
+      selectedRepos,
+      cvUrl,
+    );
 
     console.log('📊 Template data oluşturuldu:', {
       projectCount: templateData.projects?.length || 0,

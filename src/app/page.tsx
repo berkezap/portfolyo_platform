@@ -33,10 +33,49 @@ export default function HomePage() {
   const [isClient, setIsClient] = useState(false);
   const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 
+  // Waitlist state
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+
   // Client-side hydration için
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Waitlist handler
+  const handleWaitlistSubmit = async (email?: string) => {
+    const emailToUse = email || waitlistEmail;
+    if (!emailToUse) {
+      // Email input modal açılacak
+      const userEmail = prompt('E-posta adresinizi girin:');
+      if (!userEmail) return;
+      setWaitlistEmail(userEmail);
+      return handleWaitlistSubmit(userEmail);
+    }
+
+    setWaitlistLoading(true);
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailToUse,
+          feature: 'pro',
+          source: 'landing-page',
+        }),
+      });
+
+      if (response.ok) {
+        setWaitlistSuccess(true);
+        setTimeout(() => setWaitlistSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error('Waitlist error:', error);
+    } finally {
+      setWaitlistLoading(false);
+    }
+  };
 
   // Memoize expensive computations
   const authButtonConfig = {
@@ -412,6 +451,94 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Pro Features Coming Soon - Cal.com Style */}
+      <section className="relative py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+        {/* Subtle background elements */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-200 rounded-full opacity-20 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gray-300 rounded-full opacity-15 blur-3xl" />
+
+        <div className="container mx-auto px-6 relative">
+          <div className="text-center mb-16">
+            {/* Minimal badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-gray-700 text-sm font-medium mb-8 shadow-sm">
+              ✨ Pro özellikler çok yakında
+              <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">Q2 2025</span>
+            </div>
+
+            {/* Clean heading */}
+            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight">
+              Bir üst seviye
+              <br />
+              <span className="text-gray-600">PortfolYO+</span>
+            </h2>
+
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
+              Premium şablonlar, özel alan adları, gelişmiş analitik ve öncelikli destek.
+              <span className="font-medium text-gray-900"> Bekleme listesine özel %50 indirim</span>
+            </p>
+
+            {/* Simple pricing */}
+            <div className="flex flex-col items-center gap-6">
+              <div className="bg-white border border-gray-200 rounded-xl px-6 py-4 shadow-sm">
+                <div className="text-3xl font-semibold text-gray-900 mb-1">
+                  <span className="line-through text-xl text-gray-400 mr-2">$10</span>
+                  $5<span className="text-base text-gray-600">/ay</span>
+                </div>
+                <div className="text-sm text-green-600 font-medium">Bekleme listesi indirimi</div>
+              </div>
+              <Button
+                variant="primary"
+                size="lg"
+                className="px-8"
+                onClick={() => handleWaitlistSubmit()}
+                disabled={waitlistLoading}
+              >
+                {waitlistLoading
+                  ? 'Ekleniyor...'
+                  : waitlistSuccess
+                    ? '✓ Eklendi!'
+                    : 'Bekleme listesine katıl'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Feature grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <LayoutTemplate className="w-6 h-6 text-gray-600" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Premium Şablonlar</h3>
+              <p className="text-sm text-gray-600">Profesyonelce tasarlanmış şablonlar</p>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Globe className="w-6 h-6 text-gray-600" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Özel Alan Adı</h3>
+              <p className="text-sm text-gray-600">Kendi alan adınızı kullanın</p>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-6 h-6 text-gray-600" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Gelişmiş Analitik</h3>
+              <p className="text-sm text-gray-600">Detaylı analizler ve metrikler</p>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
+              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-gray-600 font-semibold text-sm">24/7</span>
+              </div>
+              <h3 className="font-medium text-gray-900 mb-2">Öncelikli Destek</h3>
+              <p className="text-sm text-gray-600">E‑posta öncelikli destek</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How it works - Akış */}
       <section className="relative py-32 bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
         <div className="container mx-auto px-6">
@@ -596,112 +723,6 @@ export default function HomePage() {
               <p className="text-gray-600 text-sm">
                 Demo modu açıksa örnek verilerle dakikalar içinde deneme yapabilirsiniz.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pro Features Coming Soon - Cal.com Style */}
-      <section className="relative py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-        {/* Subtle background elements */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-200 rounded-full opacity-20 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gray-300 rounded-full opacity-15 blur-3xl" />
-
-        <div className="container mx-auto px-6 relative">
-          <div className="text-center mb-16">
-            {/* Minimal badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-gray-700 text-sm font-medium mb-8 shadow-sm">
-              ✨ Pro özellikler çok yakında
-              <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">Q2 2025</span>
-            </div>
-
-            {/* Clean heading */}
-            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight">
-              Bir üst seviye
-              <br />
-              <span className="text-gray-600">PortfolYO+</span>
-            </h2>
-
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
-              Premium şablonlar, özel alan adları, gelişmiş analitik ve öncelikli destek.
-              <span className="font-medium text-gray-900"> Bekleme listesine özel %50 indirim</span>
-            </p>
-
-            {/* Simple pricing */}
-            <div className="flex flex-col items-center gap-6">
-              <div className="bg-white border border-gray-200 rounded-xl px-6 py-4 shadow-sm">
-                <div className="text-3xl font-semibold text-gray-900 mb-1">
-                  <span className="line-through text-gray-400 text-xl mr-3">$5</span>
-                  $2.50<span className="text-lg text-gray-600">/aylık</span>
-                </div>
-                <div className="text-sm text-gray-600">İlk 3 ay %50 indirim</div>
-              </div>
-
-              {/* Clean CTA */}
-              <button
-                onClick={async () => {
-                  const email = prompt(
-                    '🚀 Join the waitlist for Pro features!\n\n💎 Premium features:\n• Premium templates\n• Custom domain\n• Advanced analytics\n• Priority support\n\n🎁 Early bird: 50% off first 3 months!\n\nYour email:',
-                  );
-                  if (!email || !email.includes('@')) return;
-                  try {
-                    const res = await fetch('/api/waitlist', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ email, feature: 'pro', source: 'pricing-cta' }),
-                    });
-                    const j = await res.json().catch(() => ({}) as any);
-                    if (res.ok) {
-                      if (j?.note === 'duplicate') alert('Zaten waitlist’tesin!');
-                      else alert('🎉 Waitlist’e eklendin!');
-                    } else {
-                      alert('Kaydedilemedi: ' + (j?.error || res.statusText));
-                    }
-                  } catch (e) {
-                    alert('Kaydedilemedi');
-                  }
-                }}
-                className="px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors shadow-sm"
-              >
-                Bekleme Listesine Katılın
-              </button>
-
-              <p className="text-sm text-gray-500">100+ geliştirici katıldı</p>
-            </div>
-          </div>
-
-          {/* Clean feature grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <LayoutTemplate className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Premium Şablonlar</h3>
-              <p className="text-sm text-gray-600">Profesyonelce tasarlanmış şablonlar</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Globe className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Özel Alan Adı</h3>
-              <p className="text-sm text-gray-600">Kendi alan adınızı kullanın</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Gelişmiş Analitik</h3>
-              <p className="text-sm text-gray-600">Detaylı analizler ve metrikler</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-gray-600 font-semibold text-sm">24/7</span>
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Öncelikli Destek</h3>
-              <p className="text-sm text-gray-600">E‑posta öncelikli destek</p>
             </div>
           </div>
         </div>

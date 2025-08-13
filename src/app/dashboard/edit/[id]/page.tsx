@@ -19,6 +19,10 @@ import {
   GitBranch,
   Check,
   Github,
+  Globe,
+  Copy,
+  Upload,
+  Download,
 } from 'lucide-react';
 import { GitHubRepo } from '@/types/github';
 
@@ -96,6 +100,110 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
   const [selectedRepos, setSelectedRepos] = useState<number[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1);
   const [userBio, setUserBio] = useState('');
+
+  // Publishing states
+  const [publishSlug, setPublishSlug] = useState('');
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [canChangeSlug, setCanChangeSlug] = useState(true);
+  const [nextSlugChangeDate, setNextSlugChangeDate] = useState<Date | null>(null);
+
+  // Portfolio'dan mevcut publish bilgilerini al
+  useEffect(() => {
+    if (portfolio?.slug) {
+      setPublishSlug(portfolio.slug);
+    }
+
+    // Slug değişiklik limitini kontrol et
+    if (portfolio?.slug_last_changed_at) {
+      const lastChangeDate = new Date(portfolio.slug_last_changed_at);
+      const sixMonthsLater = new Date(lastChangeDate);
+      sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+
+      const now = new Date();
+      const canChange = now >= sixMonthsLater;
+
+      setCanChangeSlug(canChange);
+      if (!canChange) {
+        setNextSlugChangeDate(sixMonthsLater);
+      }
+    }
+  }, [portfolio]);
+
+  // Publishing handlers
+  const handlePublish = async () => {
+    if (!publishSlug.trim()) {
+      setPublishError('Slug gerekli');
+      return;
+    }
+
+    setIsPublishing(true);
+    setPublishError(null);
+
+    try {
+      const response = await fetch(`/api/portfolio/${portfolioId}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: publishSlug.trim() }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Yayınlama başarısız');
+      }
+
+      // Portfolio state'ini güncelle
+      if (result.portfolio) {
+        // React Query cache'ini invalide et
+        const queryClient = (window as any).__queryClient__;
+        if (queryClient) {
+          queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId] });
+        }
+      }
+    } catch (error) {
+      setPublishError(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    setIsUnpublishing(true);
+    setPublishError(null);
+
+    try {
+      const response = await fetch(`/api/portfolio/${portfolioId}/unpublish`, {
+        method: 'POST',
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Yayından kaldırma başarısız');
+      }
+
+      // Portfolio state'ini güncelle
+      const queryClient = (window as any).__queryClient__;
+      if (queryClient) {
+        queryClient.invalidateQueries({ queryKey: ['portfolio', portfolioId] });
+      }
+    } catch (error) {
+      setPublishError(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } finally {
+      setIsUnpublishing(false);
+    }
+  };
+
+  const normalizeSlug = (input: string) => {
+    return input
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\-]/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .replace(/-+/g, '-');
+  };
 
   // Kullanıcı bilgilerini state'e al
   useEffect(() => {
@@ -600,6 +708,212 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                     )}
                   </ButtonNew>
                 </div>
+              </ModernCard.Content>
+            </ModernCard>
+
+            {/* Publishing */}
+            <ModernCard variant="elevated">
+              <ModernCard.Header>
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <Globe className="w-5 h-5" />
+                  Canlı Yayın
+                </h3>
+              </ModernCard.Header>
+              <ModernCard.Content>
+                {portfolio?.status === 'published' && portfolio?.slug ? (
+                  <div className="space-y-4">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        <span className="text-green-800 font-medium">Yayında</span>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-green-700">Portfolyo canlı olarak yayında</p>
+                        <div className="flex items-center gap-2 bg-white border border-green-200 rounded p-3">
+                          <span className="text-sm font-mono text-gray-600 flex-1">
+                            https://{portfolio.slug}.portfolyo.tech
+                          </span>
+                          <ButtonNew
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `https://${portfolio.slug}.portfolyo.tech`,
+                              );
+                            }}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </ButtonNew>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <ButtonNew
+                        variant="secondary"
+                        onClick={() =>
+                          window.open(`https://${portfolio.slug}.portfolyo.tech`, '_blank')
+                        }
+                        className="w-full flex items-center justify-center gap-2"
+                        size="md"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Canlı Siteyi Görüntüle
+                      </ButtonNew>
+
+                      {/* Slug değiştirme özelliği */}
+                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium text-gray-900">URL Değiştir</h4>
+                          {!canChangeSlug && (
+                            <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                              6 ayda bir
+                            </span>
+                          )}
+                        </div>
+
+                        {canChangeSlug ? (
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={publishSlug}
+                              onChange={(e) => {
+                                const normalized = normalizeSlug(e.target.value);
+                                setPublishSlug(normalized);
+                                setPublishError(null);
+                              }}
+                              placeholder="yeni-slug"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <div className="flex gap-2">
+                              <ButtonNew
+                                variant="primary"
+                                size="sm"
+                                onClick={handlePublish}
+                                disabled={isPublishing || publishSlug === portfolio.public_slug}
+                                loading={isPublishing}
+                                className="flex-1"
+                              >
+                                URL Güncelle
+                              </ButtonNew>
+                              <ButtonNew
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setPublishSlug(portfolio.public_slug || '')}
+                                className="px-3"
+                              >
+                                İptal
+                              </ButtonNew>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="bg-amber-50 border border-amber-200 rounded p-3">
+                            <p className="text-sm text-amber-700">
+                              URL'nizi son değiştirdiğinizden 6 ay geçmediği için tekrar
+                              değiştiremezsiniz.
+                            </p>
+                            {nextSlugChangeDate && (
+                              <p className="text-xs text-amber-600 mt-1">
+                                Sonraki değişiklik: {nextSlugChangeDate.toLocaleDateString('tr-TR')}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <ButtonNew
+                        variant="destructive"
+                        onClick={handleUnpublish}
+                        disabled={isUnpublishing}
+                        loading={isUnpublishing}
+                        className="w-full flex items-center justify-center gap-2"
+                        size="md"
+                      >
+                        {isUnpublishing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Kaldırılıyor...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4" />
+                            Yayından Kaldır
+                          </>
+                        )}
+                      </ButtonNew>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle className="w-4 h-4 text-blue-600" />
+                        <span className="text-blue-800 font-medium">Henüz Yayınlanmamış</span>
+                      </div>
+                      <p className="text-sm text-blue-700">
+                        Portfolio'nuz hazır! Yayınlamak için bir web adresi seçin.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Web Adresi Seçin
+                        </label>
+                        <input
+                          type="text"
+                          value={publishSlug}
+                          onChange={(e) => {
+                            const normalized = normalizeSlug(e.target.value);
+                            setPublishSlug(normalized);
+                            setPublishError(null);
+                          }}
+                          placeholder="benim-portfolio"
+                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                        />
+                        <p className="text-xs text-gray-500">
+                          Sadece küçük harf, rakam ve tire (-) kullanabilirsiniz.
+                          <br />
+                          <span className="text-blue-600 font-medium">
+                            https://
+                            <span className="font-mono">{publishSlug || 'web-adresiniz'}</span>
+                            .portfolyo.tech
+                          </span>
+                        </p>
+                      </div>
+
+                      {publishError && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="w-4 h-4 text-red-600" />
+                            <span className="text-red-800 text-sm">{publishError}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <ButtonNew
+                        variant="primary"
+                        onClick={handlePublish}
+                        disabled={isPublishing || !publishSlug.trim() || selectedRepos.length === 0}
+                        loading={isPublishing}
+                        className="w-full flex items-center justify-center gap-2"
+                        size="md"
+                      >
+                        {isPublishing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Yayınlanıyor...
+                          </>
+                        ) : (
+                          <>
+                            <Globe className="w-4 h-4" />
+                            Canlıya Al
+                          </>
+                        )}
+                      </ButtonNew>
+                    </div>
+                  </div>
+                )}
               </ModernCard.Content>
             </ModernCard>
           </div>

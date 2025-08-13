@@ -1,43 +1,65 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  const host: string = request.headers.get('host') ?? '';
+  const pathname: string = request.nextUrl.pathname ?? '';
+
+  // Subdomain-based publishing: rewrite *.portfolyo.tech to internal public route
+  try {
+    if (host.endsWith('portfolyo.tech') && host.split('.').length >= 3) {
+      const sub: string = host.split('.')[0] || '';
+      const reserved: string[] = ['www', 'api', 'app', 'admin', 'static', 'cdn'];
+      if (!reserved.includes(sub)) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/pub';
+        url.searchParams.set('slug', sub);
+        return NextResponse.rewrite(url);
+      }
+    }
+  } catch (_) {}
+
+  const response = NextResponse.next();
 
   // Performance headers
-  response.headers.set('X-DNS-Prefetch-Control', 'on')
-  response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('Referrer-Policy', 'origin-when-cross-origin')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
+  response.headers.set('X-DNS-Prefetch-Control', 'on');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
 
   // Cache optimization for static assets
-  if (request.nextUrl.pathname.startsWith('/_next/static/') || 
-      request.nextUrl.pathname.startsWith('/static/') ||
-      request.nextUrl.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
-    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+  const staticAssetRegex = /\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/;
+  if (
+    pathname.startsWith('/_next/static/') ||
+    pathname.startsWith('/static/') ||
+    staticAssetRegex.test(pathname)
+  ) {
+    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
   }
 
   // API routes caching
-  if (request.nextUrl.pathname.startsWith('/api/')) {
+  if (pathname.startsWith('/api/')) {
     // Short cache for API responses
-    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300')
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
   }
 
   // HTML pages caching
-  if (request.nextUrl.pathname === '/' || 
-      request.nextUrl.pathname.startsWith('/portfolio/') ||
-      request.nextUrl.pathname.startsWith('/dashboard/')) {
-    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600')
+  if (
+    pathname === '/' ||
+    pathname.startsWith('/portfolio/') ||
+    pathname.startsWith('/dashboard/')
+  ) {
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
   }
 
   // Compression headers
-  response.headers.set('Accept-Encoding', 'gzip, deflate, br')
+  response.headers.set('Accept-Encoding', 'gzip, deflate, br');
 
   // Security headers for production
   if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
-    
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+
     // Content Security Policy
     const csp = [
       "default-src 'self'",
@@ -48,19 +70,19 @@ export function middleware(request: NextRequest) {
       "connect-src 'self' https://api.github.com https://supabase.co",
       "frame-ancestors 'none'",
       "base-uri 'self'",
-      "form-action 'self'"
-    ].join('; ')
-    
-    response.headers.set('Content-Security-Policy', csp)
+      "form-action 'self'",
+    ].join('; ');
+
+    response.headers.set('Content-Security-Policy', csp);
   }
 
   // Performance monitoring
-  const start = Date.now()
-  
-  // Add performance header
-  response.headers.set('Server-Timing', `total;dur=${Date.now() - start}`)
+  const start = Date.now();
 
-  return response
+  // Add performance header
+  response.headers.set('Server-Timing', `total;dur=${Date.now() - start}`);
+
+  return response;
 }
 
 export const config = {
@@ -74,4 +96,4 @@ export const config = {
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-} 
+};

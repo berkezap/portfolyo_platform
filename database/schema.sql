@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS portfolios (
     cv_url TEXT, -- CV dosyasının URL'i (S3, Vercel Blob vs.)
     generated_html TEXT, -- Oluşturulan portfolyonun HTML içeriği
     metadata JSONB DEFAULT '{}'::jsonb, -- Ek veriler (user info, stats vs.)
+    slug TEXT UNIQUE, -- Portfolio'nun benzersiz slug'ı (subdomain için)
+    status TEXT DEFAULT 'draft', -- 'draft', 'published'
+    published_at TIMESTAMP WITH TIME ZONE, -- Yayınlanma tarihi
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -21,6 +24,8 @@ CREATE TABLE IF NOT EXISTS portfolios (
 CREATE INDEX IF NOT EXISTS idx_portfolios_user_id ON portfolios(user_id);
 CREATE INDEX IF NOT EXISTS idx_portfolios_created_at ON portfolios(created_at);
 CREATE INDEX IF NOT EXISTS idx_portfolios_template ON portfolios(selected_template);
+CREATE INDEX IF NOT EXISTS idx_portfolios_slug ON portfolios(slug);
+CREATE INDEX IF NOT EXISTS idx_portfolios_status ON portfolios(status);
 
 -- Updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()

@@ -6,10 +6,10 @@ interface ProgressStepsProps {
 
 export function ProgressSteps({ currentStep }: ProgressStepsProps) {
   const steps = [
-    { id: 'repos', label: 'Repo Seçimi', number: 1 },
-    { id: 'template', label: 'Şablon', number: 2 },
+    { id: 'repos', label: 'Proje Seçimi', number: 1 },
+    { id: 'template', label: 'Şablon Seçimi', number: 2 },
     { id: 'cv', label: 'CV Yükleme', number: 3 },
-    { id: 'generate', label: 'Oluştur', number: 4 },
+    { id: 'publish', label: 'Yayınla', number: 4 },
   ];
 
   const getStepStatus = (stepId: string) => {
