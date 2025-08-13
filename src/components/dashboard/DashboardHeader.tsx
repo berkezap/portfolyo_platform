@@ -60,9 +60,6 @@ export function DashboardHeader({ demoMode, variant = 'default' }: DashboardHead
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group focus:outline-none hover-lift">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-2.5 transition-all duration-300 group-hover:scale-105 group-active:scale-95 shadow-lg">
-              <Github className="h-6 w-6 text-white" />
-            </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300">
               PortfolYO
             </span>

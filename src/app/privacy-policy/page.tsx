@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeaderNew';
 import Card from '@/components/ui/Card';
 import Container from '@/components/ui/Container';
 import Footer from '@/components/ui/Footer';

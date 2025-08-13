@@ -79,10 +79,19 @@ export function CompletedStep({
     <div className="max-w-3xl mx-auto">
       <div className="flex flex-col items-center text-center space-y-6 py-6">
         <CheckCircle2 className="w-16 h-16 text-green-600 mb-4" />
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Tebrikler!</h2>
-          <p className="text-sm text-gray-500">Portfolyonuz başarıyla oluşturuldu.</p>
-        </div>
+        {portfolioResult?.success ? (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Tebrikler!</h2>
+            <p className="text-sm text-gray-500">Portfolyonuz başarıyla oluşturuldu.</p>
+          </div>
+        ) : (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">İşlem tamamlanamadı</h2>
+            <p className="text-sm text-gray-500">
+              Bir şeyler ters gitti. Lütfen geri dönüp yeniden deneyin.
+            </p>
+          </div>
+        )}
 
         {portfolioResult?.success && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl mt-8">

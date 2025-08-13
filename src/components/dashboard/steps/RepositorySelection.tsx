@@ -2,7 +2,7 @@ import { RefreshCw, Github, AlertCircle, Star, GitBranch } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { RepositoryGridSkeleton } from '@/components/ui/Skeleton';
 import ModernCard from '@/components/ui/ModernCard';
-import ButtonNew from '@/components/ui/ButtonNew';
+import Button from '@/components/ui/Button';
 
 interface GitHubRepo {
   id: number;
@@ -132,22 +132,23 @@ export function RepositorySelection({
           ))}
         </div>
 
-        {/* Action Section - Daha geniş boşluklar */}
-        <div className="flex flex-col items-center gap-6 mt-20 mb-12">
+        {/* Action Section */}
+        <div className="flex flex-col items-center gap-4 mt-16 mb-12">
           {selectedRepos.length === 0 && (
-            <div className="flex items-center gap-3 text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl px-6 py-4 text-base font-medium">
-              <AlertCircle className="h-6 w-6" /> En az bir proje seçmelisiniz
+            <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <AlertCircle className="h-4 w-4" />
+              Lütfen en az bir repository seçin
             </div>
           )}
-          <ButtonNew
+          <Button
             onClick={onNext}
             disabled={selectedRepos.length === 0}
             size="lg"
             variant="primary"
-            className="w-full max-w-sm text-lg py-4"
+            className="w-full max-w-sm"
           >
-            Devam Et ({selectedRepos.length} proje)
-          </ButtonNew>
+            Devam Et ({selectedRepos.length} seçili)
+          </Button>
         </div>
       </div>
     );
@@ -184,16 +185,16 @@ export function RepositorySelection({
               <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="text-red-800 font-semibold text-sm mb-1">
-                  {error.includes('rate limit') ? 'GitHub API Rate Limit' : 'Hata'}
+                  {error.includes('rate limit') ? 'GitHub API Rate Limit' : 'Error'}
                 </h3>
                 <p className="text-red-700 text-sm mb-3">{error}</p>
                 {error.includes('rate limit') ? (
                   <div className="space-y-3">
                     <p className="text-red-600 text-xs">
-                      GitHub API&apos;ye çok fazla istek gönderildi. Lütfen birkaç dakika bekleyin.
+                      Too many requests to GitHub API. Please wait a few minutes.
                     </p>
                     <div className="flex gap-2">
-                      <ButtonNew
+                      <Button
                         onClick={(e: React.MouseEvent) => {
                           e.preventDefault();
                           onRefetch();
@@ -201,37 +202,35 @@ export function RepositorySelection({
                         variant="secondary"
                         size="sm"
                         disabled={loading}
-                        className="!text-red-700 !border-red-300 hover:!bg-red-100"
+                        icon={RefreshCw}
                       >
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Tekrar Dene
-                      </ButtonNew>
-                      <ButtonNew
+                        Retry
+                      </Button>
+                      <Button
                         onClick={(e: React.MouseEvent) => {
                           e.preventDefault();
                           window.location.reload();
                         }}
                         variant="secondary"
                         size="sm"
-                        className="!text-red-700 !border-red-300 hover:!bg-red-100"
                       >
-                        Sayfayı Yenile
-                      </ButtonNew>
+                        Refresh Page
+                      </Button>
                     </div>
                   </div>
                 ) : (
-                  <ButtonNew
+                  <Button
                     onClick={(e: React.MouseEvent) => {
                       e.preventDefault();
                       onRefetch();
                     }}
                     variant="secondary"
                     size="sm"
-                    className="!text-red-700 !border-red-300 hover:!bg-red-100"
+                    disabled={loading}
+                    icon={RefreshCw}
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Tekrar Dene
-                  </ButtonNew>
+                    Try Again
+                  </Button>
                 )}
               </div>
             </div>
@@ -252,30 +251,28 @@ export function RepositorySelection({
         <ModernCard.Content className="p-8">
           <div className="flex flex-col items-center mb-6">
             <Github className="h-10 w-10 text-orange-600 mb-2" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Henüz Public Projeniz Yok</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Public Repositories Found</h2>
             <p className="text-gray-500 mb-4">
-              Portfolio oluşturmak için en az bir public GitHub projeniz olması gerekiyor.
+              You need at least one public GitHub repository to create a portfolio.
             </p>
           </div>
-          <ButtonNew
+          <Button
             onClick={onRefetch}
             disabled={loading}
             size="md"
             variant="primary"
             className="w-full max-w-xs mx-auto"
+            icon={loading ? undefined : RefreshCw}
           >
             {loading ? (
               <span className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Yeniden Kontrol Ediliyor...
+                Refreshing...
               </span>
             ) : (
-              <span className="flex items-center justify-center">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Projeleri Yeniden Yükle
-              </span>
+              'Reload Repositories'
             )}
-          </ButtonNew>
+          </Button>
         </ModernCard.Content>
       </ModernCard>
     </div>

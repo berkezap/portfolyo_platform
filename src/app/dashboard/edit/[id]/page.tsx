@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useGitHubRepos } from '@/hooks/useGitHubRepos';
 import { usePortfolioEditor } from '@/hooks/usePortfolioEditor';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeaderNew';
 import ModernCard from '@/components/ui/ModernCard';
 import ButtonNew from '@/components/ui/ButtonNew';
 import {

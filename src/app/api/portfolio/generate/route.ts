@@ -165,6 +165,27 @@ export async function POST(request: NextRequest) {
       repos = reposResult;
     }
 
+    // 🧱 Free tier limiti kontrolü (sadece gerçek modda)
+    if (!demoMode) {
+      const maxFreePortfolios = Number(process.env.FREE_TIER_MAX_PORTFOLIOS || 1);
+      const userIdForLimit = user?.email || userData?.login || '';
+      if (userIdForLimit) {
+        try {
+          const existing = await PortfolioService.getUserPortfolios(userIdForLimit);
+          if (existing.length >= maxFreePortfolios) {
+            return NextResponse.json(
+              {
+                error: `Free planda en fazla ${maxFreePortfolios} portfolyo oluşturabilirsiniz. Lütfen mevcut portfolyonuzdan birini silin veya plan yükseltin.`,
+              },
+              { status: 403 },
+            );
+          }
+        } catch (e) {
+          console.error('Free tier kontrolü hata:', e);
+        }
+      }
+    }
+
     // 🗃️ 1. ADIM: Portfolio kaydını database'e kaydet
     let savedPortfolio: { id: string; created_at?: string } | undefined;
     if (demoMode) {

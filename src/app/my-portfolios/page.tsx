@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeaderNew';
 import { usePortfolioList } from '@/hooks/usePortfolioList';
 import { PortfolioGridSkeleton } from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';

@@ -74,21 +74,23 @@ const nextConfig: NextConfig = {
       /Module not found: Can't resolve 'os'/,
     ];
 
-    // Webpack resolve ayarları - minimal
-    config.resolve = {
-      ...config.resolve,
-      fallback: {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        os: false,
-        crypto: false,
-        stream: false,
-        util: false,
-        buffer: false,
-        process: false,
-      },
-    };
+    // Webpack resolve ayarları - sadece tarayıcı tarafında polyfill'leri kapat
+    if (!isServer) {
+      config.resolve = {
+        ...config.resolve,
+        fallback: {
+          ...config.resolve.fallback,
+          fs: false,
+          path: false,
+          os: false,
+          crypto: false,
+          stream: false,
+          util: false,
+          buffer: false,
+          process: false,
+        },
+      };
+    }
 
     return config;
   },

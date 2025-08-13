@@ -8,8 +8,13 @@ import { usePortfolioGenerator } from '@/hooks/usePortfolioGenerator';
 import { usePortfolioList } from '@/hooks/usePortfolioList';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeaderNew';
 import { ProgressSteps } from '@/components/dashboard/ProgressStepsNew';
+import UpgradePrompt from '@/components/dashboard/UpgradePrompt';
+import PortfolioLimitBanner from '@/components/dashboard/PortfolioLimitBanner';
+import { useSubscription } from '@/hooks/useSubscription';
 import { StepType, PortfolioTemplate } from '@/types/dashboard';
 import ErrorBoundary, { DashboardErrorFallback } from '@/components/ErrorBoundary';
+import Button from '@/components/ui/Button';
+import { X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Dinamik import'lar - sadece ihtiyaç anında yüklenecek
@@ -285,6 +290,7 @@ const portfolioTemplates: PortfolioTemplate[] = [
 export default function DashboardPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const { currentPlan, canCreatePortfolio, portfolioLimit } = useSubscription();
   const {
     data: realRepos,
     isLoading: reposLoading,
@@ -401,14 +407,13 @@ export default function DashboardPage() {
 
       await generatePortfolio(templateName, selectedRepoNames, cvUrl || undefined);
 
-      // Portfolio listesini yenile
+      // Portfolio listesini yenile ve finished adımına geç
       await refetchPortfolios();
-
-      // Portfolyo başarıyla oluşturulduysa completed adımına geç
       setStep('completed');
-    } catch (_error) {
-      console.error('Portfolio generation failed:', _error);
-      // Hata durumunda geri dön
+    } catch (genError) {
+      console.error('Portfolio generation failed:', genError);
+      // Hata mesajını kullanıcıya göster
+      setCvError(genError instanceof Error ? genError.message : 'Oluşturma başarısız oldu');
       setStep('cv');
     }
   }; // handleGoToDashboard kaldırıldı - kullanılmıyor
@@ -445,6 +450,19 @@ export default function DashboardPage() {
           {/* Progress Steps - Header'a daha yakın */}
           <div className="mt-4 mb-8">
             <ProgressSteps currentStep={step} />
+          </div>
+
+          {/* Subscription Status & Upgrade Prompts */}
+          <div className="mb-8 space-y-4">
+            {/* Portfolio Limit Banner */}
+            <PortfolioLimitBanner
+              currentCount={portfolios?.length || 0}
+              maxAllowed={portfolioLimit}
+              planType={currentPlan}
+            />
+
+            {/* Upgrade Prompt for Free Users */}
+            {currentPlan === 'FREE' && <UpgradePrompt currentPlan={currentPlan} />}
           </div>
 
           {/* Ana içerik alanı - merkezde ama geniş */}
@@ -535,15 +553,15 @@ export default function DashboardPage() {
                     {portfolioTemplates.find((t) => t.id === previewModal.templateId)?.name} -
                     Önizleme
                   </h3>
-                  <button
+                  <Button
                     onClick={() => {
                       setPreviewModal({ isOpen: false, templateId: null });
                       setPreviewHtml('');
                     }}
-                    className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
-                  >
-                    <span className="text-2xl">✕</span>
-                  </button>
+                    variant="ghost"
+                    icon={X}
+                    size="sm"
+                  ></Button>
                 </div>
 
                 <div className="flex-1 p-8 overflow-auto">
@@ -559,26 +577,28 @@ export default function DashboardPage() {
                   )}
                 </div>
 
-                <div className="px-8 py-6 border-t border-gray-100 flex justify-end space-x-4">
-                  <button
+                <div className="px-8 py-6 border-t border-gray-100 flex justify-end space-x-3">
+                  <Button
                     onClick={() => {
                       setSelectedTemplate(previewModal.templateId!);
                       setPreviewModal({ isOpen: false, templateId: null });
                       setPreviewHtml('');
                     }}
-                    className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                    variant="primary"
+                    size="md"
                   >
-                    Şablonu Seç
-                  </button>
-                  <button
+                    Select Template
+                  </Button>
+                  <Button
                     onClick={() => {
                       setPreviewModal({ isOpen: false, templateId: null });
                       setPreviewHtml('');
                     }}
-                    className="px-8 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                    variant="secondary"
+                    size="md"
                   >
-                    Kapat
-                  </button>
+                    Cancel
+                  </Button>
                 </div>
               </div>
             </div>

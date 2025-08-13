@@ -37,6 +37,17 @@ CREATE TRIGGER update_portfolios_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Waitlist table for Pro features
+CREATE TABLE IF NOT EXISTS waitlist (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email TEXT NOT NULL,
+    feature TEXT NOT NULL DEFAULT 'pro',
+    source TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_waitlist_email_feature ON waitlist(email, feature);
+
 -- Row Level Security (RLS) - Kullanıcılar sadece kendi portfolyolarını görebilir
 ALTER TABLE portfolios ENABLE ROW LEVEL SECURITY;
 

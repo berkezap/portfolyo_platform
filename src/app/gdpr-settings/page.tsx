@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { Shield, Download, Trash2, Eye, Settings, AlertTriangle } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeaderNew';
 
 interface ConsentData {
   userId: string;
