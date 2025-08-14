@@ -5,62 +5,10 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Güvenlik headers'ları
+  // Güvenlik headers'ları (CSP temporarily removed for Vercel cache issues)
   async headers() {
-    const isProd = process.env.NODE_ENV === 'production'
-
-    const commonSecurityHeaders = [
-      {
-        key: 'X-Content-Type-Options',
-        value: 'nosniff',
-      },
-      {
-        key: 'X-Frame-Options',
-        value: 'DENY',
-      },
-      {
-        key: 'X-XSS-Protection',
-        value: '1; mode=block',
-      },
-      {
-        key: 'Referrer-Policy',
-        value: 'strict-origin-when-cross-origin',
-      },
-      {
-        key: 'Permissions-Policy',
-        value: 'camera=(), microphone=(), geolocation=()',
-      },
-    ] as { key: string; value: string }[]
-
-    // Production ortamında daha sıkı CSP + HSTS uygula (CSP temporarily disabled for testing)
-    if (isProd) {
-      commonSecurityHeaders.push(
-        // {
-        //   key: 'Content-Security-Policy',
-        //   value: [
-        //     "default-src 'self'",
-        //     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com",
-        //     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        //     "font-src 'self' https://fonts.gstatic.com",
-        //     "img-src 'self' data: https: blob:",
-        //     "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://*.ingest.de.sentry.io https://*.sentry.io",
-        //     "frame-src 'none'",
-        //     "object-src 'none'",
-        //     "base-uri 'self'",
-        //     "form-action 'self'",
-        //     'upgrade-insecure-requests',
-        //   ].join('; '),
-        // },
-        { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-      )
-    }
-
-    return [
-      {
-        source: '/(.*)',
-        headers: commonSecurityHeaders,
-      },
-    ]
+    // SKIP ALL CSP HEADERS FOR NOW - TESTING ONLY
+    return []
   },
 
   images: {
