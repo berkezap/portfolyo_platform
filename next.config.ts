@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com",
             "img-src 'self' data: https: blob:",
-            "connect-src 'self' https://api.github.com https://*.supabase.co https://*.sentry.io",
+            "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://*.ingest.de.sentry.io https://*.sentry.io",
             "frame-src 'none'",
             "object-src 'none'",
             "base-uri 'self'",
