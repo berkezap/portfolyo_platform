@@ -3,14 +3,15 @@ import * as Sentry from '@sentry/nextjs';
 // Client-side Sentry initialization - consent kontrolü ile
 const hasThirdPartyConsent = (() => {
   try {
-    const consent = localStorage.getItem('cookie-consent')
-    return consent ? JSON.parse(consent).thirdParty : false
+    const consent = localStorage.getItem('cookie-consent');
+    return consent ? JSON.parse(consent).thirdParty : false;
   } catch {
-    return false
+    return false;
   }
-})()
+})();
 
-if (process.env.NEXT_PUBLIC_SENTRY_DSN && hasThirdPartyConsent) {
+if (false && process.env.NEXT_PUBLIC_SENTRY_DSN && hasThirdPartyConsent) {
+  // TEMP: Sentry disabled for CSP testing
   try {
     Sentry.init({
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
