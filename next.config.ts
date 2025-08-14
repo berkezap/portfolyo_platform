@@ -7,47 +7,58 @@ const nextConfig: NextConfig = {
 
   // Güvenlik headers'ları
   async headers() {
+    const isProd = process.env.NODE_ENV === 'production'
+
+    const commonSecurityHeaders = [
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff',
+      },
+      {
+        key: 'X-Frame-Options',
+        value: 'DENY',
+      },
+      {
+        key: 'X-XSS-Protection',
+        value: '1; mode=block',
+      },
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin',
+      },
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=()',
+      },
+    ] as { key: string; value: string }[]
+
+    // Production ortamında daha sıkı CSP + HSTS uygula
+    if (isProd) {
+      commonSecurityHeaders.push(
+        {
+          key: 'Content-Security-Policy',
+          value: [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "font-src 'self' https://fonts.gstatic.com",
+            "img-src 'self' data: https: blob:",
+            "connect-src 'self' https://api.github.com https://*.supabase.co https://*.sentry.io",
+            "frame-src 'none'",
+            "object-src 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            'upgrade-insecure-requests',
+          ].join('; '),
+        },
+        { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+      )
+    }
+
     return [
       {
         source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: https: blob:",
-              "connect-src 'self' https://api.github.com https://*.supabase.co https://*.sentry.io",
-              "frame-src 'none'",
-              "object-src 'none'",
-              "base-uri 'self'",
-              "form-action 'self'",
-              "upgrade-insecure-requests"
-            ].join('; '),
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
-          },
-        ],
+        headers: commonSecurityHeaders,
       },
     ]
   },
@@ -72,7 +83,7 @@ const nextConfig: NextConfig = {
       /Module not found: Can't resolve 'fs'/,
       /Module not found: Can't resolve 'path'/,
       /Module not found: Can't resolve 'os'/,
-    ];
+    ]
 
     // Webpack resolve ayarları - sadece tarayıcı tarafında polyfill'leri kapat
     if (!isServer) {
@@ -89,10 +100,10 @@ const nextConfig: NextConfig = {
           buffer: false,
           process: false,
         },
-      };
+      }
     }
 
-    return config;
+    return config
   },
 
   // Experimental features
@@ -112,18 +123,6 @@ const nextConfig: NextConfig = {
     // Build sırasında ESLint'i atla (zaten IDE'de yapılıyor)
     ignoreDuringBuilds: false,
   },
-
-  // Bundle analyzer
-  ...(process.env.ANALYZE === 'true' && {
-    webpack: (config) => {
-      config.plugins.push(
-        new (require('@next/bundle-analyzer'))({
-          enabled: true,
-        })
-      );
-      return config;
-    },
-  }),
 }
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -149,5 +148,10 @@ const withPWA = require('next-pwa')({
   ],
 })
 
-module.exports = withPWA(withBundleAnalyzer(nextConfig))
+// PWA'yı yalnızca production'da etkinleştir (dev'de bazı asset 404 sorunlarına yol açabiliyor)
+const isProd = process.env.NODE_ENV === 'production'
+
+module.exports = isProd
+  ? withPWA(withBundleAnalyzer(nextConfig))
+  : withBundleAnalyzer(nextConfig)
 

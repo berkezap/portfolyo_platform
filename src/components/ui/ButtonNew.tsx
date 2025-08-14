@@ -35,21 +35,21 @@ const Button: React.FC<ButtonProps> = ({
 
   const variantClasses = {
     primary:
-      'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
+      'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
     secondary:
       'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 shadow-sm hover:shadow-md hover:scale-105 active:scale-95',
     destructive:
       'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
     gradient:
-      'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover:scale-105 active:scale-95',
+      'bg-gradient-to-r from-gray-600 to-gray-800 text-white shadow-lg hover:shadow-xl focus:ring-gray-500 hover:scale-105 active:scale-95',
     'gradient-blue':
-      'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-xl focus:ring-blue-500 hover:scale-105 active:scale-95',
+      'bg-gradient-to-r from-gray-700 to-gray-900 text-white shadow-lg hover:shadow-xl focus:ring-gray-500 hover:scale-105 active:scale-95',
     glass:
-      'bg-white/80 backdrop-blur-sm text-gray-900 hover:bg-white/90 focus:ring-blue-500 border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
+      'bg-white/80 backdrop-blur-sm text-gray-900 hover:bg-white/90 focus:ring-gray-500 border border-white/20 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
     ghost:
       'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500 hover:scale-105 active:scale-95',
     outline:
-      'border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500 hover:scale-105 active:scale-95',
+      'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:ring-gray-500 hover:scale-105 active:scale-95',
     success:
       'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95',
   };

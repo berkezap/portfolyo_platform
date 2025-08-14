@@ -125,7 +125,7 @@ export function DashboardHeader({ demoMode, variant = 'default' }: DashboardHead
                 </div>
                 <Link href="/">
                   <Button
-                    variant="glass"
+                    variant="secondary"
                     size="sm"
                     icon={LogOut}
                     className="bg-white/20 hover:bg-white/30 text-gray-700 border-white/30 shadow-none hover:ring-2 hover:ring-blue-400/50"
@@ -155,7 +155,7 @@ export function DashboardHeader({ demoMode, variant = 'default' }: DashboardHead
                   </div>
                 )}
                 <Button
-                  variant="glass"
+                  variant="secondary"
                   size="sm"
                   icon={LogOut}
                   onClick={async () => {

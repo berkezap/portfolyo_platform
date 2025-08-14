@@ -23,6 +23,8 @@ import {
   Copy,
   Upload,
   Download,
+  Search,
+  ChevronUp,
 } from 'lucide-react';
 import { GitHubRepo } from '@/types/github';
 
@@ -100,6 +102,8 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
   const [selectedRepos, setSelectedRepos] = useState<number[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1);
   const [userBio, setUserBio] = useState('');
+  const [repoSearch, setRepoSearch] = useState('');
+  const [repoLanguage, setRepoLanguage] = useState('');
 
   // Publishing states
   const [publishSlug, setPublishSlug] = useState('');
@@ -108,6 +112,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
   const [publishError, setPublishError] = useState<string | null>(null);
   const [canChangeSlug, setCanChangeSlug] = useState(true);
   const [nextSlugChangeDate, setNextSlugChangeDate] = useState<Date | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   // Portfolio'dan mevcut publish bilgilerini al
   useEffect(() => {
@@ -232,6 +237,26 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
 
     return { templateId, repoIds };
   }, [portfolio, allRepos]);
+
+  // Repo dilleri ve filtrelenmiş liste
+  const repoLanguages = useMemo(() => {
+    const set = new Set<string>();
+    (allRepos || []).forEach((r) => {
+      if (r.language) set.add(r.language);
+    });
+    return Array.from(set).sort();
+  }, [allRepos]);
+
+  const filteredRepos = useMemo(() => {
+    const term = repoSearch.trim().toLowerCase();
+    return (allRepos || []).filter((r) => {
+      const matchesSearch = term
+        ? r.name.toLowerCase().includes(term) || (r.description || '').toLowerCase().includes(term)
+        : true;
+      const matchesLang = repoLanguage ? r.language === repoLanguage : true;
+      return matchesSearch && matchesLang;
+    });
+  }, [allRepos, repoSearch, repoLanguage]);
 
   // State'leri güncelle - sadece processedData değiştiğinde
   useEffect(() => {
@@ -405,520 +430,433 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <DashboardHeader demoMode={demoMode} variant="transparent" />
 
-      <div className="container mx-auto px-6 py-8" style={{ paddingTop: '64px' }}>
-        {/* Header Section */}
-        <div className="mb-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" style={{ paddingTop: '80px' }}>
+        {/* Sticky Header */}
+        <div className="sticky top-16 z-10 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 py-4 mb-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-2">Portfolyo Düzenle</h1>
-              <p className="text-gray-600">Projelerinizi ve şablonunuzu güncelleyin</p>
+            <div className="flex items-center gap-4">
+              <ButtonNew
+                variant="ghost"
+                onClick={() => router.push('/my-portfolios')}
+                className="!p-2"
+                size="sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </ButtonNew>
+              <div>
+                <h1 className="text-xl font-semibold text-gray-900">Portfolyo Düzenle</h1>
+                <p className="text-sm text-gray-500">Şablonunuzu ve projelerinizi seçin</p>
+              </div>
             </div>
-            <ButtonNew
-              variant="secondary"
-              onClick={() => router.push('/my-portfolios')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Geri
-            </ButtonNew>
+            <div className="flex items-center gap-2">
+              <ButtonNew
+                variant="ghost"
+                onClick={handlePreview}
+                disabled={selectedRepos.length === 0}
+                className="hidden sm:flex items-center gap-2"
+                size="sm"
+              >
+                <Eye className="w-4 h-4" /> Önizle
+              </ButtonNew>
+              <ButtonNew
+                variant="primary"
+                onClick={handleSave}
+                disabled={isUpdating || selectedRepos.length === 0}
+                className="flex items-center gap-2"
+                size="sm"
+                loading={isUpdating}
+              >
+                {isUpdating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Kaydediliyor
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" /> Kaydet
+                  </>
+                )}
+              </ButtonNew>
+            </div>
           </div>
         </div>
 
         {/* Success Message */}
         {isUpdateSuccess && (
-          <ModernCard variant="gradient" className="mb-8 border-green-200 bg-green-50">
-            <ModernCard.Content>
-              <div className="flex items-center space-x-3 py-4">
+          <div className="mb-8 rounded-xl bg-white border border-green-200 p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
                 <CheckCircle2 className="w-6 h-6 text-green-600" />
-                <div>
-                  <h3 className="text-green-800 font-semibold">Başarılı!</h3>
-                  <p className="text-green-700">Portfolio güncellendi. Yönlendiriliyorsunuz...</p>
-                </div>
               </div>
-            </ModernCard.Content>
-          </ModernCard>
+              <div>
+                <h3 className="text-base font-semibold text-green-900">Başarıyla güncellendi!</h3>
+                <p className="mt-1 text-sm text-green-700">Portfolio değişiklikleri kaydedildi. Ana sayfaya yönlendiriliyorsunuz...</p>
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* Main Content - 2 Column Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="xl:col-span-3 space-y-8">
-            {/* Template Selection */}
-            <ModernCard variant="elevated">
-              <ModernCard.Header>
+        {/* Progressive Layout */}
+        <div className="space-y-12">
+          {/* Step 1: Template Selection */}
+          <section className="relative">
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-full text-sm font-semibold">
+                  1
+                </div>
                 <h2 className="text-lg font-semibold text-gray-900">Şablon Seçimi</h2>
-                <p className="text-sm text-gray-600 mt-1">Portfolyonuz için bir şablon seçin</p>
-              </ModernCard.Header>
-              <ModernCard.Content>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {templates.map((template) => (
-                    <div
-                      key={template.id}
-                      className={`relative p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
-                        selectedTemplate === template.id
-                          ? 'border-blue-300 bg-blue-50 shadow-md'
-                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                      }`}
-                      onClick={() => setSelectedTemplate(template.id)}
-                    >
-                      {/* Selection Indicator */}
-                      {selectedTemplate === template.id && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                          <Check className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-
-                      {/* Template Preview */}
-                      <div className="aspect-video bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-3">
+              </div>
+              <p className="text-gray-600 ml-11">Portfolyonuz için bir tasarım teması seçin</p>
+            </div>
+            
+            <div className="ml-11">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {templates.map((template) => (
+                  <div
+                    key={template.id}
+                    className={`group relative rounded-2xl cursor-pointer transition-all duration-300 ${
+                      selectedTemplate === template.id
+                        ? 'ring-2 ring-gray-400 shadow-lg scale-[1.02]'
+                        : 'hover:shadow-md hover:scale-[1.01]'
+                    }`}
+                    onClick={() => setSelectedTemplate(template.id)}
+                  >
+                    <div className="bg-white rounded-2xl p-4 border border-gray-200">
+                      {/* Preview */}
+                      <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl mb-4 overflow-hidden relative">
                         <iframe
                           srcDoc={template.previewHtml}
                           className="w-full h-full border-0 pointer-events-none"
                           title={`${template.name} Preview`}
                         />
+                        {selectedTemplate === template.id && (
+                          <div className="absolute top-2 right-2 w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Template Info */}
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                      <div className="text-center">
+                        <h3 className="font-semibold text-gray-900 mb-1">
                           {template.name}
                         </h3>
-                        <p className="text-xs text-gray-600 mb-3">{template.description}</p>
-
-                        {/* Features */}
-                        <div className="flex flex-wrap gap-1 mb-3">
+                        <p className="text-xs text-gray-500 mb-3">{template.description}</p>
+                        
+                        <div className="flex flex-wrap gap-1 justify-center mb-4">
                           {template.features.slice(0, 2).map((feature) => (
                             <span
                               key={feature}
-                              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
+                              className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
                             >
                               {feature}
                             </span>
                           ))}
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
-                          <ButtonNew
-                            variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
-                            size="sm"
-                            onClick={(e: React.MouseEvent) => {
-                              e.stopPropagation();
-                              setSelectedTemplate(template.id);
-                            }}
-                            className="flex-1 text-xs"
-                          >
-                            {selectedTemplate === template.id ? 'Seçili' : 'Seç'}
-                          </ButtonNew>
-
-                          <ButtonNew
-                            variant="secondary"
-                            size="sm"
-                            onClick={(e: React.MouseEvent) => {
-                              e.stopPropagation();
-                              setSelectedTemplate(template.id);
-                              handlePreview();
-                            }}
-                            className="!px-3"
-                            disabled={selectedRepos.length === 0}
-                            title={selectedRepos.length === 0 ? 'Önce proje seçin' : 'Önizleme'}
-                          >
-                            <Eye className="w-3 h-3" />
-                          </ButtonNew>
-                        </div>
+                        <ButtonNew
+                          variant={selectedTemplate === template.id ? 'primary' : 'outline'}
+                          size="sm"
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            setSelectedTemplate(template.id);
+                          }}
+                          className="w-full"
+                        >
+                          {selectedTemplate === template.id ? (
+                            <>
+                              <Check className="w-3 h-3 mr-1" />
+                              Seçili
+                            </>
+                          ) : (
+                            'Seç'
+                          )}
+                        </ButtonNew>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </ModernCard.Content>
-            </ModernCard>
-
-            {/* Repository Selection */}
-            <ModernCard variant="elevated">
-              <ModernCard.Header>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">Proje Seçimi</h2>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Portfolyonuzda gösterilecek GitHub projelerini seçin
-                    </p>
                   </div>
-                  <span className="inline-block text-blue-600 bg-blue-50 rounded-full px-3 py-1 text-sm font-medium">
-                    {selectedRepos.length} seçili
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Step 2: Repository Selection */}
+          <section className="relative">
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-full text-sm font-semibold">
+                  2
+                </div>
+                <div className="flex-1 flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900">Proje Seçimi</h2>
+                  <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
+                    {selectedRepos.length} proje seçili
                   </span>
                 </div>
-              </ModernCard.Header>
-              <ModernCard.Content>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-                  {(allRepos || []).map((repo: GitHubRepo) => (
-                    <ModernCard
-                      key={repo.id}
-                      variant={selectedRepos.includes(repo.id) ? 'gradient' : 'default'}
-                      className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
-                        selectedRepos.includes(repo.id)
-                          ? 'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200'
-                          : 'hover:shadow-lg'
-                      }`}
-                      onClick={() => toggleRepo(repo.id)}
-                    >
-                      <ModernCard.Header className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-sm text-gray-900 truncate">
-                            {repo.name}
-                          </h3>
-                          <input
-                            type="checkbox"
-                            checked={selectedRepos.includes(repo.id)}
-                            readOnly
-                            className="h-4 w-4 text-blue-600 rounded border-gray-300"
-                          />
+              </div>
+              <p className="text-gray-600 ml-11">Portfolyonuzda gösterilecek GitHub projelerini seçin</p>
+            </div>
+
+            <div className="ml-11">
+              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                {/* Search Header */}
+                <div className="border-b border-gray-200 p-6">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                          <Search className="h-5 w-5 text-gray-400" />
                         </div>
-                      </ModernCard.Header>
-
-                      <ModernCard.Content className="pt-0">
-                        <p className="text-xs text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">
-                          {repo.description || 'No description available'}
-                        </p>
-
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
-                            {repo.language || 'Unknown'}
-                          </span>
-                          <div className="flex items-center gap-3 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <Star className="w-3 h-3" /> {repo.stargazers_count}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <GitBranch className="w-3 h-3" /> {repo.forks_count}
-                            </span>
-                          </div>
-                        </div>
-                      </ModernCard.Content>
-                    </ModernCard>
-                  ))}
-                </div>
-
-                {/* Error Message */}
-                {selectedRepos.length === 0 && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-                    <div className="flex items-center space-x-2">
-                      <AlertCircle className="w-4 h-4 text-red-600" />
-                      <p className="text-red-600 text-sm">En az bir proje seçmelisiniz</p>
-                    </div>
-                  </div>
-                )}
-              </ModernCard.Content>
-            </ModernCard>
-          </div>
-
-          {/* Sidebar */}
-          <div className="xl:col-span-1 space-y-6">
-            {/* Current Portfolio Info */}
-            <ModernCard variant="glass">
-              <ModernCard.Header icon={Github} iconColor="text-blue-600">
-                <h3 className="text-lg font-semibold text-gray-900">Mevcut Portfolio</h3>
-              </ModernCard.Header>
-              <ModernCard.Content>
-                <div className="space-y-4 text-sm">
-                  <div>
-                    <span className="text-gray-500 font-medium text-xs uppercase tracking-wide">
-                      Şablon
-                    </span>
-                    <p className="text-gray-900 font-semibold mt-1">
-                      {(() => {
-                        const templateId =
-                          portfolio.selected_template &&
-                          templateNameToId[portfolio.selected_template];
-                        return templateId && templateDisplayNames[templateId]
-                          ? templateDisplayNames[templateId]
-                          : 'Modern Developer';
-                      })()}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 font-medium text-xs uppercase tracking-wide">
-                      Proje Sayısı
-                    </span>
-                    <p className="text-gray-900 font-semibold text-lg mt-1">
-                      {Array.isArray(portfolio.selected_repos)
-                        ? portfolio.selected_repos.length
-                        : 0}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 font-medium text-xs uppercase tracking-wide">
-                      Son Güncelleme
-                    </span>
-                    <p className="text-gray-900 text-sm mt-1">
-                      {new Date(portfolio.updated_at).toLocaleDateString('tr-TR')}
-                    </p>
-                  </div>
-                </div>
-              </ModernCard.Content>
-            </ModernCard>
-
-            {/* Actions */}
-            <ModernCard variant="elevated">
-              <ModernCard.Header>
-                <h3 className="text-lg font-semibold text-gray-900">İşlemler</h3>
-              </ModernCard.Header>
-              <ModernCard.Content>
-                <div className="space-y-3">
-                  <ButtonNew
-                    variant="secondary"
-                    onClick={handleViewPortfolio}
-                    className="w-full flex items-center justify-center gap-2"
-                    size="md"
-                  >
-                    <Eye className="w-4 h-4" />
-                    Mevcut Portfolyo
-                  </ButtonNew>
-
-                  <ButtonNew
-                    variant="gradient"
-                    onClick={handlePreview}
-                    disabled={selectedRepos.length === 0}
-                    className="w-full flex items-center justify-center gap-2"
-                    size="md"
-                  >
-                    <Eye className="w-4 h-4" />
-                    Değişiklikleri Önizle
-                  </ButtonNew>
-
-                  <ButtonNew
-                    variant="primary"
-                    onClick={handleSave}
-                    disabled={isUpdating || selectedRepos.length === 0}
-                    className="w-full flex items-center justify-center gap-2"
-                    size="md"
-                    loading={isUpdating}
-                  >
-                    {isUpdating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Kaydediliyor...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Kaydet
-                      </>
-                    )}
-                  </ButtonNew>
-                </div>
-              </ModernCard.Content>
-            </ModernCard>
-
-            {/* Publishing */}
-            <ModernCard variant="elevated">
-              <ModernCard.Header>
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <Globe className="w-5 h-5" />
-                  Canlı Yayın
-                </h3>
-              </ModernCard.Header>
-              <ModernCard.Content>
-                {portfolio?.status === 'published' && portfolio?.slug ? (
-                  <div className="space-y-4">
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-600" />
-                        <span className="text-green-800 font-medium">Yayında</span>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-sm text-green-700">Portfolyo canlı olarak yayında</p>
-                        <div className="flex items-center gap-2 bg-white border border-green-200 rounded p-3">
-                          <span className="text-sm font-mono text-gray-600 flex-1">
-                            https://{portfolio.slug}.portfolyo.tech
-                          </span>
-                          <ButtonNew
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              navigator.clipboard.writeText(
-                                `https://${portfolio.slug}.portfolyo.tech`,
-                              );
-                            }}
-                          >
-                            <Copy className="w-3 h-3" />
-                          </ButtonNew>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <ButtonNew
-                        variant="secondary"
-                        onClick={() =>
-                          window.open(`https://${portfolio.slug}.portfolyo.tech`, '_blank')
-                        }
-                        className="w-full flex items-center justify-center gap-2"
-                        size="md"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Canlı Siteyi Görüntüle
-                      </ButtonNew>
-
-                      {/* Slug değiştirme özelliği */}
-                      <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-medium text-gray-900">URL Değiştir</h4>
-                          {!canChangeSlug && (
-                            <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
-                              6 ayda bir
-                            </span>
-                          )}
-                        </div>
-
-                        {canChangeSlug ? (
-                          <div className="space-y-2">
-                            <input
-                              type="text"
-                              value={publishSlug}
-                              onChange={(e) => {
-                                const normalized = normalizeSlug(e.target.value);
-                                setPublishSlug(normalized);
-                                setPublishError(null);
-                              }}
-                              placeholder="yeni-slug"
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            <div className="flex gap-2">
-                              <ButtonNew
-                                variant="primary"
-                                size="sm"
-                                onClick={handlePublish}
-                                disabled={isPublishing || publishSlug === portfolio.public_slug}
-                                loading={isPublishing}
-                                className="flex-1"
-                              >
-                                URL Güncelle
-                              </ButtonNew>
-                              <ButtonNew
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setPublishSlug(portfolio.public_slug || '')}
-                                className="px-3"
-                              >
-                                İptal
-                              </ButtonNew>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="bg-amber-50 border border-amber-200 rounded p-3">
-                            <p className="text-sm text-amber-700">
-                              URL'nizi son değiştirdiğinizden 6 ay geçmediği için tekrar
-                              değiştiremezsiniz.
-                            </p>
-                            {nextSlugChangeDate && (
-                              <p className="text-xs text-amber-600 mt-1">
-                                Sonraki değişiklik: {nextSlugChangeDate.toLocaleDateString('tr-TR')}
-                              </p>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <ButtonNew
-                        variant="destructive"
-                        onClick={handleUnpublish}
-                        disabled={isUnpublishing}
-                        loading={isUnpublishing}
-                        className="w-full flex items-center justify-center gap-2"
-                        size="md"
-                      >
-                        {isUnpublishing ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Kaldırılıyor...
-                          </>
-                        ) : (
-                          <>
-                            <Download className="w-4 h-4" />
-                            Yayından Kaldır
-                          </>
-                        )}
-                      </ButtonNew>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <AlertCircle className="w-4 h-4 text-blue-600" />
-                        <span className="text-blue-800 font-medium">Henüz Yayınlanmamış</span>
-                      </div>
-                      <p className="text-sm text-blue-700">
-                        Portfolio'nuz hazır! Yayınlamak için bir web adresi seçin.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Web Adresi Seçin
-                        </label>
                         <input
                           type="text"
-                          value={publishSlug}
-                          onChange={(e) => {
-                            const normalized = normalizeSlug(e.target.value);
-                            setPublishSlug(normalized);
-                            setPublishError(null);
-                          }}
-                          placeholder="benim-portfolio"
-                          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                          value={repoSearch}
+                          onChange={(e) => setRepoSearch(e.target.value)}
+                          placeholder="Proje ismi veya açıklamasında ara..."
+                          className="w-full pl-11 pr-4 py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 bg-white text-gray-900"
+                          style={{ backgroundColor: 'white', color: '#111827' }}
                         />
-                        <p className="text-xs text-gray-500">
-                          Sadece küçük harf, rakam ve tire (-) kullanabilirsiniz.
-                          <br />
-                          <span className="text-blue-600 font-medium">
-                            https://
-                            <span className="font-mono">{publishSlug || 'web-adresiniz'}</span>
-                            .portfolyo.tech
-                          </span>
-                        </p>
                       </div>
+                    </div>
+                    <select
+                      value={repoLanguage}
+                      onChange={(e) => setRepoLanguage(e.target.value)}
+                      className="px-4 py-3 text-sm border border-gray-300 rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 min-w-[140px]"
+                      style={{ backgroundColor: 'white', color: '#111827' }}
+                    >
+                      <option value="" className="bg-white text-gray-900">Tüm Diller</option>
+                      {repoLanguages.map((lang) => (
+                        <option key={lang} value={lang} className="bg-white text-gray-900">
+                          {lang}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-                      {publishError && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                          <div className="flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4 text-red-600" />
-                            <span className="text-red-800 text-sm">{publishError}</span>
+                {/* Repository Grid */}
+                <div className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                    {filteredRepos.map((repo: GitHubRepo) => (
+                      <div
+                        key={repo.id}
+                        className={`group relative rounded-xl cursor-pointer transition-all duration-200 border-2 ${
+                          selectedRepos.includes(repo.id)
+                            ? 'border-gray-400 bg-gray-50 shadow-md'
+                            : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                        }`}
+                        onClick={() => toggleRepo(repo.id)}
+                      >
+                        <div className="p-4">
+                          <div className="flex items-start gap-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedRepos.includes(repo.id)}
+                              readOnly
+                              className="mt-1 h-4 w-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between mb-2">
+                                <h3 className="font-semibold text-sm text-gray-900 truncate group-hover:text-gray-700 transition-colors">
+                                  {repo.name}
+                                </h3>
+                                {selectedRepos.includes(repo.id) && (
+                                  <div className="flex-shrink-0 ml-2">
+                                    <Check className="w-4 h-4 text-gray-600" />
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                                {repo.description || 'Bu proje için henüz bir açıklama eklenmemiş.'}
+                              </p>
+
+                              <div className="flex items-center justify-between">
+                                <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                                  {repo.language || 'Unknown'}
+                                </span>
+                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                  <span className="flex items-center gap-1">
+                                    <Star className="w-3 h-3" /> {repo.stargazers_count}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <GitBranch className="w-3 h-3" /> {repo.forks_count}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    ))}
+                  </div>
 
-                      <ButtonNew
-                        variant="primary"
-                        onClick={handlePublish}
-                        disabled={isPublishing || !publishSlug.trim() || selectedRepos.length === 0}
-                        loading={isPublishing}
-                        className="w-full flex items-center justify-center gap-2"
-                        size="md"
-                      >
-                        {isPublishing ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Yayınlanıyor...
-                          </>
-                        ) : (
-                          <>
-                            <Globe className="w-4 h-4" />
-                            Canlıya Al
-                          </>
-                        )}
-                      </ButtonNew>
+                  {/* Error State */}
+                  {selectedRepos.length === 0 && (
+                    <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4">
+                      <div className="flex items-center gap-3">
+                        <AlertCircle className="w-5 h-5 text-red-600" />
+                        <div>
+                          <p className="text-red-800 font-medium text-sm">En az bir proje seçmelisiniz</p>
+                          <p className="text-red-700 text-xs mt-1">Portfolyonuzda gösterilecek projeler için seçim yapın</p>
+                        </div>
+                      </div>
                     </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* Minimal Floating Actions Panel */}
+        <div className="fixed bottom-8 right-8 z-20 hidden xl:block">
+          <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200 overflow-hidden min-w-[280px]">
+            {/* Toggle Header - Always Visible */}
+            <div 
+              className="flex items-center gap-4 px-4 py-3 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+              onClick={() => setIsPanelOpen(!isPanelOpen)}
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span className="text-xs font-medium text-gray-600">
+                  {templateDisplayNames[selectedTemplate]}
+                </span>
+              </div>
+              <div className="h-4 w-px bg-gray-300"></div>
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-gray-600">{selectedRepos.length}</span>
+                <span className="text-xs text-gray-500">proje</span>
+              </div>
+              <div className="ml-auto">
+                <ChevronUp 
+                  className={`w-4 h-4 text-gray-400 transition-transform ${isPanelOpen ? 'rotate-180' : ''}`} 
+                />
+              </div>
+            </div>
+
+            {/* Collapsible Content */}
+            {isPanelOpen && (
+              <>
+                {portfolio?.status === 'published' && portfolio?.slug ? (
+              <div className="p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-xs font-medium text-gray-700">Canlı</span>
+                  </div>
+                  <a 
+                    href={`https://${portfolio.slug}.portfolyo.tech`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-mono text-gray-600 hover:text-gray-800 hover:underline"
+                  >
+                    {portfolio.slug}.portfolyo.tech
+                  </a>
+                </div>
+                
+                <div className="flex gap-2">
+                  <ButtonNew
+                    variant="outline"
+                    onClick={() => window.open(`https://${portfolio.slug}.portfolyo.tech`, '_blank')}
+                    className="flex-1"
+                    size="sm"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </ButtonNew>
+                  
+                  <ButtonNew
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`https://${portfolio.slug}.portfolyo.tech`);
+                    }}
+                    className="flex-1"
+                    size="sm"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </ButtonNew>
+                </div>
+                
+                <ButtonNew
+                  variant="ghost"
+                  onClick={handleUnpublish}
+                  disabled={isUnpublishing}
+                  loading={isUnpublishing}
+                  className="w-full mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  size="sm"
+                >
+                  {isUnpublishing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      <span className="text-xs">Yayından Kaldır</span>
+                    </>
+                  )}
+                </ButtonNew>
+              </div>
+            ) : (
+              <div className="p-3">
+                <div className="mb-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    <span className="text-xs font-medium text-gray-700">Yayında Değil</span>
+                  </div>
+                  
+                  <div className="flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden">
+                    <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-r border-gray-300">
+                      https://
+                    </span>
+                    <input
+                      type="text"
+                      value={publishSlug}
+                      onChange={(e) => {
+                        const normalized = normalizeSlug(e.target.value);
+                        setPublishSlug(normalized);
+                        setPublishError(null);
+                      }}
+                      placeholder="web-adresiniz"
+                      className="flex-1 px-2 py-1.5 text-xs outline-none bg-white text-gray-900"
+                    />
+                    <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-l border-gray-300">
+                      .portfolyo.tech
+                    </span>
+                  </div>
+                </div>
+
+                {publishError && (
+                  <div className="mb-2 text-xs text-red-600">
+                    {publishError}
                   </div>
                 )}
-              </ModernCard.Content>
-            </ModernCard>
+
+                <ButtonNew
+                  variant="primary"
+                  onClick={handlePublish}
+                  disabled={isPublishing || !publishSlug.trim() || selectedRepos.length === 0}
+                  loading={isPublishing}
+                  className="w-full"
+                  size="sm"
+                >
+                  {isPublishing ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Globe className="w-3.5 h-3.5 mr-1.5" />
+                      <span className="text-xs">Yayınla</span>
+                    </>
+                  )}
+                </ButtonNew>
+              </div>
+            )}
+              </>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+  

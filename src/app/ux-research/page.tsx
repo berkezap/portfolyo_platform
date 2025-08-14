@@ -1,5 +1,5 @@
 /**
- * UXResearchPage - Kullanıcı deneyimi dashboard'u.
+ * UXReimport Button from '@/components/ui/ButtonNew';earchPage - Kullanıcı deneyimi dashboard'u.
  * @returns {JSX.Element} UX araştırma ve analiz dashboard'u.
  */
 
@@ -94,7 +94,7 @@ export default function UXResearchPage() {
                 <option value="30d">Son 30 gün</option>
                 <option value="90d">Son 90 gün</option>
               </select>
-              <Button variant="gradient" icon={Activity}>
+              <Button variant="primary" icon={Activity}>
                 Rapor İndir
               </Button>
             </div>
@@ -280,7 +280,7 @@ export default function UXResearchPage() {
         <Card variant="glass" className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Aksiyon Öğeleri</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="gradient" icon={MessageCircle} className="w-full">
+            <Button variant="primary" icon={MessageCircle} className="w-full">
               Kullanıcı Anketi Başlat
             </Button>
             <Button variant="secondary" icon={Users} className="w-full">

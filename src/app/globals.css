@@ -428,3 +428,15 @@ body {
 .animation-delay-1000 {
   animation-delay: 1s;
 }
+
+/* Force light mode for form elements */
+select, input[type="text"], input[type="search"] {
+  color-scheme: light !important;
+  background-color: white !important;
+  color: #111827 !important;
+}
+
+select option {
+  background-color: white !important;
+  color: #111827 !important;
+}

@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { PortfolioService } from '@/lib/portfolioService';
 import type { SessionUser } from '@/types/auth';
+import { withRateLimit } from '@/lib/rateLimit';
 
-export async function GET(request: Request) {
+async function getHandler(request: Request) {
   console.log('📋 Portfolio List API çağrıldı!');
 
   try {
@@ -72,3 +73,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Failed to fetch portfolios' }, { status: 500 });
   }
 }
+
+export const GET = withRateLimit(getHandler as any);

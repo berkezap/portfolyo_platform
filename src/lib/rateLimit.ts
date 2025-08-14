@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cacheService } from './redis'
+import { randomUUID } from 'crypto'
 
 // Rate limit configuration
 const RATE_LIMIT_CONFIG = {
@@ -93,23 +94,54 @@ export function withRateLimit(
     
     try {
       const currentCount = await cacheService.get<number>(cacheKey) || 0
+      const remaining = Math.max(0, config.maxRequests - currentCount - 1)
+      const resetTime = Date.now() + config.windowMs
+      
+      // Rate limit headers for all responses
+      const rateLimitHeaders = {
+        'X-RateLimit-Limit': config.maxRequests.toString(),
+        'X-RateLimit-Remaining': remaining.toString(),
+        'X-RateLimit-Reset': Math.floor(resetTime / 1000).toString(),
+      }
       
       if (currentCount >= config.maxRequests) {
+        const retryAfterSeconds = Math.ceil(config.windowMs / 1000)
+        
         return NextResponse.json(
           { 
             error: 'Rate limit exceeded',
             message: `Too many requests to ${request.nextUrl.pathname}`,
-            retryAfter: Math.ceil(config.windowMs / 1000)
+            details: {
+              limit: config.maxRequests,
+              windowMs: config.windowMs,
+              retryAfterSeconds
+            },
+            traceId: randomUUID(),
+            timestamp: new Date().toISOString(),
           },
-          { status: 429 }
+          { 
+            status: 429,
+            headers: {
+              ...rateLimitHeaders,
+              'Retry-After': retryAfterSeconds.toString(),
+              'X-RateLimit-Remaining': '0',
+            }
+          }
         )
       }
       
       // Increment counter
       await cacheService.set(cacheKey, currentCount + 1, Math.ceil(config.windowMs / 1000))
       
-      // Call original handler
-      return handler(request, ...args)
+      // Call original handler and add rate limit headers
+      const response = await handler(request, ...args) as NextResponse
+      
+      // Add rate limit headers to successful responses
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => {
+        response.headers.set(key, value)
+      })
+      
+      return response
     } catch (error) {
       console.error('Rate limit error:', error)
       // If Redis fails, allow request to continue

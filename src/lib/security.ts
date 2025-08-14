@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { supabaseAdmin, type Portfolio } from '@/lib/supabase'
+import { logUnauthorizedAccess } from '@/lib/securityMonitoring'
 
 // CSRF token doğrulama şeması
 export const csrfTokenSchema = z.object({
@@ -9,10 +11,13 @@ export const csrfTokenSchema = z.object({
 })
 
 // Kullanıcı yetkilendirme kontrolü
-export async function requireAuth(_request: NextRequest) {
+export async function requireAuth(request: NextRequest) {
   const session = await getServerSession(authOptions)
   
   if (!session?.user?.id) {
+    // Yetkisiz erişimi logla
+    const ip = getClientIP(request)
+    logUnauthorizedAccess(request, ip, 'no_session')
     return {
       error: 'Unauthorized',
       status: 401
@@ -24,28 +29,43 @@ export async function requireAuth(_request: NextRequest) {
 
 // Portfolyo sahipliği kontrolü
 export async function requirePortfolioOwnership(portfolioId: string, userId: string) {
-  // Bu fonksiyon Supabase'den portfolyo bilgisini alıp sahiplik kontrolü yapar
-  // Şimdilik basit bir kontrol yapıyoruz
-  console.log(`Portfolio ownership check: ${portfolioId} for user ${userId}`)
-  return true
+  // Supabase üzerinden gerçek sahiplik kontrolü yap
+  try {
+    if (!portfolioId || !userId) return false
+
+    const { data, error } = await supabaseAdmin
+      .from('portfolios')
+      .select('id,user_id')
+      .eq('id', portfolioId)
+      .single()
+
+    if (error || !data) {
+      return false
+    }
+
+    const isOwner = (data as Pick<Portfolio, 'user_id'>).user_id === userId
+    return isOwner
+  } catch (_e) {
+    return false
+  }
 }
 
 // Gelişmiş input sanitization
 export function sanitizeInput(input: string): string {
   return input
-    .replace(/[<>]/g, '') // HTML tag'lerini kaldır
-    .replace(/javascript:/gi, '') // JavaScript protokolünü kaldır
-    .replace(/vbscript:/gi, '') // VBScript protokolünü kaldır
-    .replace(/data:/gi, '') // Data URI'lerini kaldır
-    .replace(/on\w+\s*=/gi, '') // Event handler'ları kaldır
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Script tag'lerini kaldır
-    .replace(/<iframe\b[^>]*>/gi, '') // Iframe'leri kaldır
-    .replace(/<object\b[^>]*>/gi, '') // Object tag'lerini kaldır
-    .replace(/<embed\b[^>]*>/gi, '') // Embed tag'lerini kaldır
-    .replace(/<link\b[^>]*>/gi, '') // Link tag'lerini kaldır
-    .replace(/<meta\b[^>]*>/gi, '') // Meta tag'lerini kaldır
-    .replace(/<!--[\s\S]*?-->/g, '') // HTML yorumlarını kaldır
-    .replace(/['"`]/g, '') // Tehlikeli karakterleri kaldır
+    .replace(/[<>]/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/vbscript:/gi, '')
+    .replace(/data:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^>]*>/gi, '')
+    .replace(/<object\b[^>]*>/gi, '')
+    .replace(/<embed\b[^>]*>/gi, '')
+    .replace(/<link\b[^>]*>/gi, '')
+    .replace(/<meta\b[^>]*>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/['"`]/g, '')
     .trim()
 }
 
@@ -55,7 +75,7 @@ export function validateSQLInput(input: string): boolean {
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)/i,
     /(\b(OR|AND)\b\s+\d+\s*=\s*\d+)/i,
     /(\b(OR|AND)\b\s+['"]\w+['"]\s*=\s*['"]\w+['"])/i,
-    /(--|\/\*|\*\/|;)/,
+    /(--)\/\*|\*\/|;/,
     /(\b(WAITFOR|DELAY)\b)/i,
     /(\b(BENCHMARK|SLEEP)\b)/i,
   ]
@@ -69,7 +89,7 @@ export function getClientIP(request: NextRequest): string {
   const realIP = request.headers.get('x-real-ip')
   const cfConnectingIP = request.headers.get('cf-connecting-ip')
   
-  return forwarded?.split(',')[0] || 
+  return forwarded?.split(',')[0]?.trim() || 
          realIP || 
          cfConnectingIP || 
          '127.0.0.1'
@@ -77,26 +97,31 @@ export function getClientIP(request: NextRequest): string {
 
 // Güvenli response oluşturma
 export function createSecureResponse(data: unknown, status: number = 200) {
-  return NextResponse.json(data, {
-    status,
-    headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Content-Security-Policy': [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com https://cdn.tailwindcss.com",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://api.github.com https://*.supabase.co https://*.sentry.io",
-        "frame-src 'none'",
-        "object-src 'none'"
-      ].join('; '),
-      'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    }
-  })
+  const headers: Record<string, string> = {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Content-Security-Policy': [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com https://cdn.tailwindcss.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: https: blob:",
+      "connect-src 'self' https://api.github.com https://*.supabase.co https://*.sentry.io",
+      "frame-src 'none'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      'upgrade-insecure-requests',
+    ].join('; '),
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
+  }
+
+  // HSTS (sadece prod önerilir ama header zararsızdır)
+  headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
+
+  return NextResponse.json(data, { status, headers })
 }
 
 // Error response oluşturma
@@ -108,7 +133,6 @@ export function createErrorResponse(message: string, status: number = 400) {
 export function isSafeString(input: string): boolean {
   if (!input || typeof input !== 'string') return false
   
-  // Tehlikeli karakterler ve pattern'ler
   const dangerousPatterns = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i,
     /javascript:/i,

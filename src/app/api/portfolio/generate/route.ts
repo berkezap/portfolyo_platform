@@ -10,8 +10,9 @@ import { Session } from 'next-auth';
 import type { GitHubUser, GitHubRepo } from '@/types/github';
 import type { TemplateData } from '@/types/templates';
 import type { SessionUser } from '@/types/auth';
+import { withRateLimit } from '@/lib/rateLimit';
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   console.log('🚀 Portfolio Generate API çağrıldı!');
 
   let session: Session | null = null; // TODO: Proper type from next-auth
@@ -175,7 +176,8 @@ export async function POST(request: NextRequest) {
           if (existing.length >= maxFreePortfolios) {
             return NextResponse.json(
               {
-                error: `Free planda en fazla ${maxFreePortfolios} portfolyo oluşturabilirsiniz. Lütfen mevcut portfolyonuzdan birini silin veya plan yükseltin.`,
+                error: 'Free tier limit exceeded',
+                details: `Free planda en fazla ${maxFreePortfolios} portfolyo oluşturabilirsiniz. Lütfen mevcut portfolyonuzdan birini silin veya plan yükseltin.`,
               },
               { status: 403 },
             );
@@ -196,7 +198,7 @@ export async function POST(request: NextRequest) {
       };
     } else {
       const portfolioData = {
-        user_id: demoMode ? userData.login : user?.email || userData.login,
+        user_id: demoMode ? (userData as any).login : user?.email || (userData as any).login,
         selected_template: templateName,
         selected_repos: selectedRepos || [],
         cv_url: cvUrl ?? '',
@@ -222,29 +224,36 @@ export async function POST(request: NextRequest) {
     );
 
     console.log('📊 Template data oluşturuldu:', {
-      projectCount: templateData.projects?.length || 0,
-      totalStars: templateData.TOTAL_STARS,
-      userName: templateData.USER_NAME,
+      projectCount: (templateData as any).projects?.length || 0,
     });
 
-    // HTML render et
     console.log('🎨 renderTemplate çağrılıyor...');
-    console.log('🧪 Template data keys:', Object.keys(templateData));
+    const generatedHtml: string = renderTemplate(templateName, templateData);
 
-    const generatedHTML = renderTemplate(templateName, templateData);
-    console.log('✅ Template render tamamlandı, HTML uzunluğu:', generatedHTML.length);
-    console.log('🧪 Render sonrası ilk 500 karakter:', generatedHTML.substring(0, 500));
+    if (!generatedHtml) {
+      throw new Error('Generated HTML is empty');
+    }
 
-    // 🔗 3. ADIM: Metadata oluştur ve database'i güncelle
-    PortfolioService.createMetadataFromTemplateData(templateData, templateName);
+    if (!demoMode) {
+      console.log('💾 Oluşturulan HTML veritabanına kaydediliyor...');
+      const updated = await PortfolioService.updatePortfolio(savedPortfolio!.id, {
+        generated_html: generatedHtml,
+        metadata: PortfolioService.createMetadataFromTemplateData(templateData, templateName),
+      } as any);
 
-    // Oluşturulan HTML'i veritabanına kaydet
-    await PortfolioService.updatePortfolioHtml(savedPortfolio.id, generatedHTML);
+      if (!updated) {
+        console.log('❌ Portfolio HTML güncellenemedi!');
+        return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 });
+      }
+      console.log('✅ Portfolio HTML güncellendi:', updated.id);
+    }
+
+    console.log('🎉 Portfolio generation completed successfully');
 
     return NextResponse.json({
       success: true,
-      html: generatedHTML, // HTML'i frontend'e de gönderiyoruz
-      portfolioId: savedPortfolio.id,
+      generatedHtml,
+      portfolioId: savedPortfolio!.id,
     });
   } catch (error) {
     console.error('💥 Portfolio generation error:', error);
@@ -265,3 +274,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate portfolio' }, { status: 500 });
   }
 }
+
+export const POST = withRateLimit(postHandler);

@@ -1,6 +1,10 @@
 import PricingPlans from '@/components/stripe/PricingPlans';
+import { PlanType, PLANS } from '@/lib/stripe/plans';
+import { useState } from 'react';
 
 export default function PricingPage() {
+  const [loading, setLoading] = useState<PlanType | null>(null);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <PricingPlans />

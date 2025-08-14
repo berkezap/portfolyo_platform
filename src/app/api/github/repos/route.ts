@@ -5,8 +5,9 @@ import { GitHubService } from '@/lib/github';
 import * as Sentry from '@sentry/nextjs';
 import { Session } from 'next-auth';
 import type { SessionUser } from '@/types/auth';
+import { withRateLimit } from '@/lib/rateLimit';
 
-export async function GET() {
+async function getHandler() {
   let session: Session | null = null;
 
   try {
@@ -130,3 +131,5 @@ export async function GET() {
     );
   }
 }
+
+export const GET = withRateLimit(getHandler as any);

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 export const runtime = 'edge';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,7 +15,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('portfolios')
       .select('published_html,is_published,visibility')
       .eq('public_slug', slug)

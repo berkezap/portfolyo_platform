@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/ui/Button';
 import Footer from '@/components/ui/Footer';
 import { LiquidHeader } from '@/components/ui/LiquidHeader';
-import { Github, Zap, Globe, GitBranch, LayoutTemplate } from 'lucide-react';
+import { Github, Zap, Globe, LayoutTemplate, Smartphone, Search, Check } from 'lucide-react';
+import ButtonNew from '@/components/ui/ButtonNew';
 
 function AnimatedNumber({ value, duration = 1000 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
@@ -35,8 +36,8 @@ export default function HomePage() {
 
   // Waitlist state
   const [waitlistEmail, setWaitlistEmail] = useState('');
-  const [waitlistLoading, setWaitlistLoading] = useState(false);
-  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+  const [_waitlistLoading, setWaitlistLoading] = useState(false);
+  const [_waitlistSuccess, setWaitlistSuccess] = useState(false);
 
   // Client-side hydration için
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       {/* Header */}
       <LiquidHeader demoMode={demoMode} variant="transparent" />
 
@@ -160,37 +161,15 @@ export default function HomePage() {
                   'radial-gradient(closest-side, rgba(99,102,241,0.25), rgba(99,102,241,0.10), transparent 70%)',
               }}
             />
-            {/* Portfolio Preview Container with floating animation */}
-            <div
-              className="relative group"
-              onMouseMove={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const px = (e.clientX - rect.left) / rect.width - 0.5;
-                const py = (e.clientY - rect.top) / rect.height - 0.5;
-                const card = e.currentTarget.querySelector<HTMLDivElement>('.floating-window');
-                if (card) {
-                  const rotateY = (-10 * px).toFixed(2);
-                  const rotateX = (6 * -py).toFixed(2);
-                  card.style.transform = `perspective(1000px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
-                }
-              }}
-              onMouseLeave={(e) => {
-                const card = e.currentTarget.querySelector<HTMLDivElement>('.floating-window');
-                if (card) card.style.transform = 'perspective(1000px) rotateY(-5deg) rotateX(2deg)';
-              }}
-            >
+            {/* Portfolio Preview Container */}
+            <div className="relative">
               {/* Floating background elements */}
               <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-200 rounded-full opacity-20"></div>
               <div className="absolute -bottom-20 -right-20 w-32 h-32 bg-purple-200 rounded-full opacity-20"></div>
 
               {/* Browser Window */}
               <div
-                className="floating-window relative bg-white rounded-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.35),0_18px_36px_-18px_rgba(99,102,241,0.25)] ring-1 ring-indigo-100 border border-gray-200 overflow-hidden transform-gpu"
-                style={{
-                  perspective: '1000px',
-                  transform: 'perspective(1000px) rotateY(-5deg) rotateX(2deg)',
-                  transition: 'transform 400ms ease',
-                }}
+                className="relative bg-white rounded-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.35),0_18px_36px_-18px_rgba(99,102,241,0.25)] ring-1 ring-indigo-100 border border-gray-200 overflow-hidden"
               >
                 {/* Browser Header */}
                 <div className="bg-gray-50 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
@@ -206,138 +185,101 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Portfolio Content - Realistic site layout */}
-                <div className="p-0 bg-white min-h-[420px]">
-                  {/* App Navbar */}
-                  <div className="px-5 py-3 border-b border-gray-200 bg-white/90 flex items-center justify-between">
+                {/* Portfolio Content - Modern Professional Layout */}
+                <div className="p-0 bg-gray-50 min-h-[420px]">
+                  {/* Clean Navigation */}
+                  <div className="px-6 py-4 bg-white border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-800">portfolYO</span>
+                      <div className="w-6 h-6 bg-gray-900 rounded-md flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">A</span>
+                      </div>
+                      <span className="text-sm font-semibold text-gray-900">Ahmet Yılmaz</span>
                     </div>
-                    <div className="hidden md:flex items-center gap-5 text-sm text-gray-600">
-                      <span className="cursor-default">Ana Sayfa</span>
-                      <span className="cursor-default">Projeler</span>
-                      <span className="cursor-default">Hakkımda</span>
+                    <div className="hidden md:flex items-center gap-6 text-sm text-gray-600">
+                      <span className="hover:text-gray-900 transition-colors cursor-default">Work</span>
+                      <span className="hover:text-gray-900 transition-colors cursor-default">About</span>
+                      <span className="hover:text-gray-900 transition-colors cursor-default">Contact</span>
                     </div>
-                    <div className="w-7 h-7 rounded-full bg-gray-200" />
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                   </div>
 
-                  {/* Hero banner */}
-                  <div className="px-5 pt-5 pb-4 bg-gradient-to-r from-indigo-50 to-blue-50 border-b border-gray-200">
-                    <div className="text-sm text-indigo-700 font-medium">Merhaba, ben Ahmet</div>
+                  {/* Hero Section */}
+                  <div className="px-6 py-8 bg-white">
+                    <div className="max-w-md">
+                      <h1 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                        Full-Stack Developer
+                        <span className="ml-1 w-0.5 h-5 bg-gray-900 animate-pulse"></span>
+                      </h1>
+                      <p className="text-sm text-gray-600 leading-relaxed">Building modern web applications with React, Node.js, and cloud technologies. Passionate about clean code and user experience.</p>
+                    </div>
                   </div>
 
-                  {/* Main content */}
-                  <div className="grid grid-cols-12 gap-5 p-5">
-                    {/* Sidebar */}
-                    <aside className="col-span-4 hidden md:block">
-                      <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                        <div className="mb-3">
-                          <div className="text-sm font-medium text-gray-900">Ahmet Yılmaz</div>
-                          <div className="text-xs text-gray-500">Full‑stack Developer</div>
+                  {/* Projects Section */}
+                  <div className="px-6 pb-6">
+                    <div className="mb-6">
+                      <h2 className="text-base font-semibold text-gray-900 mb-1">Selected Work</h2>
+                      <p className="text-sm text-gray-600">A collection of projects I've built and contributed to</p>
+                    </div>
+
+                    {/* Projects Grid */}
+                    <div className="grid grid-cols-1 gap-3">
+                      {/* Project 1 */}
+                      <div className="group bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-300 hover:-translate-y-0.5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900 group-hover:text-gray-700">E-Commerce Platform</h3>
+                            <p className="text-xs text-gray-500 mt-1 group-hover:text-gray-600 transition-colors">Full-stack marketplace with real-time features</p>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-yellow-500 transition-colors">
+                            <span>⭐</span>
+                            <AnimatedNumber value={34} />
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="bg-sky-100 text-sky-800 px-2 py-0.5 rounded text-[10px]">
-                            React
-                          </span>
-                          <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px]">
-                            Node.js
-                          </span>
-                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px]">
-                            TypeScript
-                          </span>
-                          <span className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px]">
-                            Docker
-                          </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">React</span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">Node.js</span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">PostgreSQL</span>
                         </div>
                       </div>
-                    </aside>
 
-                    {/* Projects grid */}
-                    <section className="col-span-12 md:col-span-8">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Card 1 */}
-                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                          <div className="h-24 bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                            <div className="absolute top-2 right-2 text-[11px] bg-white/80 rounded px-2 py-0.5 text-gray-700">
-                              ⭐ <AnimatedNumber value={34} />
-                            </div>
+                      {/* Project 2 */}
+                      <div className="group bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-300 hover:-translate-y-0.5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900 group-hover:text-gray-700">Task Management App</h3>
+                            <p className="text-xs text-gray-500 mt-1 group-hover:text-gray-600 transition-colors">Team collaboration tool with real-time sync</p>
                           </div>
-                          <div className="p-3">
-                            <div className="text-sm font-normal text-gray-900">
-                              E‑Ticaret Platformu
-                            </div>
-                            <div className="mt-2 flex gap-1 flex-wrap">
-                              <span className="bg-sky-100 text-sky-800 px-2 py-0.5 rounded text-[10px]">
-                                React
-                              </span>
-                              <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px]">
-                                Node.js
-                              </span>
-                            </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-yellow-500 transition-colors">
+                            <span>⭐</span>
+                            <AnimatedNumber value={28} />
                           </div>
                         </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">TypeScript</span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">Next.js</span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">Prisma</span>
+                        </div>
+                            </div>
 
-                        {/* Card 2 */}
-                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                          <div className="h-24 bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                            <div className="absolute top-2 right-2 text-[11px] bg-white/80 rounded px-2 py-0.5 text-gray-700">
-                              ⭐ <AnimatedNumber value={28} />
-                            </div>
+                      {/* Project 3 */}
+                      <div className="group bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-300 hover:-translate-y-0.5">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900 group-hover:text-gray-700">API Gateway</h3>
+                            <p className="text-xs text-gray-500 mt-1 group-hover:text-gray-600 transition-colors">Microservices orchestration layer</p>
                           </div>
-                          <div className="p-3">
-                            <div className="text-sm font-normal text-gray-900">Task Management</div>
-                            <div className="mt-2 flex gap-1 flex-wrap">
-                              <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[10px]">
-                                TypeScript
-                              </span>
-                              <span className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px]">
-                                Next.js
-                              </span>
-                            </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-yellow-500 transition-colors">
+                            <span>⭐</span>
+                            <AnimatedNumber value={19} />
                           </div>
                         </div>
-
-                        {/* Card 3 */}
-                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                          <div className="h-24 bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                            <div className="absolute top-2 right-2 text-[11px] bg-white/80 rounded px-2 py-0.5 text-gray-700">
-                              ⭐ <AnimatedNumber value={19} />
-                            </div>
-                          </div>
-                          <div className="p-3">
-                            <div className="text-sm font-normal text-gray-900">API Gateway</div>
-                            <div className="mt-2 flex gap-1 flex-wrap">
-                              <span className="bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[10px]">
-                                Express
-                              </span>
-                              <span className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[10px]">
-                                Docker
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 4 */}
-                        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                          <div className="h-24 bg-gradient-to-br from-gray-100 to-gray-200 relative">
-                            <div className="absolute top-2 right-2 text-[11px] bg-white/80 rounded px-2 py-0.5 text-gray-700">
-                              ⭐ <AnimatedNumber value={42} />
-                            </div>
-                          </div>
-                          <div className="p-3">
-                            <div className="text-sm font-normal text-gray-900">Mobile App</div>
-                            <div className="mt-2 flex gap-1 flex-wrap">
-                              <span className="bg-sky-100 text-sky-800 px-2 py-0.5 rounded text-[10px]">
-                                React Native
-                              </span>
-                              <span className="bg-pink-100 text-pink-800 px-2 py-0.5 rounded text-[10px]">
-                                Expo
-                              </span>
-                            </div>
-                          </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">Express</span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">Docker</span>
+                          <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md text-xs group-hover:bg-gray-200 transition-colors">Redis</span>
                         </div>
                       </div>
-                    </section>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -394,276 +336,463 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Benefits / Özellikler - Cal.com tarzı */}
-      <section
-        id="features"
-        className="relative py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden"
-      >
-        <div className="absolute -top-20 right-10 w-64 h-64 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full opacity-40 blur-3xl" />
-        <div className="absolute -bottom-24 left-10 w-80 h-80 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-30 blur-3xl" />
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6">
-              PortfolYO oluşturmak hiç bu kadar kolay olmamıştı
+      {/* Features Section - Enhanced Cal.com Style */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-8 lg:px-16">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Nasıl Çalışır?
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              GitHub projelerinizi çekici portfolyo sitelerine dönüştürmenin en kolay yolu.
-              Otomasyon, akıllı içerik ve profesyonel şablonlarla dakikalar içinde yayında olun.
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              GitHub projelerinizi profesyonel portfolyo sitesine dönüştürmenin en kolay yolu
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto relative">
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm group hover:shadow-md transition-shadow text-center">
-              <div className="w-16 h-16 mx-auto mb-6 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                <GitBranch className="h-8 w-8 text-gray-700" />
+          {/* Feature Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+            {/* Left: Steps */}
+            <div className="space-y-8">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-bold">
+                  1
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">GitHub'ı Bağlayın</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Tek tıkla GitHub hesabınızı bağlayın. Tüm public repolarınız otomatik olarak listelenir.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                GitHub’dan otomatik içerik
-              </h3>
+
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-bold">
+                  2
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Projelerinizi Seçin</h3>
               <p className="text-gray-600 leading-relaxed">
-                Repo açıklamaları, README özetleri, teknoloji etiketleri ve yıldız sayıları otomatik
-                çekilir; içeriği istediğiniz zaman yeniden oluşturabilirsiniz.
+                    Portfolyonuzda göstermek istediğiniz projeleri seçin. README, teknolojiler ve yıldızlar otomatik çekilir.
               </p>
+                </div>
             </div>
 
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm group hover:shadow-md transition-shadow text-center">
-              <div className="w-16 h-16 mx-auto mb-6 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                <LayoutTemplate className="h-8 w-8 text-gray-700" />
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-bold">
+                  3
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Şablonu Belirleyin</h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    Profesyonel şablonlar arasından stilinize en uygun olanı seçin. Hepsi mobil uyumlu ve hızlı.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Profesyonel şablonlar</h3>
+
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-gray-900 text-white rounded-lg flex items-center justify-center text-sm font-bold">
+                  4
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Anında Yayınlayın</h3>
               <p className="text-gray-600 leading-relaxed">
-                Modern ve mobil uyumlu şablonlardan birini seçerek dakikalar içinde profesyonel
-                görünüme kavuşun.
+                    Portfolyonuz otomatik oluşturulur ve özel domain'inizle yayınlanır. İstediğiniz zaman güncelleyebilirsiniz.
               </p>
+                </div>
+              </div>
             </div>
 
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-sm group hover:shadow-md transition-shadow text-center">
-              <div className="w-16 h-16 mx-auto mb-6 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                <Globe className="h-8 w-8 text-gray-700" />
+            {/* Right: Visual */}
+            <div className="lg:pl-8">
+              <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">E-Commerce Platform</div>
+                      <div className="text-xs text-gray-500">React, Node.js • ⭐ 34</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✓</span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">Task Management</div>
+                      <div className="text-xs text-gray-500">Next.js, TypeScript • ⭐ 28</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg border border-gray-200 opacity-50">
+                    <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-400 text-sm">○</span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-gray-500">Personal Blog</div>
+                      <div className="text-xs text-gray-400">Gatsby, MDX • ⭐ 12</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200 border-dashed">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-blue-900 mb-1">Professional Tech</div>
+                      <div className="text-xs text-blue-700">Şablon seçildi</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Anında paylaşın</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Oluşturduğunuz portfolyo, paylaşılabilir bir bağlantıyla anında görüntülenir ve
-                sonradan kolayca güncellenebilir.
-              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Stats Section - Section Divider */}
+      <section className="relative py-16 bg-gradient-to-br from-gray-50 via-white to-gray-100 border-y border-gray-100 overflow-hidden">
+        <div className="absolute -top-16 -left-16 w-72 h-72 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-40 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-br from-indigo-100 to-cyan-100 rounded-full opacity-40 blur-3xl" />
+        <div className="max-w-7xl mx-auto px-8 lg:px-16 relative">
+          <div className="text-center mb-12">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Güvendiğiniz hızla
+            </h3>
+            <p className="text-gray-600">
+              Modern portfolyo oluşturma deneyimi
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">5dk</div>
+              <div className="text-sm text-gray-600">Ortalama kurulum</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">0₺</div>
+              <div className="text-sm text-gray-600">Başlangıç ücreti</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">50+</div>
+              <div className="text-sm text-gray-600">Aktif portfolyo</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">100%</div>
+              <div className="text-sm text-gray-600">Mobil uyumlu</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pro Features Coming Soon - Cal.com Style */}
-      <section className="relative py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-        {/* Subtle background elements */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-200 rounded-full opacity-20 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gray-300 rounded-full opacity-15 blur-3xl" />
-
-        <div className="container mx-auto px-6 relative">
+      {/* Template Showcase Section - Cal.com Style */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-8 lg:px-16">
+          {/* Header */}
           <div className="text-center mb-16">
-            {/* Minimal badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-gray-700 text-sm font-medium mb-8 shadow-sm">
-              ✨ Pro özellikler çok yakında
-              <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">Q2 2025</span>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Profesyonel Şablonlar
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Her stile uygun, modern ve mobil uyumlu şablonlardan birini seçin
+            </p>
+          </div>
+
+          {/* Template Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {/* Template 1 */}
+            <div className="group">
+              <div className="bg-gray-100 rounded-2xl p-8 mb-6 aspect-[4/3] flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-900 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-white font-bold">MT</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-2 bg-gray-300 rounded w-24 mx-auto"></div>
+                    <div className="h-2 bg-gray-300 rounded w-16 mx-auto"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Minimal Tech</h3>
+                <p className="text-sm text-gray-600">Clean ve minimal tasarım</p>
+              </div>
             </div>
 
-            {/* Clean heading */}
-            <h2 className="text-3xl md:text-5xl font-semibold text-gray-900 mb-6 leading-tight">
-              Bir üst seviye
-              <br />
-              <span className="text-gray-600">PortfolYO+</span>
-            </h2>
-
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
-              Premium şablonlar, özel alan adları, gelişmiş analitik ve öncelikli destek.
-              <span className="font-medium text-gray-900"> Bekleme listesine özel %50 indirim</span>
-            </p>
-
-            {/* Simple pricing */}
-            <div className="flex flex-col items-center gap-6">
-              <div className="bg-white border border-gray-200 rounded-xl px-6 py-4 shadow-sm">
-                <div className="text-3xl font-semibold text-gray-900 mb-1">
-                  <span className="line-through text-xl text-gray-400 mr-2">$10</span>
-                  $5<span className="text-base text-gray-600">/ay</span>
+            {/* Template 2 */}
+            <div className="group">
+              <div className="bg-gray-100 rounded-2xl p-8 mb-6 aspect-[4/3] flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-white font-bold">PT</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-2 bg-blue-200 rounded w-24 mx-auto"></div>
+                    <div className="h-2 bg-blue-200 rounded w-16 mx-auto"></div>
+                  </div>
                 </div>
-                <div className="text-sm text-green-600 font-medium">Bekleme listesi indirimi</div>
               </div>
-              <Button
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Professional Tech</h3>
+                <p className="text-sm text-gray-600">Kurumsal ve profesyonel</p>
+              </div>
+            </div>
+
+            {/* Template 3 */}
+            <div className="group">
+              <div className="bg-gray-100 rounded-2xl p-8 mb-6 aspect-[4/3] flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-600 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-white font-bold">CT</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-2 bg-purple-200 rounded w-24 mx-auto"></div>
+                    <div className="h-2 bg-purple-200 rounded w-16 mx-auto"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Creative Tech</h3>
+                <p className="text-sm text-gray-600">Yaratıcı ve modern</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Template Features Section - Section Divider */}
+      <section className="relative py-16 bg-gradient-to-br from-gray-50 via-white to-gray-100 border-y border-gray-100 overflow-hidden">
+        <div className="absolute -top-16 -left-16 w-72 h-72 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-40 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-br from-indigo-100 to-cyan-100 rounded-full opacity-40 blur-3xl" />
+        <div className="max-w-7xl mx-auto px-8 lg:px-16 relative">
+          <div className="text-center mb-12">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Tüm şablonlarda dahil
+            </h3>
+            <p className="text-gray-600">
+              Her şablon bu özelliklerle geliyor
+            </p>
+          </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Smartphone className="w-5 h-5 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">Mobil Uyumlu</h4>
+              <p className="text-sm text-gray-600">Tüm cihazlarda mükemmel</p>
+                </div>
+
+            <div>
+              <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">Hızlı Yükleme</h4>
+              <p className="text-sm text-gray-600">Optimize edilmiş performans</p>
+                </div>
+
+            <div>
+              <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <LayoutTemplate className="w-5 h-5 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">Özelleştirilebilir</h4>
+              <p className="text-sm text-gray-600">Renk ve içerik kontrolü</p>
+                </div>
+
+            <div>
+              <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Search className="w-5 h-5 text-white" />
+              </div>
+              <h4 className="font-semibold text-gray-900 mb-2">SEO Optimized</h4>
+              <p className="text-sm text-gray-600">Arama motorları için</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+            {/* Pro Features Coming Soon - Cal.com Style */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-8 lg:px-16">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-sm font-medium mb-6">
+              ✨ Yakında
+              <span className="bg-white px-2 py-0.5 rounded text-xs">Q2 2025</span>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              PortfolYO<span className="text-blue-600">+</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Daha fazla özelleştirme, analitik ve profesyonel araçlarla portfolyonuzu bir üst seviyeye taşıyın
+            </p>
+          </div>
+
+                    {/* Feature Preview Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="relative group p-8 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white hover:shadow-lg hover:border-blue-300 transition-all duration-300">
+              <div className="absolute top-6 right-6 w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <LayoutTemplate className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Özel Tema Editörü</h3>
+              <p className="text-gray-600 mb-4">Renkler, fontlar, spacing ve component'ları dilediğiniz gibi özelleştirin. Visual editor ile kod yazmadan tasarım yapın.</p>
+              <div className="text-sm text-blue-600 font-medium">Beta: Q2 2025</div>
+            </div>
+
+            <div className="relative group p-8 rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-white hover:shadow-lg hover:border-green-300 transition-all duration-300">
+              <div className="absolute top-6 right-6 w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                <Globe className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Özel Domain</h3>
+              <p className="text-gray-600 mb-4">adiniz.com ile profesyonel görünüm. SSL sertifikası, CDN optimizasyonu ve DNS yönetimi dahil.</p>
+              <div className="text-sm text-green-600 font-medium">Beta: Q2 2025</div>
+            </div>
+
+            <div className="relative group p-8 rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white hover:shadow-lg hover:border-purple-300 transition-all duration-300">
+              <div className="absolute top-6 right-6 w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Gelişmiş Analitik</h3>
+              <p className="text-gray-600 mb-4">Ziyaretçi davranışları, traffic kaynakları, conversion oranları ve detaylı performance metrikleri.</p>
+              <div className="text-sm text-purple-600 font-medium">Beta: Q2 2025</div>
+            </div>
+
+            <div className="relative group p-8 rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-lg hover:border-orange-300 transition-all duration-300">
+              <div className="absolute top-6 right-6 w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xs font-bold">24</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Priority Support</h3>
+              <p className="text-gray-600 mb-4">24 saat içinde yanıt garantisi, özel Slack kanalı ve 1-on-1 onboarding desteği.</p>
+              <div className="text-sm text-orange-600 font-medium">Beta: Q2 2025</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Pricing Section - Section Divider */}
+      <section className="relative py-16 bg-gradient-to-br from-gray-50 via-white to-gray-100 border-y border-gray-100 overflow-hidden">
+        <div className="absolute -top-16 -left-16 w-72 h-72 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-40 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-br from-indigo-100 to-cyan-100 rounded-full opacity-40 blur-3xl" />
+        <div className="max-w-7xl mx-auto px-8 lg:px-16 relative">
+          <div className="text-center mb-12">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Şu anda geliştirme aşamasında
+            </h3>
+            <p className="text-gray-600">
+              Beta aşamasında - erken kullanıcılar için özel fiyat
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <div className="text-center">
+              <div className="bg-white border border-gray-200 rounded-xl px-8 py-4 shadow-sm">
+                <div className="text-3xl font-bold text-gray-900 mb-1">
+                  <span className="line-through text-xl text-gray-400 mr-3">₺50</span>
+                  ₺25<span className="text-lg text-gray-600">/ay</span>
+                </div>
+                <div className="text-sm text-green-600 font-medium">%50 erken kullanıcı indirimi</div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <ButtonNew
                 variant="primary"
                 size="lg"
-                className="px-8"
-                onClick={() => handleWaitlistSubmit()}
-                disabled={waitlistLoading}
+                className="px-8 py-3"
+                onClick={() => router.push('/pricing')}
               >
-                {waitlistLoading
-                  ? 'Ekleniyor...'
-                  : waitlistSuccess
-                    ? '✓ Eklendi!'
-                    : 'Bekleme listesine katıl'}
-              </Button>
-            </div>
-          </div>
-
-          {/* Feature grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <LayoutTemplate className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Premium Şablonlar</h3>
-              <p className="text-sm text-gray-600">Profesyonelce tasarlanmış şablonlar</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Globe className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Özel Alan Adı</h3>
-              <p className="text-sm text-gray-600">Kendi alan adınızı kullanın</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-6 h-6 text-gray-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Gelişmiş Analitik</h3>
-              <p className="text-sm text-gray-600">Detaylı analizler ve metrikler</p>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:border-gray-300 hover:shadow-sm transition-all">
-              <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-gray-600 font-semibold text-sm">24/7</span>
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Öncelikli Destek</h3>
-              <p className="text-sm text-gray-600">E‑posta öncelikli destek</p>
+                Bekleme Listesine Katıl
+              </ButtonNew>
+              <p className="text-xs text-gray-500 mt-2">Kredi kartı gerekmiyor</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How it works - Akış */}
-      <section className="relative py-32 bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
+
+
+      {/* Developer Story / Geliştirici Hikayesi */}
+      <section className="relative py-24 bg-white overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6">
-              Portfolyo yolculuğunuza başlamak için
-            </h2>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-              Sadece 3 basit adımda GitHub projelerinizi profesyonel portfolYO'ya dönüştürün
-            </p>
-          </div>
-
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gray-800 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 group-hover:bg-gray-700 transition-colors">
-                  01
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-sm font-medium mb-6">
+                <div className="w-4 h-4 bg-gray-600 rounded-sm flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">&lt;/&gt;</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-4">GitHub'ı bağla</h3>
-                <p className="text-gray-400 leading-relaxed">
-                  GitHub hesabınızla giriş yapın ve göstermek istediğiniz projelerinizi seçin.
-                  Otomatik bilgi çekme ile zaman kazanın.
-                </p>
+                Geliştirici Tarafından
               </div>
-
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gray-800 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 group-hover:bg-gray-700 transition-colors">
-                  02
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-4">Şablonu seç</h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Kişiliğinize ve sektörünüze uygun profesyonel şablonlardan birini seçin. Her
-                  şablon tamamen responsive ve modern.
-                </p>
-              </div>
-
-              <div className="text-center group">
-                <div className="w-16 h-16 bg-gray-800 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 group-hover:bg-gray-700 transition-colors">
-                  03
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-4">Yayınla ve paylaş</h3>
-                <p className="text-gray-400 leading-relaxed">
-                  Portfolyo siteniz hazır! Paylaşılabilir bağlantı ile anında görüntülenir ve
-                  dilediğiniz zaman güncelleyebilirsiniz.
-                </p>
-              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                Geliştiriciler için, <br className="hidden md:block" />
+                <span className="text-blue-600">geliştiriciler tarafından</span>
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Harika projeleri olan ama sergilemekte zorlanan geliştiriciler için tasarlandı
+              </p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Template Gallery / Şablon Galerisi */}
-      <section className="relative py-24 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-32 bg-gradient-to-b from-gray-100 to-transparent rounded-b-full opacity-70" />
-        <div className="absolute -top-24 -left-10 w-72 h-72 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full opacity-25 blur-3xl" />
-        <div className="absolute -bottom-24 -right-10 w-80 h-80 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-20 blur-3xl" />
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4">
-              Her tarza uygun bir sahne
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Modern, minimalist ve yaratıcı şablonlarımızla projeleriniz hak ettiği sunumu bulur.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-white transition-all hover:shadow-md hover:-translate-y-1 animate-fade-in">
-              <iframe
-                className="aspect-video w-full border-0 bg-white"
-                srcDoc="<!DOCTYPE html><html><head><style>*{font-family:ui-sans-serif,system-ui}body{margin:0}</style></head><body><div style='padding:24px;border-bottom:1px solid #eee'><strong>Modern Developer</strong></div><div style='padding:24px;color:#6b7280'>Önizleme yakında.</div></body></html>"
-              />
-              <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Modern Developer</h3>
-                <p className="text-sm text-gray-600">
-                  Temiz tipografi, teknoloji rozetleri ve yıldız metrikleri için ideal.
-                </p>
-              </div>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-white transition-all hover:shadow-md hover:-translate-y-1 animate-fade-in animation-delay-200">
-              <iframe
-                className="aspect-video w-full border-0 bg-white"
-                srcDoc="<!DOCTYPE html><html><head><style>*{font-family:ui-sans-serif,system-ui}body{margin:0}</style></head><body><div style='padding:24px;border-bottom:1px solid #eee'><strong>Creative Technologist</strong></div><div style='padding:24px;color:#6b7280'>Önizleme yakında.</div></body></html>"
-              />
-              <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Creative Technologist</h3>
-                <p className="text-sm text-gray-600">
-                  Yaratıcı görsel hiyerarşi ve vitrin odaklı yapı.
-                </p>
-              </div>
-            </div>
-            <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-white transition-all hover:shadow-md hover:-translate-y-1 animate-fade-in animation-delay-400">
-              <iframe
-                className="aspect-video w-full border-0 bg-white"
-                srcDoc="<!DOCTYPE html><html><head><style>*{font-family:ui-sans-serif,system-ui}body{margin:0}</style></head><body><div style='padding:24px;border-bottom:1px solid #eee'><strong>Minimalist Professional</strong></div><div style='padding:24px;color:#6b7280'>Önizleme yakında.</div></body></html>"
-              />
-              <div className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Minimalist Professional</h3>
-                <p className="text-sm text-gray-600">
-                  Sade, hızlı ve iş görüşmelerine uygun sunum.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Founder Note / Kurucudan Not */}
-      <section className="relative py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-        <div className="absolute -top-24 right-0 w-72 h-72 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full opacity-40 blur-3xl" />
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 md:p-10 shadow-sm">
-              <div className="flex items-start gap-6">
-                <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Story */}
+              <div className="space-y-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                   B
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Geliştiriciler için, geliştiriciler tarafından
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                      Merhaba, ben Berke
                   </h3>
                   <p className="text-gray-700 leading-relaxed">
-                    Merhaba, ben Berke. PortfolYO’yu, harika projeleri olan ama sergilemekte
-                    zorlanan geliştiriciler için tek başıma inşa ettim. Amacım, kariyerinizin
-                    başındaki engellerden birini kaldırmak ve size hız kazandırmak.
-                  </p>
+                      PortfolYO'yu, harika projeleri olan ama sergilemekte zorlanan geliştiriciler için tek başıma inşa ettim. 
+                      Amacım, kariyerinizin başındaki engellerden birini kaldırmak ve size hız kazandırmak.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Gerçek İhtiyaç</h4>
+                    <p className="text-sm text-gray-600">
+                      Kendi portfolyo sorunumdan yola çıkarak geliştirdim
+                    </p>
+                  </div>
+                  
+                  <div className="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                      <Zap className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Hızlı Çözüm</h4>
+                    <p className="text-sm text-gray-600">
+                      5 dakikada profesyonel portfolyo oluşturun
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Code Preview */}
+              <div className="relative">
+                <div className="bg-gray-900 rounded-xl p-6 shadow-xl">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-gray-400 text-sm ml-2">portfolyo.config.js</span>
+                  </div>
+                  <div className="text-sm font-mono text-gray-300 space-y-2">
+                    <div><span className="text-blue-400">const</span> <span className="text-white">portfolyo</span> = {`{`}</div>
+                    <div className="ml-4"><span className="text-green-400">"github"</span>: <span className="text-yellow-400">"berkezap"</span>,</div>
+                    <div className="ml-4"><span className="text-green-400">"template"</span>: <span className="text-yellow-400">"modern-developer"</span>,</div>
+                    <div className="ml-4"><span className="text-green-400">"deploy"</span>: <span className="text-blue-400">true</span></div>
+                    <div>{`}`}</div>
+                    <div className="pt-2 text-gray-500">// That's it!</div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-lg">
+                  <Check className="w-6 h-6" />
                 </div>
               </div>
             </div>
@@ -672,84 +801,191 @@ export default function HomePage() {
       </section>
 
       {/* FAQ / SSS */}
-      <section className="relative py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
-        <div className="absolute -top-24 left-0 w-72 h-72 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full opacity-20 blur-3xl" />
-        <div className="absolute -bottom-24 right-0 w-80 h-80 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-20 blur-3xl" />
-        <div className="container mx-auto px-6 relative">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4">
-              Sıkça Sorulan Sorular
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Kısa ve net cevaplar. Abartı yok.
-            </p>
-          </div>
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-xl border border-gray-200 p-6 bg-white transition-colors hover:bg-gray-50 hover:border-gray-300">
-              <h3 className="font-semibold text-gray-900 mb-2">GitHub hesabı gerekli mi?</h3>
-              <p className="text-gray-600 text-sm">
-                Evet. Projelerinizi güvenle çekebilmek için GitHub ile giriş yapmanız gerekir.
+      <section className="relative py-24 bg-white overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-sm font-medium mb-6">
+                <div className="w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">?</span>
+                </div>
+                Sıkça Sorulan Sorular
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                Merak ettikleriniz
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Kısa ve net cevaplar. Abartı yok.
               </p>
             </div>
-            <div className="rounded-xl border border-gray-200 p-6 bg-white transition-colors hover:bg-gray-50 hover:border-gray-300">
-              <h3 className="font-semibold text-gray-900 mb-2">Otomatik güncelleniyor mu?</h3>
-              <p className="text-gray-600 text-sm">
-                İçeriği istediğiniz zaman yeniden oluşturabilirsiniz. Arka planda sürekli
-                senkronizasyon yapmıyoruz.
-              </p>
-            </div>
-            <div className="rounded-xl border border-gray-200 p-6 bg-white transition-colors hover:bg-gray-50 hover:border-gray-300">
-              <h3 className="font-semibold text-gray-900 mb-2">Ücretsiz mi?</h3>
-              <p className="text-gray-600 text-sm">
-                Şu an ücretsiz. Gelecekteki planları şeffafça duyuracağız.
-              </p>
-            </div>
-            <div className="rounded-xl border border-gray-200 p-6 bg-white transition-colors hover:bg-gray-50 hover:border-gray-300">
-              <h3 className="font-semibold text-gray-900 mb-2">Veri güvenliği ve çerezler?</h3>
-              <p className="text-gray-600 text-sm">
-                Çerez tercihleri ve GDPR akışıyla kontrol sizde. Yalnızca izin verdiğiniz verileri
-                işleriz.
-              </p>
-            </div>
-            <div className="rounded-xl border border-gray-200 p-6 bg-white transition-colors hover:bg-gray-50 hover:border-gray-300">
-              <h3 className="font-semibold text-gray-900 mb-2">Düzenleme mümkün mü?</h3>
-              <p className="text-gray-600 text-sm">
-                Evet, oluşturduktan sonra portfolyonuzu tekrar güncelleyebilir ve yeni denemeler
-                yapabilirsiniz.
-              </p>
-            </div>
-            <div className="rounded-xl border border-gray-200 p-6 bg-white transition-colors hover:bg-gray-50 hover:border-gray-300">
-              <h3 className="font-semibold text-gray-900 mb-2">Demo var mı?</h3>
-              <p className="text-gray-600 text-sm">
-                Demo modu açıksa örnek verilerle dakikalar içinde deneme yapabilirsiniz.
-              </p>
+
+            <div className="space-y-4">
+              <div className="group border border-gray-200 rounded-xl bg-white hover:shadow-md transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        GitHub hesabı gerekli mi?
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Evet. Projelerinizi güvenle çekebilmek için GitHub ile giriş yapmanız gerekir. 
+                        Bu sayede repo'larınıza erişim sağlayıp otomatik portfolyo oluşturabiliyoruz.
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center ml-4">
+                      <Github className="w-4 h-4 text-gray-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="group border border-gray-200 rounded-xl bg-white hover:shadow-md transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        Otomatik güncelleniyor mu?
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        İçeriği istediğiniz zaman yeniden oluşturabilirsiniz. Arka planda sürekli 
+                        senkronizasyon yapmıyoruz - kontrol tamamen sizde.
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center ml-4">
+                      <Zap className="w-4 h-4 text-blue-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="group border border-gray-200 rounded-xl bg-white hover:shadow-md transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        Ücretsiz mi?
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Şu an ücretsiz. Gelecekteki planları şeffafça duyuracağız. 
+                        Pro özellikler için erken kullanıcı indirimleri yapacağız.
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center ml-4">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="group border border-gray-200 rounded-xl bg-white hover:shadow-md transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        Veri güvenliği nasıl?
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Çerez tercihleri ve GDPR akışıyla kontrol sizde. Yalnızca izin verdiğiniz verileri 
+                        işleriz. GitHub token'ları güvenli şekilde saklanır.
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center ml-4">
+                      <Search className="w-4 h-4 text-purple-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="group border border-gray-200 rounded-xl bg-white hover:shadow-md transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        Düzenleme mümkün mü?
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Evet, oluşturduktan sonra portfolyonuzu tekrar güncelleyebilir, 
+                        farklı şablonlar deneyebilir ve içeriği değiştirebilirsiniz.
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center ml-4">
+                      <LayoutTemplate className="w-4 h-4 text-orange-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="group border border-gray-200 rounded-xl bg-white hover:shadow-md transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                        Demo var mı?
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Demo modu açıksa örnek verilerle dakikalar içinde deneme yapabilirsiniz. 
+                        Gerçek GitHub hesabı olmadan da test edebilirsiniz.
+                      </p>
+                    </div>
+                    <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center ml-4">
+                      <Globe className="w-4 h-4 text-gray-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section - Softer tone */}
-      <section className="relative py-12 md:py-16 bg-gradient-to-b from-gray-50 via-white to-gray-50 overflow-hidden">
-        <div className="absolute -top-20 left-1/3 w-72 h-72 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full opacity-25 blur-3xl" />
-        <div className="absolute -bottom-24 right-1/4 w-80 h-80 bg-gradient-to-br from-fuchsia-100 to-purple-100 rounded-full opacity-25 blur-3xl" />
-        <div className="container mx-auto px-6 text-center relative">
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-3">
-            PortfolYO yolculuğunuza başlayın
-          </h2>
-          <p className="text-sm md:text-base text-gray-600 max-w-xl mx-auto mb-6 leading-relaxed">
-            GitHub projelerinizi birkaç tıkla etkileyici bir portfolYO'ya dönüştürün. Ücretsiz,
-            hızlı ve profesyonel.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Button variant="primary" size="lg" icon={Github} onClick={authButtonConfig.action}>
-              {authButtonConfig.text}
-            </Button>
-            <p className="text-sm text-gray-500">Kredi kartı gerekmiyor • 2 dakikada kurulum</p>
+      {/* Final CTA Section - Section Divider */}
+      <section className="relative pt-16 pb-24 bg-gradient-to-br from-gray-50 via-white to-gray-100 border-t border-gray-100">
+        <div className="absolute -top-16 -left-16 w-96 h-96 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full opacity-30 blur-3xl" />
+        <div className="absolute -bottom-12 -right-24 w-80 h-80 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full opacity-20 blur-3xl" />
+        
+        <div className="container mx-auto px-6 relative">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full text-gray-700 text-sm font-medium mb-6 shadow-sm border border-gray-200">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              Hemen başlayın
+            </div>
+
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Portfolyo deneyiminizi<br className="hidden md:block" />
+              <span className="text-blue-600">yeniden tanımlayın</span>
+            </h2>
+
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+              GitHub projelerinizi birkaç tıkla etkileyici bir portfolyoya dönüştürün
+            </p>
+
+            <div className="flex justify-center items-center mb-6">
+              <ButtonNew 
+                variant="primary" 
+                size="md" 
+                className="px-6 py-3"
+                onClick={authButtonConfig.action}
+              >
+                <Github className="w-4 h-4 mr-2" />
+                {authButtonConfig.text}
+              </ButtonNew>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm text-gray-500 mb-16">
+              <div className="flex items-center gap-2">
+                <Check className="w-3 h-3 text-green-500" />
+                Kredi kartı gerekmiyor
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-3 h-3 text-green-500" />
+                2 dakikada kurulum
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      <div style={{ height: '60px' }} />
       <Footer />
     </div>
   );
 }
+

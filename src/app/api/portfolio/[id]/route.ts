@@ -7,12 +7,35 @@ import * as Sentry from '@sentry/nextjs';
 import { GitHubService } from '@/lib/github';
 import { formatUserDataForTemplate, renderTemplate } from '@/lib/templateEngine';
 import type { GitHubUser, GitHubRepo } from '@/types/github'; // tipler buradan import edildi
+import { withRateLimit } from '@/lib/rateLimit';
+import { createErrorResponse } from '@/lib/errorHandler';
+import { requireAuth, requirePortfolioOwnership } from '@/lib/security';
+
+// UUID validation helper
+function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
 
 // GET - Portfolio detayını getir (public access)
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     console.log('🔍 Portfolio detayı getiriliyor:', id);
+
+    // UUID validation
+    if (!isValidUUID(id)) {
+      return createErrorResponse(
+        'Invalid portfolio ID format',
+        'Portfolio ID must be a valid UUID',
+        400,
+        { endpoint: 'portfolio-get', action: 'get' },
+        { providedId: id }
+      );
+    }
 
     const portfolio = await PortfolioService.getPortfolio(id);
 
@@ -54,22 +77,34 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // PATCH - Portfolio güncelle (requires authentication and ownership)
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  let id = '';
-
+async function patchHandler(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
-    id = (await params).id;
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email || !session.user.accessToken) {
+    // UUID validation
+    if (!isValidUUID(id)) {
+      return createErrorResponse(
+        'Invalid portfolio ID format',
+        'Portfolio ID must be a valid UUID',
+        400,
+        { endpoint: 'portfolio-patch', action: 'update' },
+        { providedId: id }
+      );
+    }
+
+    // Centralized auth
+    const auth = await requireAuth(request);
+    if ('error' in auth) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
+    const session = auth.session;
+    const userId = (session.user as any).email || session.user.id;
 
-    const existingPortfolio = await PortfolioService.getPortfolio(id);
-    if (!existingPortfolio) {
-      return NextResponse.json({ success: false, error: 'Portfolio not found' }, { status: 404 });
-    }
-
-    if (existingPortfolio.user_id !== session.user.email) {
+    // Ownership check
+    const owns = await requirePortfolioOwnership(id, String(userId));
+    if (!owns) {
       return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
     }
 
@@ -93,6 +128,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const { template, selectedRepos, cvUrl, userBio } = validation.data;
 
+    const existingPortfolio = await PortfolioService.getPortfolio(id);
+    if (!existingPortfolio) {
+      return NextResponse.json({ success: false, error: 'Portfolio not found' }, { status: 404 });
+    }
+
     const updatePayload: Partial<import('@/lib/supabase').Portfolio> = {
       selected_template: template,
       selected_repos: selectedRepos,
@@ -105,7 +145,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (needsTemplateRender) {
       try {
-        const githubService = new GitHubService(session.user.accessToken);
+        const accessToken = (session.user as any)?.accessToken as string | undefined;
+        if (!accessToken) {
+          return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+        }
+        const githubService = new GitHubService(accessToken);
 
         // Paralel veri çekme - daha hızlı
         const [userDataRaw, allReposRaw] = await Promise.all([
@@ -193,26 +237,37 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     );
   }
 }
+export const PATCH = withRateLimit(patchHandler as any);
 
 // DELETE - Portfolio sil (requires authentication and ownership)
-export async function DELETE(
+async function deleteHandler(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  context: { params: Promise<{ id: string }> },
 ) {
-  let id: string = '';
+  const { id } = await context.params;
   try {
-    id = (await params).id;
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    // UUID validation
+    if (!isValidUUID(id)) {
+      return createErrorResponse(
+        'Invalid portfolio ID format',
+        'Portfolio ID must be a valid UUID',
+        400,
+        { endpoint: 'portfolio-delete', action: 'delete' },
+        { providedId: id }
+      );
+    }
+
+    // Centralized auth
+    const auth = await requireAuth(request);
+    if ('error' in auth) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
+    const session = auth.session;
+    const userId = (session.user as any).email || session.user.id;
 
-    const existingPortfolio = await PortfolioService.getPortfolio(id);
-    if (!existingPortfolio) {
-      return NextResponse.json({ success: false, error: 'Portfolio not found' }, { status: 404 });
-    }
-
-    if (existingPortfolio.user_id !== session.user.email) {
+    // Ownership check
+    const owns = await requirePortfolioOwnership(id, String(userId));
+    if (!owns) {
       return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
     }
 
@@ -234,3 +289,4 @@ export async function DELETE(
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+export const DELETE = withRateLimit(deleteHandler as any);

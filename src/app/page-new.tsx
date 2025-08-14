@@ -3,7 +3,7 @@
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Suspense, lazy, useEffect, useState } from 'react';
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/ButtonNew';
 import Card from '@/components/ui/Card';
 import Footer from '@/components/ui/Footer';
 import AppHeader from '@/components/ui/AppHeader';
@@ -223,8 +223,8 @@ export default function HomePage() {
           </p>
           {!session && (
             <Button
-              variant="glass"
-              size="xl"
+              variant="primary"
+              size="lg"
               icon={Github}
               onClick={() => signIn('github')}
               className="bg-white/20 hover:bg-white/30 text-white border-white/30 shadow-xl hover-lift"

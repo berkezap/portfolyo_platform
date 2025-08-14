@@ -39,8 +39,8 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.json',
   icons: {
-    icon: '/portfolyo-icon.svg',
-    apple: '/portfolyo-icon.svg',
+    icon: '/portfolyo-logo.svg',
+    apple: '/portfolyo-logo.svg',
   },
   other: {
     'theme-color': '#2563EB',
