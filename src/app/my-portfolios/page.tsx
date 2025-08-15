@@ -91,7 +91,16 @@ export default function MyPortfoliosPage() {
 
     if (isDeleting) return;
 
-    window.open(`/portfolio/${portfolioId}`, '_blank');
+    // Find portfolio to check if published
+    const portfolio = portfolios.find((p) => p.id === portfolioId);
+
+    if (portfolio?.is_published && portfolio?.public_slug) {
+      // Published portfolio - subdomain'e git
+      window.open(`http://${portfolio.public_slug}.portfolyo.tech`, '_blank');
+    } else {
+      // Draft portfolio - internal preview
+      window.open(`/portfolio/${portfolioId}`, '_blank');
+    }
   };
 
   const getTemplateDisplayName = (template: string) => {

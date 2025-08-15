@@ -816,70 +816,14 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                     </ButtonNew>
                   </div>
                 ) : (
-                  <div className="p-3">
-                    <div className="mb-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                        <span className="text-xs font-medium text-gray-700">Yayında Değil</span>
-                      </div>
-
-                      <div className="flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden">
-                        <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-r border-gray-300">
-                          https://
-                        </span>
-                        <input
-                          type="text"
-                          value={publishSlug}
-                          onChange={(e) => {
-                            const normalized = normalizeSlug(e.target.value);
-                            setPublishSlug(normalized);
-                            setPublishError(null);
-                          }}
-                          placeholder="web-adresiniz"
-                          disabled={!canChangeSlug && portfolio?.is_published}
-                          className={`flex-1 px-2 py-1.5 text-xs outline-none bg-white text-gray-900 ${!canChangeSlug && portfolio?.is_published ? 'cursor-not-allowed opacity-50 bg-gray-100' : ''}`}
-                        />
-                        <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-l border-gray-300">
-                          .portfolyo.tech
-                        </span>
-                      </div>
+                  <div className="text-center py-6">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                      <span className="text-sm text-gray-600">Portfolio taslak durumunda</span>
                     </div>
-
-                    {!canChangeSlug && portfolio?.is_published && nextSlugChangeDate && (
-                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-                        <p className="text-xs text-yellow-800">
-                          ⚠️ Slug değişikliği 6 ayda bir kez yapılabilir. Sonraki değişiklik:{' '}
-                          {nextSlugChangeDate.toLocaleDateString('tr-TR')}
-                        </p>
-                      </div>
-                    )}
-
-                    {publishError && (
-                      <div className="mb-2 text-xs text-red-600">{publishError}</div>
-                    )}
-
-                    <ButtonNew
-                      variant="primary"
-                      onClick={handlePublish}
-                      disabled={
-                        isPublishing ||
-                        !publishSlug.trim() ||
-                        selectedRepos.length === 0 ||
-                        (portfolio?.is_published && !canChangeSlug)
-                      }
-                      loading={isPublishing}
-                      className="w-full"
-                      size="sm"
-                    >
-                      {isPublishing ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <>
-                          <Globe className="w-3.5 h-3.5 mr-1.5" />
-                          <span className="text-xs">Yayınla</span>
-                        </>
-                      )}
-                    </ButtonNew>
+                    <p className="text-xs text-gray-500">
+                      Yayınlamak için ana dashboard'u kullanın
+                    </p>
                   </div>
                 )}
               </>
