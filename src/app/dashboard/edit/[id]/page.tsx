@@ -116,8 +116,8 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
 
   // Portfolio'dan mevcut publish bilgilerini al
   useEffect(() => {
-    if (portfolio?.slug) {
-      setPublishSlug(portfolio.slug);
+    if (portfolio?.public_slug) {
+      setPublishSlug(portfolio.public_slug);
     }
 
     // Slug değişiklik limitini kontrol et
@@ -762,12 +762,12 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                         <span className="text-xs font-medium text-gray-700">Canlı</span>
                       </div>
                       <a
-                        href={`https://${portfolio.slug}.portfolyo.tech`}
+                        href={`http://${portfolio.public_slug}.portfolyo.tech`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs font-mono text-gray-600 hover:text-gray-800 hover:underline"
                       >
-                        {portfolio.slug}.portfolyo.tech
+                        {portfolio.public_slug}.portfolyo.tech
                       </a>
                     </div>
 
@@ -775,7 +775,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                       <ButtonNew
                         variant="outline"
                         onClick={() =>
-                          window.open(`https://${portfolio.slug}.portfolyo.tech`, '_blank')
+                          window.open(`http://${portfolio.public_slug}.portfolyo.tech`, '_blank')
                         }
                         className="flex-1"
                         size="sm"
@@ -786,7 +786,9 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                       <ButtonNew
                         variant="outline"
                         onClick={() => {
-                          navigator.clipboard.writeText(`https://${portfolio.slug}.portfolyo.tech`);
+                          navigator.clipboard.writeText(
+                            `http://${portfolio.public_slug}.portfolyo.tech`,
+                          );
                         }}
                         className="flex-1"
                         size="sm"
@@ -834,13 +836,23 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                             setPublishError(null);
                           }}
                           placeholder="web-adresiniz"
-                          className="flex-1 px-2 py-1.5 text-xs outline-none bg-white text-gray-900"
+                          disabled={!canChangeSlug && portfolio?.is_published}
+                          className={`flex-1 px-2 py-1.5 text-xs outline-none bg-white text-gray-900 ${!canChangeSlug && portfolio?.is_published ? 'cursor-not-allowed opacity-50 bg-gray-100' : ''}`}
                         />
                         <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-l border-gray-300">
                           .portfolyo.tech
                         </span>
                       </div>
                     </div>
+
+                    {!canChangeSlug && portfolio?.is_published && nextSlugChangeDate && (
+                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <p className="text-xs text-yellow-800">
+                          ⚠️ Slug değişikliği 6 ayda bir kez yapılabilir. Sonraki değişiklik:{' '}
+                          {nextSlugChangeDate.toLocaleDateString('tr-TR')}
+                        </p>
+                      </div>
+                    )}
 
                     {publishError && (
                       <div className="mb-2 text-xs text-red-600">{publishError}</div>
@@ -849,7 +861,12 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                     <ButtonNew
                       variant="primary"
                       onClick={handlePublish}
-                      disabled={isPublishing || !publishSlug.trim() || selectedRepos.length === 0}
+                      disabled={
+                        isPublishing ||
+                        !publishSlug.trim() ||
+                        selectedRepos.length === 0 ||
+                        (portfolio?.is_published && !canChangeSlug)
+                      }
                       loading={isPublishing}
                       className="w-full"
                       size="sm"
