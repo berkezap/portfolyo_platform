@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { Github, Mail } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { data: session } = useSession();
 
   return (
     <footer className="bg-gray-900 text-gray-300 relative z-10">
@@ -19,8 +21,8 @@ export default function Footer() {
               <span className="text-xl font-bold text-white">PortfolYO</span>
             </div>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed">
-              GitHub projelerinizi birkaç tıkla profesyonel portfolyoya dönüştürün. 
-              Geliştiriciler için tasarlanmış modern platform.
+              GitHub projelerinizi birkaç tıkla profesyonel portfolyoya dönüştürün. Geliştiriciler
+              için tasarlanmış modern platform.
             </p>
             <div className="flex space-x-4">
               <a
@@ -44,22 +46,26 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-6 mt-12">Platform</h3>
             <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/my-portfolios"
-                  className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                  Portfolyolarım
-                </Link>
-              </li>
+              {session && (
+                <li>
+                  <Link
+                    href="/dashboard"
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              )}
+              {session && (
+                <li>
+                  <Link
+                    href="/my-portfolios"
+                    className="text-gray-400 hover:text-white transition-colors text-sm"
+                  >
+                    Portfolyolarım
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link
                   href="/pricing"
@@ -112,9 +118,9 @@ export default function Footer() {
             <span>Made with</span>
             <span className="text-red-400">♥</span>
             <span>by</span>
-            <a 
-              href="https://github.com/berkezap" 
-              target="_blank" 
+            <a
+              href="https://github.com/berkezap"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-blue-400 hover:text-blue-300 transition-colors"
             >

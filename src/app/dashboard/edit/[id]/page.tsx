@@ -306,8 +306,14 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
   }, [allRepos, selectedRepos, selectedTemplate, userBio, updatePortfolioMutation]);
 
   const handleViewPortfolio = useCallback(() => {
-    window.open(`/portfolio/${portfolioId}`, '_blank');
-  }, [portfolioId]);
+    if (portfolio?.is_published && portfolio?.public_slug) {
+      // Published portfolio - subdomain'e yönlendir
+      window.open(`http://${portfolio.public_slug}.portfolyo.tech`, '_blank');
+    } else {
+      // Draft portfolio - internal preview
+      window.open(`/portfolio/${portfolioId}`, '_blank');
+    }
+  }, [portfolioId, portfolio]);
 
   // Preview fonksiyonu - ZENGİN VERİ ile
   const handlePreview = useCallback(() => {
@@ -492,7 +498,9 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
               </div>
               <div>
                 <h3 className="text-base font-semibold text-green-900">Başarıyla güncellendi!</h3>
-                <p className="mt-1 text-sm text-green-700">Portfolio değişiklikleri kaydedildi. Ana sayfaya yönlendiriliyorsunuz...</p>
+                <p className="mt-1 text-sm text-green-700">
+                  Portfolio değişiklikleri kaydedildi. Ana sayfaya yönlendiriliyorsunuz...
+                </p>
               </div>
             </div>
           </div>
@@ -511,7 +519,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
               </div>
               <p className="text-gray-600 ml-11">Portfolyonuz için bir tasarım teması seçin</p>
             </div>
-            
+
             <div className="ml-11">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {templates.map((template) => (
@@ -541,11 +549,9 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
 
                       {/* Template Info */}
                       <div className="text-center">
-                        <h3 className="font-semibold text-gray-900 mb-1">
-                          {template.name}
-                        </h3>
+                        <h3 className="font-semibold text-gray-900 mb-1">{template.name}</h3>
                         <p className="text-xs text-gray-500 mb-3">{template.description}</p>
-                        
+
                         <div className="flex flex-wrap gap-1 justify-center mb-4">
                           {template.features.slice(0, 2).map((feature) => (
                             <span
@@ -597,7 +603,9 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                   </span>
                 </div>
               </div>
-              <p className="text-gray-600 ml-11">Portfolyonuzda gösterilecek GitHub projelerini seçin</p>
+              <p className="text-gray-600 ml-11">
+                Portfolyonuzda gösterilecek GitHub projelerini seçin
+              </p>
             </div>
 
             <div className="ml-11">
@@ -626,7 +634,9 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                       className="px-4 py-3 text-sm border border-gray-300 rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 min-w-[140px]"
                       style={{ backgroundColor: 'white', color: '#111827' }}
                     >
-                      <option value="" className="bg-white text-gray-900">Tüm Diller</option>
+                      <option value="" className="bg-white text-gray-900">
+                        Tüm Diller
+                      </option>
                       {repoLanguages.map((lang) => (
                         <option key={lang} value={lang} className="bg-white text-gray-900">
                           {lang}
@@ -668,7 +678,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                                   </div>
                                 )}
                               </div>
-                              
+
                               <p className="text-xs text-gray-600 mb-3 line-clamp-2">
                                 {repo.description || 'Bu proje için henüz bir açıklama eklenmemiş.'}
                               </p>
@@ -699,8 +709,12 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                       <div className="flex items-center gap-3">
                         <AlertCircle className="w-5 h-5 text-red-600" />
                         <div>
-                          <p className="text-red-800 font-medium text-sm">En az bir proje seçmelisiniz</p>
-                          <p className="text-red-700 text-xs mt-1">Portfolyonuzda gösterilecek projeler için seçim yapın</p>
+                          <p className="text-red-800 font-medium text-sm">
+                            En az bir proje seçmelisiniz
+                          </p>
+                          <p className="text-red-700 text-xs mt-1">
+                            Portfolyonuzda gösterilecek projeler için seçim yapın
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -715,7 +729,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
         <div className="fixed bottom-8 right-8 z-20 hidden xl:block">
           <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200 overflow-hidden min-w-[280px]">
             {/* Toggle Header - Always Visible */}
-            <div 
+            <div
               className="flex items-center gap-4 px-4 py-3 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => setIsPanelOpen(!isPanelOpen)}
             >
@@ -731,8 +745,8 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
                 <span className="text-xs text-gray-500">proje</span>
               </div>
               <div className="ml-auto">
-                <ChevronUp 
-                  className={`w-4 h-4 text-gray-400 transition-transform ${isPanelOpen ? 'rotate-180' : ''}`} 
+                <ChevronUp
+                  className={`w-4 h-4 text-gray-400 transition-transform ${isPanelOpen ? 'rotate-180' : ''}`}
                 />
               </div>
             </div>
@@ -741,116 +755,116 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
             {isPanelOpen && (
               <>
                 {portfolio?.status === 'published' && portfolio?.slug ? (
-              <div className="p-3">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-xs font-medium text-gray-700">Canlı</span>
-                  </div>
-                  <a 
-                    href={`https://${portfolio.slug}.portfolyo.tech`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-mono text-gray-600 hover:text-gray-800 hover:underline"
-                  >
-                    {portfolio.slug}.portfolyo.tech
-                  </a>
-                </div>
-                
-                <div className="flex gap-2">
-                  <ButtonNew
-                    variant="outline"
-                    onClick={() => window.open(`https://${portfolio.slug}.portfolyo.tech`, '_blank')}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                  </ButtonNew>
-                  
-                  <ButtonNew
-                    variant="outline"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`https://${portfolio.slug}.portfolyo.tech`);
-                    }}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </ButtonNew>
-                </div>
-                
-                <ButtonNew
-                  variant="ghost"
-                  onClick={handleUnpublish}
-                  disabled={isUnpublishing}
-                  loading={isUnpublishing}
-                  className="w-full mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
-                  size="sm"
-                >
-                  {isUnpublishing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      <Download className="w-3.5 h-3.5 mr-1.5" />
-                      <span className="text-xs">Yayından Kaldır</span>
-                    </>
-                  )}
-                </ButtonNew>
-              </div>
-            ) : (
-              <div className="p-3">
-                <div className="mb-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                    <span className="text-xs font-medium text-gray-700">Yayında Değil</span>
-                  </div>
-                  
-                  <div className="flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden">
-                    <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-r border-gray-300">
-                      https://
-                    </span>
-                    <input
-                      type="text"
-                      value={publishSlug}
-                      onChange={(e) => {
-                        const normalized = normalizeSlug(e.target.value);
-                        setPublishSlug(normalized);
-                        setPublishError(null);
-                      }}
-                      placeholder="web-adresiniz"
-                      className="flex-1 px-2 py-1.5 text-xs outline-none bg-white text-gray-900"
-                    />
-                    <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-l border-gray-300">
-                      .portfolyo.tech
-                    </span>
-                  </div>
-                </div>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-xs font-medium text-gray-700">Canlı</span>
+                      </div>
+                      <a
+                        href={`https://${portfolio.slug}.portfolyo.tech`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-mono text-gray-600 hover:text-gray-800 hover:underline"
+                      >
+                        {portfolio.slug}.portfolyo.tech
+                      </a>
+                    </div>
 
-                {publishError && (
-                  <div className="mb-2 text-xs text-red-600">
-                    {publishError}
+                    <div className="flex gap-2">
+                      <ButtonNew
+                        variant="outline"
+                        onClick={() =>
+                          window.open(`https://${portfolio.slug}.portfolyo.tech`, '_blank')
+                        }
+                        className="flex-1"
+                        size="sm"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </ButtonNew>
+
+                      <ButtonNew
+                        variant="outline"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`https://${portfolio.slug}.portfolyo.tech`);
+                        }}
+                        className="flex-1"
+                        size="sm"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </ButtonNew>
+                    </div>
+
+                    <ButtonNew
+                      variant="ghost"
+                      onClick={handleUnpublish}
+                      disabled={isUnpublishing}
+                      loading={isUnpublishing}
+                      className="w-full mt-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      size="sm"
+                    >
+                      {isUnpublishing ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <>
+                          <Download className="w-3.5 h-3.5 mr-1.5" />
+                          <span className="text-xs">Yayından Kaldır</span>
+                        </>
+                      )}
+                    </ButtonNew>
+                  </div>
+                ) : (
+                  <div className="p-3">
+                    <div className="mb-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                        <span className="text-xs font-medium text-gray-700">Yayında Değil</span>
+                      </div>
+
+                      <div className="flex items-stretch rounded-lg border border-gray-300 bg-white overflow-hidden">
+                        <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-r border-gray-300">
+                          https://
+                        </span>
+                        <input
+                          type="text"
+                          value={publishSlug}
+                          onChange={(e) => {
+                            const normalized = normalizeSlug(e.target.value);
+                            setPublishSlug(normalized);
+                            setPublishError(null);
+                          }}
+                          placeholder="web-adresiniz"
+                          className="flex-1 px-2 py-1.5 text-xs outline-none bg-white text-gray-900"
+                        />
+                        <span className="px-2 py-1.5 text-xs text-gray-500 bg-gray-50 border-l border-gray-300">
+                          .portfolyo.tech
+                        </span>
+                      </div>
+                    </div>
+
+                    {publishError && (
+                      <div className="mb-2 text-xs text-red-600">{publishError}</div>
+                    )}
+
+                    <ButtonNew
+                      variant="primary"
+                      onClick={handlePublish}
+                      disabled={isPublishing || !publishSlug.trim() || selectedRepos.length === 0}
+                      loading={isPublishing}
+                      className="w-full"
+                      size="sm"
+                    >
+                      {isPublishing ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <>
+                          <Globe className="w-3.5 h-3.5 mr-1.5" />
+                          <span className="text-xs">Yayınla</span>
+                        </>
+                      )}
+                    </ButtonNew>
                   </div>
                 )}
-
-                <ButtonNew
-                  variant="primary"
-                  onClick={handlePublish}
-                  disabled={isPublishing || !publishSlug.trim() || selectedRepos.length === 0}
-                  loading={isPublishing}
-                  className="w-full"
-                  size="sm"
-                >
-                  {isPublishing ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      <Globe className="w-3.5 h-3.5 mr-1.5" />
-                      <span className="text-xs">Yayınla</span>
-                    </>
-                  )}
-                </ButtonNew>
-              </div>
-            )}
               </>
             )}
           </div>
@@ -859,4 +873,3 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
     </div>
   );
 }
-  
