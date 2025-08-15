@@ -170,10 +170,18 @@ async function postHandler(request: NextRequest) {
     if (!demoMode) {
       const maxFreePortfolios = Number(process.env.FREE_TIER_MAX_PORTFOLIOS || 1);
       const userIdForLimit = user?.email || userData?.login || '';
+      console.log('🔢 Free tier limit kontrolü:', { maxFreePortfolios, userIdForLimit, demoMode });
       if (userIdForLimit) {
         try {
           const existing = await PortfolioService.getUserPortfolios(userIdForLimit);
+          console.log(
+            '📊 Mevcut portfolyo sayısı:',
+            existing.length,
+            'Max allowed:',
+            maxFreePortfolios,
+          );
           if (existing.length >= maxFreePortfolios) {
+            console.log('❌ Free tier limit aşıldı!');
             return NextResponse.json(
               {
                 error: 'Free tier limit exceeded',
@@ -182,6 +190,7 @@ async function postHandler(request: NextRequest) {
               { status: 403 },
             );
           }
+          console.log('✅ Free tier limit kontrolü geçti');
         } catch (e) {
           console.error('Free tier kontrolü hata:', e);
         }

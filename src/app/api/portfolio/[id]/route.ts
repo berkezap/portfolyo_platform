@@ -182,8 +182,15 @@ async function patchHandler(request: NextRequest, context: { params: Promise<{ i
 
         updatePayload.generated_html = newGeneratedHtml;
         // Free v1 kuralı: yayınlıysa canlı HTML de güncellensin
-        if (existingPortfolio.is_published) {
+        console.log('🔄 Portfolio publish status kontrolü:', {
+          status: existingPortfolio.status,
+          is_published: existingPortfolio.is_published,
+        });
+        if (existingPortfolio.status === 'published' || existingPortfolio.is_published) {
+          console.log('✅ Published portfolio - canlı HTML güncellenecek');
           (updatePayload as any).published_html = newGeneratedHtml;
+        } else {
+          console.log('📝 Draft portfolio - sadece generated_html güncellenecek');
         }
         updatePayload.metadata = PortfolioService.createMetadataFromTemplateData(
           templateData,
