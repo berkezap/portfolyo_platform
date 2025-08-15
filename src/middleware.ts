@@ -58,7 +58,8 @@ export function middleware(request: NextRequest) {
 
   // Security headers for production
   if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    // TEMPORARILY DISABLED: includeSubDomains removed until wildcard SSL is ready
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000');
 
     // Content Security Policy
     const csp = [

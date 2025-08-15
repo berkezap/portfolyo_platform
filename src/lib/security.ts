@@ -1,52 +1,52 @@
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from './auth'
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { supabaseAdmin, type Portfolio } from '@/lib/supabase'
-import { logUnauthorizedAccess } from '@/lib/securityMonitoring'
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from './auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { supabaseAdmin, type Portfolio } from '@/lib/supabase';
+import { logUnauthorizedAccess } from '@/lib/securityMonitoring';
 
 // CSRF token doğrulama şeması
 export const csrfTokenSchema = z.object({
-  csrfToken: z.string().min(1, 'CSRF token gerekli')
-})
+  csrfToken: z.string().min(1, 'CSRF token gerekli'),
+});
 
 // Kullanıcı yetkilendirme kontrolü
 export async function requireAuth(request: NextRequest) {
-  const session = await getServerSession(authOptions)
-  
+  const session = await getServerSession(authOptions);
+
   if (!session?.user?.id) {
     // Yetkisiz erişimi logla
-    const ip = getClientIP(request)
-    logUnauthorizedAccess(request, ip, 'no_session')
+    const ip = getClientIP(request);
+    logUnauthorizedAccess(request, ip, 'no_session');
     return {
       error: 'Unauthorized',
-      status: 401
-    }
+      status: 401,
+    };
   }
-  
-  return { session }
+
+  return { session };
 }
 
 // Portfolyo sahipliği kontrolü
 export async function requirePortfolioOwnership(portfolioId: string, userId: string) {
   // Supabase üzerinden gerçek sahiplik kontrolü yap
   try {
-    if (!portfolioId || !userId) return false
+    if (!portfolioId || !userId) return false;
 
     const { data, error } = await supabaseAdmin
       .from('portfolios')
       .select('id,user_id')
       .eq('id', portfolioId)
-      .single()
+      .single();
 
     if (error || !data) {
-      return false
+      return false;
     }
 
-    const isOwner = (data as Pick<Portfolio, 'user_id'>).user_id === userId
-    return isOwner
+    const isOwner = (data as Pick<Portfolio, 'user_id'>).user_id === userId;
+    return isOwner;
   } catch (_e) {
-    return false
+    return false;
   }
 }
 
@@ -66,7 +66,7 @@ export function sanitizeInput(input: string): string {
     .replace(/<meta\b[^>]*>/gi, '')
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/['"`]/g, '')
-    .trim()
+    .trim();
 }
 
 // SQL injection koruması için input validation
@@ -78,21 +78,18 @@ export function validateSQLInput(input: string): boolean {
     /(--)\/\*|\*\/|;/,
     /(\b(WAITFOR|DELAY)\b)/i,
     /(\b(BENCHMARK|SLEEP)\b)/i,
-  ]
-  
-  return !sqlPatterns.some(pattern => pattern.test(input))
+  ];
+
+  return !sqlPatterns.some((pattern) => pattern.test(input));
 }
 
 // Rate limit kontrolü için helper
 export function getClientIP(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const realIP = request.headers.get('x-real-ip')
-  const cfConnectingIP = request.headers.get('cf-connecting-ip')
-  
-  return forwarded?.split(',')[0]?.trim() || 
-         realIP || 
-         cfConnectingIP || 
-         '127.0.0.1'
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIP = request.headers.get('x-real-ip');
+  const cfConnectingIP = request.headers.get('cf-connecting-ip');
+
+  return forwarded?.split(',')[0]?.trim() || realIP || cfConnectingIP || '127.0.0.1';
 }
 
 // Güvenli response oluşturma
@@ -115,24 +112,25 @@ export function createSecureResponse(data: unknown, status: number = 200) {
       "form-action 'self'",
       'upgrade-insecure-requests',
     ].join('; '),
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()'
-  }
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  };
 
   // HSTS (sadece prod önerilir ama header zararsızdır)
-  headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
+  // TEMPORARILY DISABLED: includeSubDomains removed until wildcard SSL is ready
+  headers['Strict-Transport-Security'] = 'max-age=31536000; preload';
 
-  return NextResponse.json(data, { status, headers })
+  return NextResponse.json(data, { status, headers });
 }
 
 // Error response oluşturma
 export function createErrorResponse(message: string, status: number = 400) {
-  return createSecureResponse({ error: message }, status)
+  return createSecureResponse({ error: message }, status);
 }
 
 // Güvenli string validation
 export function isSafeString(input: string): boolean {
-  if (!input || typeof input !== 'string') return false
-  
+  if (!input || typeof input !== 'string') return false;
+
   const dangerousPatterns = [
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i,
     /javascript:/i,
@@ -144,7 +142,7 @@ export function isSafeString(input: string): boolean {
     /<embed\b[^>]*>/i,
     /<!--[\s\S]*?-->/,
     /['"`]/,
-  ]
-  
-  return !dangerousPatterns.some(pattern => pattern.test(input))
+  ];
+
+  return !dangerousPatterns.some((pattern) => pattern.test(input));
 }
