@@ -263,6 +263,7 @@ async function postHandler(request: NextRequest) {
         is_published: true,
         published_at: new Date().toISOString(),
         visibility: 'public',
+        published_html: portfolio.generated_html, // Bu satır eklendi - generated_html'i published_html'e kopyala
       })
       .eq('id', portfolioId)
       .select('id, public_slug, is_published, published_at')
