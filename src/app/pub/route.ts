@@ -37,13 +37,17 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Portfolio not found', { status: 404 });
     }
 
-    console.log('✅ Portfolio found, serving HTML');
+    console.log(
+      '✅ Portfolio found, serving HTML (published_html length:',
+      portfolio.published_html?.length || 0,
+      ')',
+    );
     // Return HTML with proper headers
     return new NextResponse(portfolio.published_html, {
       status: 200,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'public, max-age=300, s-maxage=600',
+        'Cache-Control': 'public, max-age=10, s-maxage=30', // Reduced cache for debugging
         'Content-Security-Policy':
           "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: https:; img-src * data: blob:; font-src * data:;",
         'X-Frame-Options': 'SAMEORIGIN',

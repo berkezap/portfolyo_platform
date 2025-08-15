@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
     const headers = new Headers();
     headers.set('Content-Type', 'text/html; charset=utf-8');
-    headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    headers.set('Cache-Control', 'public, max-age=10, s-maxage=30'); // Reduced cache for debugging
     headers.set(
       'Content-Security-Policy',
       "default-src 'none'; style-src 'self' 'unsafe-inline'; img-src https: data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'",
