@@ -17,7 +17,7 @@ function isValidUUID(str: string): boolean {
 
 async function postHandler(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  
+
   // UUID validation
   if (!isValidUUID(id)) {
     return createErrorResponse(
@@ -25,7 +25,7 @@ async function postHandler(request: NextRequest, context: { params: Promise<{ id
       'Portfolio ID must be a valid UUID',
       400,
       { endpoint: 'portfolio-publish', action: 'publish' },
-      { providedId: id }
+      { providedId: id },
     );
   }
 
@@ -82,7 +82,7 @@ async function postHandler(request: NextRequest, context: { params: Promise<{ id
   if (!updated)
     return NextResponse.json({ success: false, error: 'Publish failed' }, { status: 500 });
 
-  const publicUrl = `https://${normalized}.portfolyo.tech`;
+  const publicUrl = `http://${normalized}.portfolyo.tech`; // TODO: Change to HTTPS when SSL is ready
   return NextResponse.json({ success: true, publicUrl, portfolio: updated });
 }
 

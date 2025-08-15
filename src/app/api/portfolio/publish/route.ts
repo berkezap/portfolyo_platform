@@ -284,7 +284,7 @@ async function postHandler(request: NextRequest) {
       success: true,
       portfolioId,
       slug,
-      url: `https://${slug}.portfolyo.tech`,
+      url: `http://${slug}.portfolyo.tech`, // TODO: Change to HTTPS when SSL is ready
       message: 'Portfolio başarıyla yayınlandı!',
     });
   } catch (error) {
