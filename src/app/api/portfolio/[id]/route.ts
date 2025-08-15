@@ -18,10 +18,7 @@ function isValidUUID(str: string): boolean {
 }
 
 // GET - Portfolio detayını getir (public access)
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
     console.log('🔍 Portfolio detayı getiriliyor:', id);
@@ -33,7 +30,7 @@ export async function GET(
         'Portfolio ID must be a valid UUID',
         400,
         { endpoint: 'portfolio-get', action: 'get' },
-        { providedId: id }
+        { providedId: id },
       );
     }
 
@@ -64,9 +61,10 @@ export async function GET(
         published_at: portfolio.published_at,
         slug_last_changed_at: portfolio.slug_last_changed_at,
         slug_change_count: portfolio.slug_change_count,
-        // Legacy uyumluluğu için
-        public_slug: portfolio.slug,
-        is_published: portfolio.status === 'published',
+        // Database field'larını doğrudan kullan
+        public_slug: portfolio.public_slug,
+        is_published: portfolio.is_published,
+        visibility: portfolio.visibility,
       },
     });
   } catch (error) {
@@ -77,10 +75,7 @@ export async function GET(
 }
 
 // PATCH - Portfolio güncelle (requires authentication and ownership)
-async function patchHandler(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+async function patchHandler(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   try {
     // UUID validation
@@ -90,7 +85,7 @@ async function patchHandler(
         'Portfolio ID must be a valid UUID',
         400,
         { endpoint: 'portfolio-patch', action: 'update' },
-        { providedId: id }
+        { providedId: id },
       );
     }
 
@@ -240,10 +235,7 @@ async function patchHandler(
 export const PATCH = withRateLimit(patchHandler as any);
 
 // DELETE - Portfolio sil (requires authentication and ownership)
-async function deleteHandler(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> },
-) {
+async function deleteHandler(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
   try {
     // UUID validation
@@ -253,7 +245,7 @@ async function deleteHandler(
         'Portfolio ID must be a valid UUID',
         400,
         { endpoint: 'portfolio-delete', action: 'delete' },
-        { providedId: id }
+        { providedId: id },
       );
     }
 
