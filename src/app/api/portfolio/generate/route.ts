@@ -168,9 +168,15 @@ async function postHandler(request: NextRequest) {
 
     // 🧱 Free tier limiti kontrolü (sadece gerçek modda)
     if (!demoMode) {
-      const maxFreePortfolios = Number(process.env.FREE_TIER_MAX_PORTFOLIOS || 1);
+      // FORCE FREE TIER LIMIT TO 1
+      const maxFreePortfolios = 1; // Force to 1 regardless of env var
       const userIdForLimit = user?.email || userData?.login || '';
-      console.log('🔢 Free tier limit kontrolü:', { maxFreePortfolios, userIdForLimit, demoMode });
+      console.log('🔢 Free tier limit kontrolü (FORCED TO 1):', {
+        maxFreePortfolios,
+        userIdForLimit,
+        demoMode,
+        envVar: process.env.FREE_TIER_MAX_PORTFOLIOS,
+      });
       if (userIdForLimit) {
         try {
           const existing = await PortfolioService.getUserPortfolios(userIdForLimit);

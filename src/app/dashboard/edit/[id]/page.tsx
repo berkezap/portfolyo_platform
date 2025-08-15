@@ -291,6 +291,11 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
       public_slug: portfolio?.public_slug,
     });
 
+    // ALERT ile durumu göster
+    alert(
+      `Portfolio Status: ${portfolio?.status} | Published: ${portfolio?.is_published} | Slug: ${portfolio?.public_slug}`,
+    );
+
     if (!allRepos || selectedRepos.length === 0) {
       console.error('Repo seçimi gerekli');
       return;
