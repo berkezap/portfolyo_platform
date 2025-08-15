@@ -294,6 +294,7 @@ export default function DashboardPage() {
   const [step, setStep] = useState<StepType>('repos');
   const [portfolioId, setPortfolioId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({
     isOpen: false,
     templateId: null,
@@ -444,6 +445,11 @@ export default function DashboardPage() {
 
       console.log('✅ Portfolio yayınlandı:', data);
 
+      // Published URL'i kaydet
+      if (data.url) {
+        setPublishedUrl(data.url);
+      }
+
       // Portfolio listesini yenile ve completed adımına geç
       await refetchPortfolios();
       setStep('completed');
@@ -568,6 +574,7 @@ export default function DashboardPage() {
                   portfolioResult={result}
                   demoMode={demoMode}
                   userName={session?.user?.name || undefined}
+                  publishedUrl={publishedUrl || undefined}
                   onNewPortfolio={() => {
                     setStep('repos');
                     clearResult();

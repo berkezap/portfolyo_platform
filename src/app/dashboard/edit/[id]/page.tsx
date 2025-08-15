@@ -754,7 +754,7 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
             {/* Collapsible Content */}
             {isPanelOpen && (
               <>
-                {portfolio?.status === 'published' && portfolio?.slug ? (
+                {portfolio?.is_published && portfolio?.public_slug ? (
                   <div className="p-3">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">

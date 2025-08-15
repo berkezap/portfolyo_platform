@@ -18,15 +18,21 @@ interface CompletedStepProps {
   demoMode: boolean;
   userName?: string;
   onNewPortfolio: () => void;
+  publishedUrl?: string; // Published portfolio URL
 }
 
 export function CompletedStep({
   portfolioResult,
   demoMode: _demoMode,
   onNewPortfolio,
+  publishedUrl,
 }: CompletedStepProps) {
   const handleViewPortfolio = () => {
-    if (portfolioResult?.success && portfolioResult?.html) {
+    if (publishedUrl) {
+      // Published portfolio - subdomain'e git
+      window.open(publishedUrl, '_blank');
+    } else if (portfolioResult?.success && portfolioResult?.html) {
+      // Fallback - blob URL
       const blob = new Blob([portfolioResult.html], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank');
