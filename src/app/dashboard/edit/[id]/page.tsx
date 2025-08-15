@@ -284,6 +284,12 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
 
   const handleSave = useCallback(async () => {
     console.log('Kaydet tıklandı');
+    console.log('📊 Portfolio mevcut durumu:', {
+      id: portfolio?.id,
+      status: portfolio?.status,
+      is_published: portfolio?.is_published,
+      public_slug: portfolio?.public_slug,
+    });
 
     if (!allRepos || selectedRepos.length === 0) {
       console.error('Repo seçimi gerekli');
