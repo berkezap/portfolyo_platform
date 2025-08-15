@@ -186,7 +186,10 @@ async function patchHandler(request: NextRequest, context: { params: Promise<{ i
           status: existingPortfolio.status,
           is_published: existingPortfolio.is_published,
         });
-        if (existingPortfolio.status === 'published' || existingPortfolio.is_published) {
+        // Portfolio published ise (is_published prioritesi)
+        const isPublished =
+          existingPortfolio.is_published === true || existingPortfolio.status === 'published';
+        if (isPublished) {
           console.log('✅ Published portfolio - canlı HTML güncellenecek');
           (updatePayload as any).published_html = newGeneratedHtml;
         } else {
