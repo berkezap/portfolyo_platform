@@ -5,10 +5,41 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
 
-  // Güvenlik headers'ları (CSP temporarily removed for Vercel cache issues)
+  // Güvenlik headers'ları
   async headers() {
-    // SKIP ALL CSP HEADERS FOR NOW - TESTING ONLY
-    return []
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://browser.sentry-cdn.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://api.github.com https://*.supabase.co https://api.stripe.com https://*.sentry.io",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; ')
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          }
+        ]
+      }
+    ]
   },
 
   images: {

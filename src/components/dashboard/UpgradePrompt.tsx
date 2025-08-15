@@ -13,13 +13,25 @@ interface UpgradePromptProps {
 export default function UpgradePrompt({ currentPlan, className = '' }: UpgradePromptProps) {
   if (currentPlan !== 'FREE') return null;
 
-  const handleWaitlistSignup = () => {
+  const handleWaitlistSignup = async () => {
     const email = prompt(
       '🚀 Get notified when Pro launches (Q2 2025):\n\n• 50% off first 3 months\n• Premium templates\n• Custom domains\n• Advanced analytics\n\nEnter your email:',
     );
     if (email && email.includes('@')) {
-      alert("🎉 Thanks! We'll notify you when Pro is ready with your early bird discount!");
-      // TODO: Add to waitlist API
+      try {
+        const response = await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, feature: 'pro', source: 'upgrade_prompt' }),
+        });
+        if (response.ok) {
+          alert("🎉 Thanks! We'll notify you when Pro is ready with your early bird discount!");
+        } else {
+          alert('⚠️ Something went wrong, please try again later.');
+        }
+      } catch (error) {
+        alert('⚠️ Something went wrong, please try again later.');
+      }
     }
   };
 

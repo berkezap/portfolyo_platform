@@ -10,8 +10,8 @@ const hasThirdPartyConsent = (() => {
   }
 })();
 
-if (false && process.env.NEXT_PUBLIC_SENTRY_DSN && hasThirdPartyConsent) {
-  // TEMP: Sentry disabled for CSP testing
+if (process.env.NEXT_PUBLIC_SENTRY_DSN && hasThirdPartyConsent) {
+  // Sentry enabled with consent
   try {
     Sentry.init({
       dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,

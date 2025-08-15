@@ -100,14 +100,26 @@ export default function PricingPlans() {
             {/* Coming Soon Button with Email Collection */}
             <div className="space-y-3">
               <button
-                onClick={() => {
+                onClick={async () => {
                   // Email collection modal or redirect to waitlist
                   const email = prompt('Pro lansmanından haberdar olun! E-postanızı girin:');
                   if (email && email.includes('@')) {
-                    alert(
-                      '🎉 Teşekkürler! Pro hazır olduğunda erken kuş indiriminizle birlikte size haber vereceğiz!',
-                    );
-                    // TODO: Add to waitlist API
+                    try {
+                      const response = await fetch('/api/waitlist', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, feature: 'pro', source: 'pricing_page' }),
+                      });
+                      if (response.ok) {
+                        alert(
+                          '🎉 Teşekkürler! Pro hazır olduğunda erken kuş indiriminizle birlikte size haber vereceğiz!',
+                        );
+                      } else {
+                        alert('⚠️ Bir sorun oluştu, lütfen daha sonra tekrar deneyin.');
+                      }
+                    } catch (error) {
+                      alert('⚠️ Bir sorun oluştu, lütfen daha sonra tekrar deneyin.');
+                    }
                   }
                 }}
                 className="w-full py-2.5 px-4 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors"
