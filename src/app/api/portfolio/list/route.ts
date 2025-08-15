@@ -61,6 +61,13 @@ async function getHandler(request: Request) {
       createdAt: portfolio.created_at,
       updatedAt: portfolio.updated_at,
       metadata: portfolio.metadata || {},
+      // Publishing fields
+      is_published: portfolio.is_published,
+      public_slug: portfolio.public_slug,
+      slug: portfolio.slug,
+      status: portfolio.status,
+      published_at: portfolio.published_at,
+      visibility: portfolio.visibility,
     }));
 
     return NextResponse.json({
