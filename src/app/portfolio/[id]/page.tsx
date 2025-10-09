@@ -12,6 +12,7 @@ interface Portfolio {
   selected_repos: string[];
   cv_url?: string;
   generated_html?: string;
+  published_html?: string;
   metadata?: {
     user?: string;
     repoCount?: number;
@@ -185,8 +186,17 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
-      if (data.success && data.portfolio?.generated_html) {
-        setPortfolio(data.portfolio);
+      if (data.success && data.portfolio) {
+        // Önce published_html'i kontrol et (yayınlanmış portfolio için), yoksa generated_html kullan
+        const htmlToShow = data.portfolio.published_html || data.portfolio.generated_html;
+        if (htmlToShow) {
+          setPortfolio({
+            ...data.portfolio,
+            generated_html: htmlToShow,
+          });
+        } else {
+          setError('Portfolio HTML bulunamadı.');
+        }
       } else {
         setError(data.error || 'Portfolio could not be loaded.');
       }

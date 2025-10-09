@@ -18,8 +18,10 @@ async function postHandler(request: NextRequest) {
   try {
     console.log('🚀 Portfolio Publish API çağrıldı!');
 
-    // Demo mode kontrolü: Demo'da DB yerine direkt başarı dön
+    // Environment kontrolü
+    const isDevelopment = process.env.NODE_ENV === 'development';
     const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
     if (demoMode) {
       const body = await request.json();
       const parsed = publishSchema.safeParse(body);
@@ -86,6 +88,7 @@ async function postHandler(request: NextRequest) {
         slug,
         url: `https://${slug}.portfolyo.tech`,
         message: 'Portfolio (demo) başarıyla yayınlandı!',
+        isDevelopment: false,
       });
     }
 
@@ -255,16 +258,18 @@ async function postHandler(request: NextRequest) {
       );
     }
 
-    // Portfolio yayınlama
+    // Portfolio yayınlama - Development modunda gerçekten yayınlama
+    const updateData = {
+      public_slug: slug,
+      is_published: !isDevelopment, // Development'ta false, production'da true
+      visibility: isDevelopment ? 'unlisted' : 'public', // Development'ta unlisted
+      published_html: portfolio.generated_html,
+      ...(isDevelopment ? {} : { published_at: new Date().toISOString() }), // Development'ta published_at güncelleme
+    };
+
     const { data: updatedPortfolio, error: updateError } = await supabaseAdmin
       .from('portfolios')
-      .update({
-        public_slug: slug,
-        is_published: true,
-        published_at: new Date().toISOString(),
-        visibility: 'public',
-        published_html: portfolio.generated_html, // Bu satır eklendi - generated_html'i published_html'e kopyala
-      })
+      .update(updateData)
       .eq('id', portfolioId)
       .select('id, public_slug, is_published, published_at')
       .single();
@@ -280,12 +285,28 @@ async function postHandler(request: NextRequest) {
       );
     }
 
+    // Development modunda local preview URL, production'da subdomain
+    const baseUrl = isDevelopment
+      ? `http://localhost:${process.env.PORT || 3000}`
+      : `https://${slug}.portfolyo.tech`;
+
+    const portfolioUrl = isDevelopment ? `${baseUrl}/portfolio/${slug}` : baseUrl;
+
+    console.log(
+      isDevelopment
+        ? `🔧 Development mode: Portfolio preview hazır (yayınlanmadı): ${portfolioUrl}`
+        : `✅ Production mode: Portfolio yayınlandı: ${portfolioUrl}`,
+    );
+
     return NextResponse.json({
       success: true,
       portfolioId,
       slug,
-      url: `http://${slug}.portfolyo.tech`, // TODO: Change to HTTPS when SSL is ready
-      message: 'Portfolio başarıyla yayınlandı!',
+      url: portfolioUrl,
+      message: isDevelopment
+        ? 'Portfolio preview hazır! (Development modunda - henüz yayınlanmadı)'
+        : 'Portfolio başarıyla yayınlandı!',
+      isDevelopment,
     });
   } catch (error) {
     console.error('❌ Portfolio publish hatası:', error);

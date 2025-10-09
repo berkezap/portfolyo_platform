@@ -19,6 +19,8 @@ interface CompletedStepProps {
   userName?: string;
   onNewPortfolio: () => void;
   publishedUrl?: string; // Published portfolio URL
+  isDevelopment?: boolean; // Development mode indicator
+  portfolioId?: string; // Portfolio ID for direct edit
 }
 
 export function CompletedStep({
@@ -26,10 +28,12 @@ export function CompletedStep({
   demoMode: _demoMode,
   onNewPortfolio,
   publishedUrl,
+  isDevelopment,
+  portfolioId,
 }: CompletedStepProps) {
   const handleViewPortfolio = () => {
     if (publishedUrl) {
-      // Published portfolio - subdomain'e git
+      // Published portfolio veya development preview
       window.open(publishedUrl, '_blank');
     } else if (portfolioResult?.success && portfolioResult?.html) {
       // Fallback - blob URL
@@ -78,7 +82,12 @@ export function CompletedStep({
   };
 
   const handleManagePortfolios = () => {
-    window.location.href = '/my-portfolios';
+    // Eğer portfolioId varsa direkt edit sayfasına git, yoksa portfolio listesine
+    if (portfolioId) {
+      window.location.href = `/dashboard/edit/${portfolioId}`;
+    } else {
+      window.location.href = '/my-portfolios';
+    }
   };
 
   return (
@@ -88,7 +97,18 @@ export function CompletedStep({
         {portfolioResult?.success ? (
           <div>
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">Tebrikler!</h2>
-            <p className="text-sm text-gray-500">Portfolyonuz başarıyla oluşturuldu.</p>
+            {isDevelopment ? (
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">Portfolio preview hazır!</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <span className="text-xs font-medium text-yellow-800">
+                    🔧 Development Mode - Henüz yayınlanmadı
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">Portfolyonuz başarıyla yayınlandı!</p>
+            )}
           </div>
         ) : (
           <div>

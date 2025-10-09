@@ -95,8 +95,13 @@ export default function MyPortfoliosPage() {
     const portfolio = portfolios.find((p) => p.id === portfolioId);
 
     if (portfolio?.is_published && portfolio?.public_slug) {
-      // Published portfolio - subdomain'e git
-      window.open(`http://${portfolio.public_slug}.portfolyo.tech`, '_blank');
+      // Published portfolio - environment'a göre URL oluştur
+      const isDevelopment =
+        window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const portfolioUrl = isDevelopment
+        ? `http://localhost:${window.location.port || 3000}/portfolio/${portfolio.public_slug}`
+        : `https://${portfolio.public_slug}.portfolyo.tech`;
+      window.open(portfolioUrl, '_blank');
     } else {
       // Draft portfolio - internal preview
       window.open(`/portfolio/${portfolioId}`, '_blank');

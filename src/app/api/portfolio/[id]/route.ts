@@ -23,18 +23,17 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     const { id } = await context.params;
     console.log('🔍 Portfolio detayı getiriliyor:', id);
 
-    // UUID validation
-    if (!isValidUUID(id)) {
-      return createErrorResponse(
-        'Invalid portfolio ID format',
-        'Portfolio ID must be a valid UUID',
-        400,
-        { endpoint: 'portfolio-get', action: 'get' },
-        { providedId: id },
-      );
-    }
+    let portfolio;
 
-    const portfolio = await PortfolioService.getPortfolio(id);
+    // UUID mi yoksa slug mu kontrol et
+    if (isValidUUID(id)) {
+      // UUID ile arama
+      portfolio = await PortfolioService.getPortfolio(id);
+    } else {
+      // Slug ile arama
+      console.log('📝 Slug ile portfolio aranıyor:', id);
+      portfolio = await PortfolioService.getPortfolioBySlug(id);
+    }
 
     if (!portfolio) {
       console.log('❌ Portfolio bulunamadı:', id);
@@ -52,6 +51,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
         selected_repos: portfolio.selected_repos,
         cv_url: portfolio.cv_url,
         generated_html: portfolio.generated_html,
+        published_html: portfolio.published_html,
         metadata: portfolio.metadata,
         created_at: portfolio.created_at,
         updated_at: portfolio.updated_at,
@@ -186,11 +186,13 @@ async function patchHandler(request: NextRequest, context: { params: Promise<{ i
           status: existingPortfolio.status,
           is_published: existingPortfolio.is_published,
         });
-        // Portfolio published ise (is_published prioritesi)
+        // Portfolio published ise veya public_slug varsa (development preview için)
         const isPublished =
           existingPortfolio.is_published === true || existingPortfolio.status === 'published';
-        if (isPublished) {
-          console.log('✅ Published portfolio - canlı HTML güncellenecek');
+        const hasPublicSlug = !!existingPortfolio.public_slug;
+
+        if (isPublished || hasPublicSlug) {
+          console.log('✅ Published/Preview portfolio - canlı HTML güncellenecek');
           (updatePayload as any).published_html = newGeneratedHtml;
         } else {
           console.log('📝 Draft portfolio - sadece generated_html güncellenecek');

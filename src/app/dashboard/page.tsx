@@ -295,6 +295,7 @@ export default function DashboardPage() {
   const [portfolioId, setPortfolioId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
+  const [isDevelopment, setIsDevelopment] = useState<boolean>(false);
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; templateId: number | null }>({
     isOpen: false,
     templateId: null,
@@ -422,6 +423,11 @@ export default function DashboardPage() {
       return;
     }
 
+    // Portfolio ID'yi state'e kaydet (eğer yoksa)
+    if (!portfolioId) {
+      setPortfolioId(currentPortfolioId);
+    }
+
     setGenerating(true);
     setCvError(null);
 
@@ -445,10 +451,15 @@ export default function DashboardPage() {
 
       console.log('✅ Portfolio yayınlandı:', data);
 
-      // Published URL'i kaydet
+      // Published URL'i ve development mode'u kaydet
       if (data.url) {
         setPublishedUrl(data.url);
       }
+      // Response'tan gelen portfolioId ile state'i güncelle
+      if (data.portfolioId && data.portfolioId !== portfolioId) {
+        setPortfolioId(data.portfolioId);
+      }
+      setIsDevelopment(data.isDevelopment || false);
 
       // Portfolio listesini yenile ve completed adımına geç
       await refetchPortfolios();
@@ -575,6 +586,8 @@ export default function DashboardPage() {
                   demoMode={demoMode}
                   userName={session?.user?.name || undefined}
                   publishedUrl={publishedUrl || undefined}
+                  isDevelopment={isDevelopment}
+                  portfolioId={portfolioId || undefined}
                   onNewPortfolio={() => {
                     setStep('repos');
                     clearResult();
@@ -582,6 +595,8 @@ export default function DashboardPage() {
                     setSelectedTemplate(1);
                     setCvUrl(null);
                     setCvError(null);
+                    setIsDevelopment(false);
+                    setPortfolioId(null);
                   }}
                 />
               </div>
