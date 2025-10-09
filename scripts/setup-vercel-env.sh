@@ -3,7 +3,8 @@
 # ====================================
 # Vercel Environment Variables Kurulum Script'i
 # ====================================
-# Bu script production secret'larını Vercel'e ekler
+# ⚠️  GÜVENLİK: Bu script artık .env.local'den okur
+# ⚠️  Asla gerçek secret'ları bu dosyaya yazmayın!
 
 set -e
 
@@ -17,6 +18,18 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# .env.local kontrolü
+if [ ! -f ".env.local" ]; then
+    echo -e "${RED}❌ .env.local dosyası bulunamadı!${NC}"
+    echo "Lütfen önce .env.local dosyasını oluşturun (env.example'dan kopyalayın)"
+    exit 1
+fi
+
+# .env.local'i yükle
+set -a
+source .env.local
+set +a
 
 # Vercel CLI kontrolü
 if ! command -v vercel &> /dev/null; then
@@ -45,6 +58,10 @@ echo ""
 add_env() {
     local key=$1
     local value=$2
+    if [ -z "$value" ]; then
+        echo -e "${RED}❌ $key değeri boş!${NC}"
+        return 1
+    fi
     echo -e "${BLUE}Adding: $key${NC}"
     echo "$value" | vercel env add "$key" production
 }
@@ -55,20 +72,20 @@ echo ""
 # NextAuth
 echo "1️⃣  NextAuth Configuration"
 add_env "NODE_ENV" "production"
-add_env "NEXTAUTH_URL" "https://portfolyoplatform.vercel.app"
-add_env "NEXTAUTH_SECRET" "ZBdt47OxURN36ZTgln2QBI3BslS+/70BZqUgjI4wkvE="
+add_env "NEXTAUTH_URL" "${NEXTAUTH_URL}"
+add_env "NEXTAUTH_SECRET" "${NEXTAUTH_SECRET}"
 add_env "NEXTAUTH_DEBUG" "false"
 
 # GitHub OAuth
 echo ""
 echo "2️⃣  GitHub OAuth"
-add_env "GITHUB_CLIENT_ID" "Ov23lilgi6pmncXFhwhJ"
-add_env "GITHUB_CLIENT_SECRET" "a7c19d72ee673b1f2aeef9275c2c714675f07a02"
+add_env "GITHUB_CLIENT_ID" "${GITHUB_CLIENT_ID}"
+add_env "GITHUB_CLIENT_SECRET" "${GITHUB_CLIENT_SECRET}"
 
 # App Config
 echo ""
 echo "3️⃣  App Configuration"
-add_env "NEXT_PUBLIC_APP_URL" "https://portfolyoplatform.vercel.app"
+add_env "NEXT_PUBLIC_APP_URL" "${NEXT_PUBLIC_APP_URL}"
 add_env "NEXT_PUBLIC_APP_NAME" "PortfolYO"
 add_env "NEXT_PUBLIC_DEMO_MODE" "false"
 add_env "NEXT_PUBLIC_DEBUG" "false"
@@ -76,21 +93,21 @@ add_env "NEXT_PUBLIC_DEBUG" "false"
 # Supabase
 echo ""
 echo "4️⃣  Supabase Database"
-add_env "NEXT_PUBLIC_SUPABASE_URL" "https://srgvpcwbcjsuostcexmn.supabase.co"
-add_env "NEXT_PUBLIC_SUPABASE_ANON_KEY" "your-supabase-anon-key"
-add_env "SUPABASE_SERVICE_ROLE_KEY" "your-supabase-service-role-key"
+add_env "NEXT_PUBLIC_SUPABASE_URL" "${NEXT_PUBLIC_SUPABASE_URL}"
+add_env "NEXT_PUBLIC_SUPABASE_ANON_KEY" "${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+add_env "SUPABASE_SERVICE_ROLE_KEY" "${SUPABASE_SERVICE_ROLE_KEY}"
 
 # Redis
 echo ""
 echo "5️⃣  Upstash Redis"
-add_env "UPSTASH_REDIS_REST_URL" "https://devoted-joey-37674.upstash.io"
-add_env "UPSTASH_REDIS_REST_TOKEN" "AZMqAAIncDEyN2RjNGE0ODM3YjA0YjJkOTMyOTEyNGRiZGQzYzZmMXAxMzc2NzQ"
+add_env "UPSTASH_REDIS_REST_URL" "${UPSTASH_REDIS_REST_URL}"
+add_env "UPSTASH_REDIS_REST_TOKEN" "${UPSTASH_REDIS_REST_TOKEN}"
 
 # Sentry
 echo ""
 echo "7️⃣  Sentry Error Tracking"
-add_env "SENTRY_DSN" "https://e04cc32d6cd56ec3fb7970efe6a92ef2@o4509645266485248.ingest.de.sentry.io/4509645272449104"
-add_env "NEXT_PUBLIC_SENTRY_DSN" "https://e04cc32d6cd56ec3fb7970efe6a92ef2@o4509645266485248.ingest.de.sentry.io/4509645272449104"
+add_env "SENTRY_DSN" "${SENTRY_DSN}"
+add_env "NEXT_PUBLIC_SENTRY_DSN" "${NEXT_PUBLIC_SENTRY_DSN}"
 
 echo ""
 echo "===================================================="
