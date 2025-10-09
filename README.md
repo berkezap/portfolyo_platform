@@ -23,8 +23,7 @@ A full-stack SaaS platform that automatically generates beautiful portfolio webs
 **Backend:** Supabase (PostgreSQL + Storage)  
 **Authentication:** NextAuth.js (GitHub OAuth)  
 **Styling:** Tailwind CSS + shadcn/ui  
-**Deployment:** Vercel (Edge Functions)  
-**Payments:** Stripe (subscription billing)
+**Deployment:** Vercel (Edge Functions)
 
 ## Key Features I Built
 
@@ -45,12 +44,6 @@ A full-stack SaaS platform that automatically generates beautiful portfolio webs
 - Subdomain routing (middleware-based)
 - Environment-aware deployment (dev/staging/prod)
 - SEO-optimized generated HTML
-
-### 4. Subscription System
-
-- Stripe integration for premium features
-- Webhook handling for payment events
-- Usage-based limits
 
 ## Development Workflow
 
@@ -76,8 +69,7 @@ src/
 ├── components/ # React components
 ├── lib/
 │ ├── auth.ts # NextAuth config
-│ ├── supabase.ts # Database client
-│ └── stripe.ts # Payment integration
+│ └── supabase.ts # Database client
 └── middleware.ts # Auth + routing
 \`\`\`
 

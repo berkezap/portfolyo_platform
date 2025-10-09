@@ -36,17 +36,7 @@ check_env() {
     fi
 }
 
-check_stripe_mode() {
-    if [[ "$STRIPE_SECRET_KEY" == sk_test_* ]]; then
-        echo -e "${RED}❌ STRIPE_SECRET_KEY test mode'da! Production'da sk_live_* kullanmalısın${NC}"
-        ((ERRORS++))
-    elif [[ "$STRIPE_SECRET_KEY" == sk_live_* ]]; then
-        echo -e "${GREEN}✅ STRIPE_SECRET_KEY live mode${NC}"
-    else
-        echo -e "${YELLOW}⚠️  STRIPE_SECRET_KEY formatı tanınmadı${NC}"
-        ((WARNINGS++))
-    fi
-}
+# Stripe checks removed - payment system not currently used
 
 check_url_https() {
     local var_name=$1
@@ -96,11 +86,6 @@ check_env "NEXT_PUBLIC_SUPABASE_URL" "your"
 check_url_https "NEXT_PUBLIC_SUPABASE_URL"
 check_env "NEXT_PUBLIC_SUPABASE_ANON_KEY" "your"
 check_env "SUPABASE_SERVICE_ROLE_KEY" "your"
-
-# Stripe
-check_env "STRIPE_SECRET_KEY" "your"
-check_env "STRIPE_PUBLISHABLE_KEY" "your"
-check_stripe_mode
 
 # Redis
 check_env "UPSTASH_REDIS_REST_URL" "your"
