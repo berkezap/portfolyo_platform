@@ -84,7 +84,10 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
   };
 
   const isValid = slug.length >= 3 && !slugError && !checkingSlug;
-  const previewUrl = `https://${slug}.portfolyo.tech`;
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const previewUrl = isDevelopment
+    ? `http://localhost:3000/portfolio/${slug}`
+    : `https://${slug}.portfolyo.tech`;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -107,9 +110,14 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Portfolio Web Adresiniz
+                {isDevelopment && (
+                  <span className="text-orange-600 text-xs ml-2">(Development Mode)</span>
+                )}
               </label>
               <div className="flex items-center text-lg">
-                <span className="text-gray-600">https://</span>
+                <span className="text-gray-600">
+                  {isDevelopment ? 'http://localhost:3000/portfolio/' : 'https://'}
+                </span>
                 <input
                   type="text"
                   value={slug}
@@ -119,7 +127,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                   maxLength={30}
                   disabled={loading}
                 />
-                <span className="text-gray-600">.portfolyo.tech</span>
+                <span className="text-gray-600">{isDevelopment ? '' : '.portfolyo.tech'}</span>
               </div>
             </div>
 

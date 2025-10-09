@@ -1,6 +1,17 @@
 import { type NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 
+// Vercel preview URL'leri için dinamik base URL
+const getBaseUrl = () => {
+  if (process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'http://localhost:3000';
+};
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({

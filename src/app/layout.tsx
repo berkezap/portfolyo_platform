@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-title': 'PortfolYO',
     // TEMP: Override CSP for Supabase Storage
     'Content-Security-Policy':
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://*.ingest.de.sentry.io https://api.stripe.com; img-src 'self' data: https:; font-src 'self' data:;",
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://*.ingest.de.sentry.io; img-src 'self' data: https:; font-src 'self' data:;",
     'mobile-web-app-capable': 'yes',
   },
   alternates: {

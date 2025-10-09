@@ -82,7 +82,10 @@ async function postHandler(request: NextRequest, context: { params: Promise<{ id
   if (!updated)
     return NextResponse.json({ success: false, error: 'Publish failed' }, { status: 500 });
 
-  const publicUrl = `http://${normalized}.portfolyo.tech`; // TODO: Change to HTTPS when SSL is ready
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const publicUrl = isDevelopment
+    ? `http://localhost:3000/portfolio/${normalized}`
+    : `http://${normalized}.portfolyo.tech`; // TODO: Change to HTTPS when SSL is ready
   return NextResponse.json({ success: true, publicUrl, portfolio: updated });
 }
 
