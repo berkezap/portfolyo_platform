@@ -15,5 +15,20 @@
   },
   "files.associations": {
     "*.css": "tailwindcss"
+  },
+
+  // 🚀 PortfolYO Git Workflow Protection
+  "git.branchProtection": ["main"],
+  "git.branchProtectionPrompt": "alwaysPrompt",
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "git.inputValidation": true,
+  "git.inputValidationLength": 72,
+
+  // 📝 Workflow reminder in status bar
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#1a472a",
+    "statusBar.foreground": "#00ff88"
   }
-} 
+}

@@ -2,6 +2,22 @@
 
 GitHub projelerinizi 5 dakikada profesyonel portfolyoya dönüştüren platform.
 
+---
+
+## ⚠️ ÖNEMLİ: GIT WORKFLOW (MUTLAKA OKU!)
+
+**Her commit öncesi hatırla:**
+
+```
+feature → preview → main
+```
+
+**Doğrudan `main` branch'e push YAPMA!**
+
+👉 **Detaylı kılavuz:** [docs/WORKFLOW.md](./docs/WORKFLOW.md)
+
+---
+
 ## Özellikler
 
 - ** Hızlı Oluşturma**: 5 dakikada portfolyo

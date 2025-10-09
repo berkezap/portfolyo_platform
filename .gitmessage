@@ -1,0 +1,18 @@
+# 🚀 PortfolYO Commit
+
+# ⚠️  WORKFLOW REMINDER:
+# feature → preview → main
+# 
+# 1️⃣  Feature branch'te çalış
+# 2️⃣  Preview'da test et (portfolyoplatform-git-preview-...vercel.app)
+# 3️⃣  Production'a al (portfolyo.tech)
+#
+# 📖 Detaylı bilgi: docs/WORKFLOW.md
+
+# Type: feat|fix|docs|style|refactor|test|chore
+# Scope: (optional) api|ui|db|auth|etc
+# Subject: Kısa açıklama (50 karakter max)
+#
+# Body: (optional) Detaylı açıklama
+#
+# Breaking change: (optional) BREAKING CHANGE: açıklama
