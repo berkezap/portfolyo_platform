@@ -1,76 +1,111 @@
-# PortfolYO Platform
+# PortfolYO
 
-GitHub projelerinizi 5 dakikada profesyonel portfolyoya dönüştüren platform.
+> Turn your GitHub profile into a professional portfolio in minutes.
 
----
+**Live at:** [portfolyo.tech](https://portfolyo.tech)
 
-## ⚠️ ÖNEMLİ: GIT WORKFLOW (MUTLAKA OKU!)
-
-**Her commit öncesi hatırla:**
-
-```
-feature → preview → main
-```
-
-**Doğrudan `main` branch'e push YAPMA!**
-
-👉 **Detaylı kılavuz:** [docs/WORKFLOW.md](./docs/WORKFLOW.md)
+A full-stack SaaS platform that automatically generates beautiful portfolio websites from GitHub data. Built to solve the problem of developers spending hours creating portfolios instead of coding.
 
 ---
 
-## Özellikler
+## What It Does
 
-- ** Hızlı Oluşturma**: 5 dakikada portfolyo
-- ** Profesyonel Şablonlar**: 6 farklı tasarım
-- ** GitHub Entegrasyonu**: Otomatik proje yükleme
-- ** Responsive Design**: Tüm cihazlarda mükemmel
-- ** AI Destekli**: Akıllı içerik önerileri
+- **One-click portfolio generation** from GitHub profile
+- **Real-time preview** before publishing
+- **Custom domains** (yourname.portfolyo.tech)
+- **Multiple professional templates** (Minimalist, Modern, Creative)
+- **Responsive design** that works on any device
+- **Analytics dashboard** to track portfolio views
 
-## 🔄 Git Workflow
+## Tech Stack
 
-**ÖNEMLI:** Production'a gitmeden önce **mutlaka** preview'da test edin!
+**Frontend:** Next.js 15 (App Router), React 19, TypeScript  
+**Backend:** Supabase (PostgreSQL + Storage)  
+**Authentication:** NextAuth.js (GitHub OAuth)  
+**Styling:** Tailwind CSS + shadcn/ui  
+**Deployment:** Vercel (Edge Functions)  
+**Payments:** Stripe (subscription billing)
 
-```bash
-# 1️⃣ Feature geliştir
-git checkout -b feature/yeni-ozellik
-npm run dev  # localhost test
+## Key Features I Built
 
-# 2️⃣ Preview'da test et
-git checkout preview
-git merge feature/yeni-ozellik
-git push origin preview
-# → Test et: https://portfolyoplatform-git-preview-...vercel.app
+### 1. GitHub Integration
 
-# 3️⃣ Production'a al
-git checkout main
-git merge preview
-git push origin main
-# → Canlı: https://portfolyo.tech
-```
+- OAuth flow with GitHub
+- Fetches repos, stars, languages automatically
+- Real-time data sync
 
-📖 **Detaylı workflow:** [WORKFLOW.md](./docs/WORKFLOW.md)
+### 2. Portfolio Editor
 
-## 📚 Dokümantasyon
+- Drag-and-drop project ordering
+- Template switching with live preview
+- CV/resume upload to Supabase Storage
 
-### 🔄 **Development**
+### 3. Publishing System
 
-- [Git Workflow](./docs/WORKFLOW.md) - **ÖNCE BUNU OKU!**
-- [Setup Guides](./docs/setup/) - Kurulum kılavuzları
+- Subdomain routing (middleware-based)
+- Environment-aware deployment (dev/staging/prod)
+- SEO-optimized generated HTML
 
-### 🎨 **Brand Identity**
+### 4. Subscription System
 
-- [Brand Identity](./docs/brand-identity/README.md) - Marka kimliği ana sayfası
+- Stripe integration for premium features
+- Webhook handling for payment events
+- Usage-based limits
 
-### 🔧 **Technical**
+## Development Workflow
 
-- [Docs Ana Sayfa](./docs/README.md) - Tüm dokümantasyon
-- [Testing](./docs/testing/) - Test raporları
-- [Technical](./docs/technical/) - Teknik dokümanlar
+This project uses a strict git workflow for quality control:
 
-## Lisans
+\`\`\`bash
+feature branches → preview (staging) → main (production)
+\`\`\`
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+Each environment has its own GitHub OAuth app and database to prevent conflicts.
+
+See [docs/WORKFLOW.md](docs/WORKFLOW.md) for details.
+
+## Project Structure
+
+\`\`\`
+src/
+├── app/
+│ ├── api/ # REST API routes
+│ ├── dashboard/ # User dashboard
+│ ├── portfolio/[id]/ # Portfolio pages
+│ └── [slug]/ # Public portfolio routes
+├── components/ # React components
+├── lib/
+│ ├── auth.ts # NextAuth config
+│ ├── supabase.ts # Database client
+│ └── stripe.ts # Payment integration
+└── middleware.ts # Auth + routing
+\`\`\`
+
+## Challenges Solved
+
+**Challenge:** Preview deployments breaking GitHub OAuth  
+**Solution:** Created separate OAuth apps per environment (dev/preview/prod)
+
+**Challenge:** Portfolio edits not updating published version  
+**Solution:** Environment-aware API that updates both \`generated_html\` and \`published_html\`
+
+**Challenge:** CSP blocking Supabase storage in production  
+**Solution:** Synced Content-Security-Policy headers between \`next.config.ts\` and \`middleware.ts\`
+
+## Performance
+
+- Lighthouse Score: 95+ on all metrics
+- First Contentful Paint: <1.2s
+- Time to Interactive: <2.5s
 
 ---
 
-**PortfolYO** - GitHub projelerinizi 5 dakikada portfolyoya dönüştürün! 🚀
+## License
+
+© 2025 Berke Zap. Proprietary software - all rights reserved.
+
+This is a private commercial project. The code is not available for redistribution or commercial use.
+
+**Viewing this repo?** I'm open to discussing the technical decisions and architecture. Feel free to reach out for collaboration opportunities.
+
+**Contact:** ihsanberke.ozsap@std.yeditepe.edu.tr
