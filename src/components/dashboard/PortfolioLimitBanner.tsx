@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { PLANS } from '@/lib/stripe/plans';
 
 interface PortfolioLimitBannerProps {
   currentCount: number;

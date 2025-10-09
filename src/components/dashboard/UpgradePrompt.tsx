@@ -1,9 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import SubscriptionStatus from '@/components/stripe/SubscriptionStatus';
 import Button from '@/components/ui/Button';
-import Link from 'next/link';
 
 interface UpgradePromptProps {
   currentPlan: 'FREE' | 'PRO';
