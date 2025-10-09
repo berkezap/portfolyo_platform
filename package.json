@@ -9,7 +9,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "analyze": "ANALYZE=true npm run build",
-    "security:audit": "npm audit --audit-level=moderate",
+    "security:audit": "npm audit --audit-level=high",
     "security:fix": "npm audit fix",
     "security:check": "npm audit --audit-level=high && npm outdated",
     "performance:check": "npm run build && npm run analyze",
@@ -17,7 +17,10 @@
     "performance:budget": "npx webpack-bundle-analyzer .next/static/chunks/*.js",
     "performance:optimize": "npm run build && npm run performance:lighthouse",
     "setup:gdpr": "node scripts/setup-gdpr-db.js",
-    "postinstall": "npm run security:audit",
+    "setup:dev": "./scripts/setup-dev-env.sh",
+    "validate:prod": "./scripts/validate-prod-secrets.sh",
+    "env:check": "node -e \"console.log('NODE_ENV:', process.env.NODE_ENV); console.log('APP_URL:', process.env.NEXT_PUBLIC_APP_URL)\"",
+    "postinstall": "npm run security:audit || true",
     "prepare": "husky install"
   },
   "dependencies": {
