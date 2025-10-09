@@ -65,103 +65,47 @@ export default function PortfolioViewPage({ params }: { params: Promise<{ id: st
   }, [mode, id]); // mode veya id değiştiğinde çalışır.
 
   const handlePreviewMode = useCallback(async () => {
-    console.log('🎯 handlePreviewMode çalıştı');
+    console.log('🎯 handlePreviewMode çalıştı - Gerçek API kullanılacak');
     try {
       setLoading(true);
       setError(null);
 
-      const currentPreviewDataString = localStorage.getItem('portfolio-preview');
+      // API'den portfolio'yu çek - bu sayede gerçek rendered HTML'i alıyoruz
+      const response = await fetch(`/api/portfolio/${id}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
-      if (currentPreviewDataString) {
-        const parsed = JSON.parse(currentPreviewDataString);
+      const data = await response.json();
+      if (data.success && data.portfolio) {
+        // Preview modda SADECE generated_html kullan (published_html değil)
+        const htmlToShow = data.portfolio.generated_html;
 
-        if (parsed.portfolioId === id) {
-          console.log('✅ Template yükleniyor:', parsed.template);
-
-          const templateResponse = await fetch(`/templates/${parsed.template}/index.html`);
-          if (!templateResponse.ok) {
-            throw new Error(
-              `Template yüklenemedi: ${parsed.template} (${templateResponse.status})`,
-            );
-          }
-
-          let templateHtml = await templateResponse.text();
-          console.log('📄 Template HTML yüklendi:', parsed.template);
-
-          // Replace user data
-          templateHtml = templateHtml
-            .replace(/\{\{USER_NAME\}\}/g, parsed.user?.name || 'Kullanıcı Adı')
-            .replace(/\{\{USER_BIO\}\}/g, parsed.user?.bio || 'Bio bilgisi girilmemiş.')
-            .replace(/\{\{USER_TITLE\}\}/g, 'Portfolio Preview')
-            .replace(/\{\{USER_AVATAR_URL\}\}/g, parsed.user?.avatar_url || '/portfolyo-logo.svg')
-            .replace(/\{\{GITHUB_URL\}\}/g, parsed.user?.github_url || '#')
-            .replace(/\{\{LINKEDIN_URL\}\}/g, parsed.user?.linkedin_url || '#')
-            .replace(/\{\{CV_URL\}\}/g, parsed.user?.cv_url || '#');
-
-          // Generate projects HTML from rich data
-          const projectsHtml = (parsed.repos || [])
-            .map((repo: any) => {
-              // Basic template structure, can be customized per template
-              return `
-              <div class="card rounded-xl p-6 scroll-animate" style="border: 1px solid #333;">
-                <h3 class="font-display text-2xl font-bold mb-3 gradient-text">📦 ${repo.name}</h3>
-                <p class="text-muted text-sm mb-4 leading-relaxed">
-                  ${repo.description || 'Bu proje için bir açıklama eklenmemiş.'}
-                </p>
-                <div class="flex flex-wrap gap-2 mb-6">
-                  ${repo.language ? `<span class="text-xs text-muted border border-gray-700 rounded-full px-3 py-1">${repo.language}</span>` : ''}
-                  <span class="text-xs text-muted border border-gray-700 rounded-full px-3 py-1">⭐ ${repo.stargazers_count}</span>
-                  <span class="text-xs text-muted border border-gray-700 rounded-full px-3 py-1">🍴 ${repo.forks_count}</span>
-                </div>
-                <div class="flex items-center space-x-4 mt-auto">
-                  <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="text-sm text-cyan-400 hover:underline">View Source</a>
-                </div>
-              </div>
-            `;
-            })
-            .join('');
-
-          templateHtml = templateHtml.replace(
-            /\{\{PROJECTS_START\}\}[\s\S]*?\{\{PROJECTS_END\}\}/g,
-            projectsHtml,
-          );
-
-          // Clean up any remaining placeholders
-          templateHtml = templateHtml.replace(/\{\{[^}]+\}\}/g, '');
-
+        if (htmlToShow) {
+          // Preview indicator'ı ekle
           const previewIndicator = `
             <div style="position: fixed; top: 20px; right: 20px; background: linear-gradient(45deg, #00ff00, #00aaff); color: #000; padding: 12px 20px; border-radius: 8px; font-weight: bold; z-index: 9999; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: pulse 2s infinite;">
-              🎯 ${parsed.template.toUpperCase()} PREVIEW
+              🎯 ${data.portfolio.selected_template?.toUpperCase() || 'TEMPLATE'} PREVIEW
             </div>
             <style>
               @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } }
             </style>
           `;
 
-          templateHtml = templateHtml.replace('</body>', `${previewIndicator}</body>`);
+          const htmlWithIndicator = htmlToShow.replace('</body>', `${previewIndicator}</body>`);
 
-          const mockPortfolio: Portfolio = {
-            id: parsed.portfolioId,
-            selected_template: parsed.template,
-            selected_repos: (parsed.repos || []).map((r: any) => r.name),
-            generated_html: templateHtml,
-            metadata: {
-              user: parsed.user?.name,
-              repoCount: parsed.repos?.length || 0,
-              generated_at: new Date(parsed.timestamp).toISOString(),
-            },
-          };
-
-          setPortfolio(mockPortfolio);
+          setPortfolio({
+            ...data.portfolio,
+            generated_html: htmlWithIndicator,
+          });
           setLoading(false);
           return;
+        } else {
+          throw new Error('Portfolio HTML bulunamadı');
         }
+      } else {
+        throw new Error(data.error || 'Portfolio yüklenemedi');
       }
-
-      setError(
-        'Preview verileri bulunamadı veya eşleşmiyor. Lütfen edit sayfasından tekrar önizleme yapın.',
-      );
-      setLoading(false);
     } catch (error) {
       console.error('❌ Preview hatası:', error);
       const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
