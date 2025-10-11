@@ -11,6 +11,7 @@ import type { GitHubUser, GitHubRepo } from '@/types/github';
 import type { TemplateData } from '@/types/templates';
 import type { SessionUser } from '@/types/auth';
 import { withRateLimit } from '@/lib/rateLimit';
+import { isTemplatePremium } from '@/config/templates';
 
 async function postHandler(request: NextRequest) {
   console.log('🚀 Portfolio Generate API çağrıldı!');
@@ -54,6 +55,25 @@ async function postHandler(request: NextRequest) {
     console.log('📂 Template name:', templateName);
     console.log('📋 Selected repos:', selectedRepos);
     console.log('📄 CV URL:', cvUrl);
+
+    // Check if template is premium and user has access
+    if (isTemplatePremium(templateName) && !demoMode) {
+      // Get user's subscription status from Supabase
+      const tempSession = await getServerSession(authOptions);
+      if (!tempSession?.user?.email) {
+        console.error('❌ User not authenticated for premium template');
+        return NextResponse.json(
+          { error: 'Authentication required for premium templates' },
+          { status: 401 },
+        );
+      }
+
+      // TODO: Check subscription status from Supabase
+      // For now, allow all authenticated users (will be restricted later)
+      console.log(
+        '⚠️ Premium template access check - temporarily allowing all authenticated users',
+      );
+    }
 
     let userData: GitHubUser;
     let repos: GitHubRepo[];

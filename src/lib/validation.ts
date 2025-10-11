@@ -71,13 +71,10 @@ const validateSecureString = (str: string) => {
 // Portfolio Generation Schema
 export const portfolioGenerationSchema = z.object({
   template: z.enum([
-    'professional-tech',
-    'minimalist-professional',
-    'creative-portfolio',
-    // Legacy templates for backward compatibility
-    'modern-developer',
-    'creative-technologist',
-    'storyteller',
+    'developer-minimal',
+    'tech-minimalist',
+    'cyberpunk-developer',
+    'creative-coder',
   ]),
   selectedRepos: z
     .array(

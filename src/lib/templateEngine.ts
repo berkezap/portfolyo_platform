@@ -139,6 +139,7 @@ export function renderTemplate(templateName: string, data: TemplateData): string
     });
 
     // Process simple placeholders
+    const currentYear = new Date().getFullYear();
     output = output
       .replace(/{{USER_NAME}}/g, data.USER_NAME || '')
       .replace(/{{USER_TITLE}}/g, data.USER_TITLE || '')
@@ -149,7 +150,12 @@ export function renderTemplate(templateName: string, data: TemplateData): string
       .replace(/{{GITHUB_URL}}/g, data.GITHUB_URL || '')
       .replace(/{{LINKEDIN_URL}}/g, data.LINKEDIN_URL || '')
       .replace(/{{CV_URL}}/g, data.CV_URL || '')
-      .replace(/{{TOTAL_STARS}}/g, String(data.TOTAL_STARS || 0));
+      .replace(/{{TWITTER_URL}}/g, data.TWITTER_URL || '')
+      .replace(/{{TOTAL_REPOS}}/g, String(data.TOTAL_REPOS || 0))
+      .replace(/{{TOTAL_STARS}}/g, String(data.TOTAL_STARS || 0))
+      .replace(/{{YEARS_EXPERIENCE}}/g, String(data.YEARS_EXPERIENCE || 1))
+      .replace(/{{CURRENT_YEAR}}/g, String(currentYear))
+      .replace(/{{YEAR}}/g, String(currentYear));
 
     console.log(`[TemplateEngine] Template başarıyla render edildi, uzunluk: ${output.length}`);
 
