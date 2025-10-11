@@ -1,0 +1,149 @@
+{
+  "navigation": {
+    "home": "Home",
+    "pricing": "Prijzen",
+    "dashboard": "Dashboard",
+    "myPortfolios": "Mijn portfolio's",
+    "signIn": "Inloggen",
+    "signOut": "Uitloggen"
+  },
+  "hero": {
+    "title": "Van GitHub naar",
+    "titleBrand": "portfolYO",
+    "titleTime": "in 5 minuten",
+    "subtitle": "Transformeer je GitHub-projecten in professionele portfolio-websites zonder te coderen. Volledig aanpasbare oplossing voor ontwikkelaars, ontwerpers en bedrijven.",
+    "ctaStart": "Begin met GitHub",
+    "ctaPricing": "Prijzen",
+    "ctaDashboard": "Ga naar dashboard",
+    "noCreditCard": "Geen creditcard vereist"
+  },
+  "builtOn": {
+    "title": "Gebouwd op: Moderne technologieën die je vertrouwt"
+  },
+  "howItWorks": {
+    "title": "Hoe werkt het?",
+    "subtitle": "De gemakkelijkste manier om je GitHub-projecten om te zetten in een professionele portfolio-website",
+    "step1Title": "Verbind GitHub",
+    "step1Desc": "Verbind je GitHub-account met één klik. Alle openbare repositories worden automatisch vermeld.",
+    "step2Title": "Selecteer projecten",
+    "step2Desc": "Kies de projecten die je in je portfolio wilt tonen. README, technologieën en sterren worden automatisch opgehaald.",
+    "step3Title": "Kies sjabloon",
+    "step3Desc": "Selecteer het sjabloon dat het beste bij je stijl past uit professionele sjablonen. Alle zijn mobielvriendelijk en snel.",
+    "step4Title": "Publiceer direct",
+    "step4Desc": "Je portfolio wordt automatisch gegenereerd en gepubliceerd met je aangepaste domein. Je kunt het op elk moment bijwerken."
+  },
+  "stats": {
+    "trustTitle": "Met de snelheid die je vertrouwt",
+    "trustSubtitle": "Moderne portfolio-creatie-ervaring",
+    "setupTime": "5min",
+    "setupLabel": "Gemiddelde setup",
+    "cost": "€0",
+    "costLabel": "Startkosten",
+    "activePortfolios": "50+",
+    "activeLabel": "Actieve portfolio's",
+    "mobileCompatible": "100%",
+    "mobileLabel": "Mobiel compatibel"
+  },
+  "templates": {
+    "title": "Professionele sjablonen",
+    "subtitle": "Kies uit moderne en mobielvriendelijke sjablonen voor elke stijl",
+    "minimalTech": "Minimalistisch Tech",
+    "minimalTechDesc": "Schoon en minimalistisch ontwerp",
+    "professionalTech": "Professioneel Tech",
+    "professionalTechDesc": "Zakelijk en professioneel",
+    "creativeTech": "Creatief Tech",
+    "creativeTechDesc": "Creatief en modern",
+    "allInclude": "Inbegrepen in alle sjablonen",
+    "allIncludeDesc": "Elk sjabloon wordt geleverd met deze functies",
+    "mobileResponsive": "Mobiel responsive",
+    "mobileResponsiveDesc": "Perfect op alle apparaten",
+    "fastLoading": "Snel laden",
+    "fastLoadingDesc": "Geoptimaliseerde prestaties",
+    "customizable": "Aanpasbaar",
+    "customizableDesc": "Kleur- en inhoudscontrole",
+    "seoOptimized": "SEO geoptimaliseerd",
+    "seoOptimizedDesc": "Voor zoekmachines"
+  },
+  "proFeatures": {
+    "title": "PortfolYO+",
+    "comingSoon": "Binnenkort",
+    "quarter": "Q2 2025",
+    "subtitle": "Breng je portfolio naar het volgende niveau met meer aanpassing, analyses en professionele tools",
+    "customThemeTitle": "Aangepaste thema-editor",
+    "customThemeDesc": "Pas kleuren, lettertypen, spatiëring en componenten aan zoals je wilt. Ontwerp zonder code met de visuele editor.",
+    "customDomainTitle": "Aangepast domein",
+    "customDomainDesc": "Professionele uitstraling met jouw naam.com. SSL-certificaat, CDN-optimalisatie en DNS-beheer inbegrepen.",
+    "analyticsTitle": "Geavanceerde analyses",
+    "analyticsDesc": "Bezoekersgedrag, verkeersbronnen, conversieratio's en gedetailleerde prestatiemetrieken.",
+    "supportTitle": "Prioriteitsondersteuning",
+    "supportDesc": "24-uurs responsgarantie, toegewijd Slack-kanaal en 1-op-1 onboarding-ondersteuning.",
+    "beta": "Beta"
+  },
+  "pricing": {
+    "devTitle": "Momenteel in ontwikkeling",
+    "devSubtitle": "Bètafase - speciale prijzen voor early adopters",
+    "perMonth": "/maand",
+    "discount": "50% korting voor early adopters",
+    "joinWaitlist": "Meld je aan voor de wachtlijst"
+  },
+  "developer": {
+    "badge": "Door ontwikkelaar",
+    "title": "Voor ontwikkelaars,",
+    "titleHighlight": "door ontwikkelaars",
+    "subtitle": "Ontworpen voor ontwikkelaars die geweldige projecten hebben maar moeite hebben om ze te tonen",
+    "greetingTitle": "Hallo, ik ben Berke",
+    "greetingDesc": "Ik heb PortfolYO alleen gebouwd voor ontwikkelaars die geweldige projecten hebben maar moeite hebben om ze te tonen. Mijn doel is om een van de obstakels aan het begin van je carrière te verwijderen en je te versnellen.",
+    "realNeedTitle": "Echte behoefte",
+    "realNeedDesc": "Ontwikkeld vanuit mijn eigen portfolioprobleem",
+    "quickSolutionTitle": "Snelle oplossing",
+    "quickSolutionDesc": "Creëer een professioneel portfolio in 5 minuten"
+  },
+  "faq": {
+    "title": "Je vragen",
+    "subtitle": "Korte en duidelijke antwoorden. Geen overdrijving.",
+    "badge": "Veelgestelde vragen",
+    "q1": "Is een GitHub-account vereist?",
+    "a1": "Ja. Je moet inloggen met GitHub om je projecten veilig op te halen. Op deze manier hebben we toegang tot je repositories en kunnen we automatisch een portfolio maken.",
+    "q2": "Wordt het automatisch bijgewerkt?",
+    "a2": "Je kunt de inhoud op elk moment opnieuw genereren. We doen geen continue achtergrond synchronisatie - de controle is volledig bij jou.",
+    "q3": "Is het gratis?",
+    "a3": "Momenteel gratis. We zullen toekomstige plannen transparant aankondigen. We zullen kortingen aanbieden voor early adopters op Pro-functies.",
+    "q4": "Hoe zit het met gegevensbeveiliging?",
+    "a4": "De controle is bij jou met cookievoorkeuren en GDPR-stromen. We verwerken alleen gegevens die je toestaat. GitHub-tokens worden veilig opgeslagen.",
+    "q5": "Kan ik bewerken?",
+    "a5": "Ja, na het maken kun je je portfolio opnieuw bijwerken, verschillende sjablonen proberen en inhoud wijzigen.",
+    "q6": "Is er een demo?",
+    "a6": "Als de demomodus aan staat, kun je binnen enkele minuten proberen met voorbeeldgegevens. Je kunt testen zonder een echt GitHub-account."
+  },
+  "finalCta": {
+    "badge": "Begin nu",
+    "title": "Herdefinieer je",
+    "titleHighlight": "portfolio-ervaring",
+    "subtitle": "Transformeer je GitHub-projecten in een indrukwekkend portfolio met een paar klikken"
+  },
+  "footer": {
+    "allRightsReserved": "Alle rechten voorbehouden.",
+    "privacyPolicy": "Privacybeleid",
+    "termsOfService": "Servicevoorwaarden"
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "success": "Succesvol",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "create": "Maken",
+    "update": "Bijwerken",
+    "close": "Sluiten",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "search": "Zoeken",
+    "filter": "Filteren",
+    "sort": "Sorteren",
+    "yes": "Ja",
+    "no": "Nee"
+  }
+}

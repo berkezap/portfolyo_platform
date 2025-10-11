@@ -3,10 +3,13 @@
 import Link from 'next/link';
 import { Github, Mail } from 'lucide-react';
 import { useSession } from 'next-auth/react';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const { data: session } = useSession();
+  const t = useTranslations('footer');
+  const locale = useLocale();
 
   return (
     <footer className="bg-gray-900 text-gray-300 relative z-10">
@@ -20,10 +23,7 @@ export default function Footer() {
               </div>
               <span className="text-xl font-bold text-white">PortfolYO</span>
             </div>
-            <p className="text-gray-400 mb-6 max-w-sm leading-relaxed">
-              GitHub projelerinizi birkaç tıkla profesyonel portfolyoya dönüştürün. Geliştiriciler
-              için tasarlanmış modern platform.
-            </p>
+            <p className="text-gray-400 mb-6 max-w-sm leading-relaxed">{t('description')}</p>
             <div className="flex space-x-4">
               <a
                 href="https://github.com/berkezap"
@@ -44,65 +44,65 @@ export default function Footer() {
 
           {/* Platform */}
           <div>
-            <h3 className="text-white font-semibold mb-6 mt-12">Platform</h3>
+            <h3 className="text-white font-semibold mb-6 mt-12">{t('platformTitle')}</h3>
             <ul className="space-y-3">
               {session && (
                 <li>
                   <Link
-                    href="/dashboard"
+                    href={`/${locale}/dashboard`}
                     className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
-                    Dashboard
+                    {t('dashboard')}
                   </Link>
                 </li>
               )}
               {session && (
                 <li>
                   <Link
-                    href="/my-portfolios"
+                    href={`/${locale}/my-portfolios`}
                     className="text-gray-400 hover:text-white transition-colors text-sm"
                   >
-                    Portfolyolarım
+                    {t('myPortfolios')}
                   </Link>
                 </li>
               )}
               <li>
                 <Link
-                  href="/pricing"
+                  href={`/${locale}/pricing`}
                   className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
-                  Fiyatlandırma
+                  {t('pricing')}
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Yasal */}
+          {/* Legal */}
           <div>
-            <h3 className="text-white font-semibold mb-6 mt-12">Yasal</h3>
+            <h3 className="text-white font-semibold mb-6 mt-12">{t('legalTitle')}</h3>
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/privacy-policy"
+                  href={`/${locale}/privacy-policy`}
                   className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
-                  Gizlilik Politikası
+                  {t('privacyPolicy')}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/terms-of-service"
+                  href={`/${locale}/terms-of-service`}
                   className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
-                  Kullanım Şartları
+                  {t('termsOfService')}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/gdpr-settings"
+                  href={`/${locale}/gdpr-settings`}
                   className="text-gray-400 hover:text-white transition-colors text-sm"
                 >
-                  Veri Koruma
+                  {t('dataProtection')}
                 </Link>
               </li>
             </ul>
@@ -112,12 +112,12 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; {currentYear} PortfolYO. Tüm hakları saklıdır.
+            &copy; {currentYear} PortfolYO. {t('allRightsReserved')}
           </p>
           <div className="flex items-center space-x-1 mt-4 md:mt-0 text-xs text-gray-500">
-            <span>Made with</span>
+            <span>{t('madeWith')}</span>
             <span className="text-red-400">♥</span>
-            <span>by</span>
+            <span>{t('by')}</span>
             <a
               href="https://github.com/berkezap"
               target="_blank"

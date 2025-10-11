@@ -1,0 +1,149 @@
+{
+  "navigation": {
+    "home": "Startseite",
+    "pricing": "Preise",
+    "dashboard": "Dashboard",
+    "myPortfolios": "Meine Portfolios",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden"
+  },
+  "hero": {
+    "title": "Von GitHub zu",
+    "titleBrand": "portfolYO",
+    "titleTime": "in 5 Minuten",
+    "subtitle": "Verwandeln Sie Ihre GitHub-Projekte ohne Programmieren in professionelle Portfolio-Websites. Vollständig anpassbare Lösung für Entwickler, Designer und Unternehmen.",
+    "ctaStart": "Mit GitHub starten",
+    "ctaPricing": "Preise",
+    "ctaDashboard": "Zum Dashboard",
+    "noCreditCard": "Keine Kreditkarte erforderlich"
+  },
+  "builtOn": {
+    "title": "Aufgebaut auf: Moderne Technologien, denen Sie vertrauen"
+  },
+  "howItWorks": {
+    "title": "Wie funktioniert es?",
+    "subtitle": "Der einfachste Weg, Ihre GitHub-Projekte in eine professionelle Portfolio-Website zu verwandeln",
+    "step1Title": "GitHub verbinden",
+    "step1Desc": "Verbinden Sie Ihr GitHub-Konto mit einem Klick. Alle Ihre öffentlichen Repositories werden automatisch aufgelistet.",
+    "step2Title": "Projekte auswählen",
+    "step2Desc": "Wählen Sie die Projekte aus, die Sie in Ihrem Portfolio präsentieren möchten. README, Technologien und Sterne werden automatisch abgerufen.",
+    "step3Title": "Vorlage auswählen",
+    "step3Desc": "Wählen Sie die Vorlage, die am besten zu Ihrem Stil passt, aus professionellen Vorlagen. Alle sind mobilfreundlich und schnell.",
+    "step4Title": "Sofort veröffentlichen",
+    "step4Desc": "Ihr Portfolio wird automatisch generiert und mit Ihrer benutzerdefinierten Domain veröffentlicht. Sie können es jederzeit aktualisieren."
+  },
+  "stats": {
+    "trustTitle": "Mit der Geschwindigkeit, der Sie vertrauen",
+    "trustSubtitle": "Modernes Portfolio-Erstellungserlebnis",
+    "setupTime": "5Min",
+    "setupLabel": "Durchschnittliche Einrichtung",
+    "cost": "0€",
+    "costLabel": "Startgebühr",
+    "activePortfolios": "50+",
+    "activeLabel": "Aktive Portfolios",
+    "mobileCompatible": "100%",
+    "mobileLabel": "Mobilkompatibel"
+  },
+  "templates": {
+    "title": "Professionelle Vorlagen",
+    "subtitle": "Wählen Sie aus modernen und mobilfreundlichen Vorlagen für jeden Stil",
+    "minimalTech": "Minimalistisch Tech",
+    "minimalTechDesc": "Klares und minimalistisches Design",
+    "professionalTech": "Professionell Tech",
+    "professionalTechDesc": "Unternehmerisch und professionell",
+    "creativeTech": "Kreativ Tech",
+    "creativeTechDesc": "Kreativ und modern",
+    "allInclude": "In allen Vorlagen enthalten",
+    "allIncludeDesc": "Jede Vorlage kommt mit diesen Funktionen",
+    "mobileResponsive": "Mobil Responsive",
+    "mobileResponsiveDesc": "Perfekt auf allen Geräten",
+    "fastLoading": "Schnelles Laden",
+    "fastLoadingDesc": "Optimierte Leistung",
+    "customizable": "Anpassbar",
+    "customizableDesc": "Farb- und Inhaltssteuerung",
+    "seoOptimized": "SEO-optimiert",
+    "seoOptimizedDesc": "Für Suchmaschinen"
+  },
+  "proFeatures": {
+    "title": "PortfolYO+",
+    "comingSoon": "Demnächst",
+    "quarter": "Q2 2025",
+    "subtitle": "Bringen Sie Ihr Portfolio mit mehr Anpassung, Analysen und professionellen Tools auf die nächste Stufe",
+    "customThemeTitle": "Benutzerdefinierter Theme-Editor",
+    "customThemeDesc": "Passen Sie Farben, Schriftarten, Abstände und Komponenten nach Belieben an. Gestalten Sie ohne Code mit dem visuellen Editor.",
+    "customDomainTitle": "Benutzerdefinierte Domain",
+    "customDomainDesc": "Professionelles Aussehen mit ihrname.com. SSL-Zertifikat, CDN-Optimierung und DNS-Verwaltung inklusive.",
+    "analyticsTitle": "Erweiterte Analysen",
+    "analyticsDesc": "Besucherverhalten, Traffic-Quellen, Conversion-Raten und detaillierte Leistungsmetriken.",
+    "supportTitle": "Prioritäts-Support",
+    "supportDesc": "24-Stunden-Antwortgarantie, dedizierter Slack-Kanal und 1-on-1-Onboarding-Support.",
+    "beta": "Beta"
+  },
+  "pricing": {
+    "devTitle": "Derzeit in Entwicklung",
+    "devSubtitle": "Beta-Phase - Sonderpreise für Early Adopters",
+    "perMonth": "/Monat",
+    "discount": "50% Frühbucher-Rabatt",
+    "joinWaitlist": "Zur Warteliste hinzufügen"
+  },
+  "developer": {
+    "badge": "Von Entwickler",
+    "title": "Für Entwickler,",
+    "titleHighlight": "von Entwicklern",
+    "subtitle": "Entwickelt für Entwickler, die großartige Projekte haben, aber Schwierigkeiten haben, sie zu präsentieren",
+    "greetingTitle": "Hallo, ich bin Berke",
+    "greetingDesc": "Ich habe PortfolYO allein für Entwickler gebaut, die großartige Projekte haben, aber Schwierigkeiten haben, sie zu präsentieren. Mein Ziel ist es, eines der Hindernisse am Anfang Ihrer Karriere zu beseitigen und Sie zu beschleunigen.",
+    "realNeedTitle": "Echtes Bedürfnis",
+    "realNeedDesc": "Entwickelt aus meinem eigenen Portfolio-Problem",
+    "quickSolutionTitle": "Schnelle Lösung",
+    "quickSolutionDesc": "Erstellen Sie ein professionelles Portfolio in 5 Minuten"
+  },
+  "faq": {
+    "title": "Ihre Fragen",
+    "subtitle": "Kurze und klare Antworten. Keine Übertreibung.",
+    "badge": "Häufig gestellte Fragen",
+    "q1": "Ist ein GitHub-Konto erforderlich?",
+    "a1": "Ja. Sie müssen sich mit GitHub anmelden, um Ihre Projekte sicher abzurufen. Auf diese Weise können wir auf Ihre Repositories zugreifen und automatisch ein Portfolio erstellen.",
+    "q2": "Wird es automatisch aktualisiert?",
+    "a2": "Sie können den Inhalt jederzeit neu generieren. Wir führen keine kontinuierliche Hintergrundsynchronisierung durch - die Kontrolle liegt vollständig bei Ihnen.",
+    "q3": "Ist es kostenlos?",
+    "a3": "Derzeit kostenlos. Wir werden zukünftige Pläne transparent ankündigen. Wir werden Frühbucher-Rabatte für Pro-Funktionen anbieten.",
+    "q4": "Was ist mit Datensicherheit?",
+    "a4": "Die Kontrolle liegt bei Ihnen mit Cookie-Einstellungen und GDPR-Flows. Wir verarbeiten nur Daten, die Sie zulassen. GitHub-Tokens werden sicher gespeichert.",
+    "q5": "Kann ich bearbeiten?",
+    "a5": "Ja, nach der Erstellung können Sie Ihr Portfolio erneut aktualisieren, verschiedene Vorlagen ausprobieren und Inhalte ändern.",
+    "q6": "Gibt es eine Demo?",
+    "a6": "Wenn der Demo-Modus aktiviert ist, können Sie innerhalb von Minuten mit Beispieldaten testen. Sie können ohne echtes GitHub-Konto testen."
+  },
+  "finalCta": {
+    "badge": "Jetzt starten",
+    "title": "Definieren Sie Ihre",
+    "titleHighlight": "Portfolio-Erfahrung neu",
+    "subtitle": "Verwandeln Sie Ihre GitHub-Projekte mit wenigen Klicks in ein beeindruckendes Portfolio"
+  },
+  "footer": {
+    "allRightsReserved": "Alle Rechte vorbehalten.",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "termsOfService": "Nutzungsbedingungen"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Erfolgreich",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "update": "Aktualisieren",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "yes": "Ja",
+    "no": "Nein"
+  }
+}

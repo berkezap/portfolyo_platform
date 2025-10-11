@@ -1,5 +1,15 @@
+import createMiddleware from 'next-intl/middleware';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { locales, defaultLocale } from '@/i18n/config';
+
+// Create i18n middleware
+const intlMiddleware = createMiddleware({
+  locales,
+  defaultLocale,
+  localePrefix: 'as-needed', // Don't prefix default locale
+  localeDetection: false, // Disable automatic locale detection from browser
+});
 
 export function middleware(request: NextRequest) {
   const host: string = request.headers.get('host') ?? '';
@@ -19,7 +29,9 @@ export function middleware(request: NextRequest) {
     }
   } catch (_) {}
 
-  const response = NextResponse.next();
+  // Apply i18n routing
+  const i18nResponse = intlMiddleware(request);
+  const response = i18nResponse || NextResponse.next();
 
   // Performance headers
   response.headers.set('X-DNS-Prefetch-Control', 'on');
@@ -94,7 +106,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - pub (public portfolio routes - no i18n)
+     * - sw.js, manifest.json, workbox files (PWA files)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|pub|sw.js|manifest.json|workbox-.*\\.js).*)',
   ],
 };

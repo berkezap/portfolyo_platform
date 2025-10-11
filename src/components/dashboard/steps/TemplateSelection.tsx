@@ -2,6 +2,7 @@ import React from 'react';
 import { Check, Eye } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { PortfolioTemplate } from '@/types/dashboard';
+import { useTranslations } from 'next-intl';
 
 interface TemplateSelectionProps {
   templates: PortfolioTemplate[];
@@ -20,12 +21,15 @@ export function TemplateSelection({
   onBack,
   onPreview,
 }: TemplateSelectionProps) {
+  const t = useTranslations();
   return (
     <div className="max-w-full mx-auto">
       {/* Hero Section - Minimalist başlık */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Şablonunuzu Seçin</h1>
-        <p className="text-sm text-gray-500">Portfolyonuz için bir şablon seçin</p>
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          {t('dashboard.selectTemplate')}
+        </h1>
+        <p className="text-sm text-gray-500">{t('dashboard.selectTemplateDescAlt')}</p>
       </div>
 
       {/* Template Grid - Repo kartları gibi minimalist */}
@@ -90,7 +94,9 @@ export function TemplateSelection({
                     onSelectTemplate(template.id);
                   }}
                 >
-                  {selectedTemplate === template.id ? 'Seçildi' : 'Seç'}
+                  {selectedTemplate === template.id
+                    ? t('dashboard.selected')
+                    : t('dashboard.select')}
                 </Button>
 
                 <Button
@@ -113,7 +119,7 @@ export function TemplateSelection({
       {/* Navigation */}
       <div className="flex justify-between items-center">
         <Button variant="secondary" size="md" onClick={onBack} className="px-6 py-2">
-          Geri
+          {t('common.back')}
         </Button>
 
         <Button
@@ -123,7 +129,7 @@ export function TemplateSelection({
           disabled={!selectedTemplate}
           className="px-6 py-2"
         >
-          Devam Et
+          {t('dashboard.continue')}
         </Button>
       </div>
     </div>

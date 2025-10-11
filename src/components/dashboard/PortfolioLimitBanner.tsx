@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 interface PortfolioLimitBannerProps {
   currentCount: number;
@@ -13,6 +14,7 @@ export default function PortfolioLimitBanner({
   maxAllowed,
   planType,
 }: PortfolioLimitBannerProps) {
+  const t = useTranslations('dashboard');
   const isAtLimit = currentCount >= maxAllowed;
   const isNearLimit = currentCount >= maxAllowed - 1;
 
@@ -24,8 +26,8 @@ export default function PortfolioLimitBanner({
         <div>
           <h3 className="text-sm font-medium text-gray-900">
             {isAtLimit
-              ? `PortfolYO limitine ulaştınız (${currentCount}/${maxAllowed})`
-              : `PortfolYO limitine yaklaştınız (${currentCount}/${maxAllowed})`}
+              ? t('limitReachedFull', { current: currentCount, max: maxAllowed })
+              : t('limitNearFull', { current: currentCount, max: maxAllowed })}
           </h3>
         </div>
       </div>

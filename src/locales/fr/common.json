@@ -1,0 +1,149 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "pricing": "Tarifs",
+    "dashboard": "Tableau de bord",
+    "myPortfolios": "Mes Portfolios",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter"
+  },
+  "hero": {
+    "title": "De GitHub à",
+    "titleBrand": "portfolYO",
+    "titleTime": "en 5 minutes",
+    "subtitle": "Transformez vos projets GitHub en sites de portfolio professionnels sans coder. Solution entièrement personnalisable pour les développeurs, designers et entreprises.",
+    "ctaStart": "Commencer avec GitHub",
+    "ctaPricing": "Tarifs",
+    "ctaDashboard": "Aller au tableau de bord",
+    "noCreditCard": "Aucune carte de crédit requise"
+  },
+  "builtOn": {
+    "title": "Construit sur : Technologies modernes en lesquelles vous avez confiance"
+  },
+  "howItWorks": {
+    "title": "Comment ça marche ?",
+    "subtitle": "Le moyen le plus simple de transformer vos projets GitHub en un site de portfolio professionnel",
+    "step1Title": "Connecter GitHub",
+    "step1Desc": "Connectez votre compte GitHub en un clic. Tous vos dépôts publics sont automatiquement listés.",
+    "step2Title": "Sélectionner les projets",
+    "step2Desc": "Choisissez les projets que vous souhaitez présenter dans votre portfolio. README, technologies et étoiles sont récupérés automatiquement.",
+    "step3Title": "Choisir un modèle",
+    "step3Desc": "Sélectionnez le modèle qui correspond le mieux à votre style parmi les modèles professionnels. Tous sont adaptés aux mobiles et rapides.",
+    "step4Title": "Publier instantanément",
+    "step4Desc": "Votre portfolio est automatiquement généré et publié avec votre domaine personnalisé. Vous pouvez le mettre à jour à tout moment."
+  },
+  "stats": {
+    "trustTitle": "Avec la vitesse en laquelle vous avez confiance",
+    "trustSubtitle": "Expérience moderne de création de portfolio",
+    "setupTime": "5min",
+    "setupLabel": "Configuration moyenne",
+    "cost": "0€",
+    "costLabel": "Frais de départ",
+    "activePortfolios": "50+",
+    "activeLabel": "Portfolios actifs",
+    "mobileCompatible": "100%",
+    "mobileLabel": "Compatible mobile"
+  },
+  "templates": {
+    "title": "Modèles professionnels",
+    "subtitle": "Choisissez parmi des modèles modernes et adaptés aux mobiles pour chaque style",
+    "minimalTech": "Tech minimaliste",
+    "minimalTechDesc": "Design épuré et minimaliste",
+    "professionalTech": "Tech professionnel",
+    "professionalTechDesc": "Corporate et professionnel",
+    "creativeTech": "Tech créatif",
+    "creativeTechDesc": "Créatif et moderne",
+    "allInclude": "Inclus dans tous les modèles",
+    "allIncludeDesc": "Chaque modèle est livré avec ces fonctionnalités",
+    "mobileResponsive": "Responsive mobile",
+    "mobileResponsiveDesc": "Parfait sur tous les appareils",
+    "fastLoading": "Chargement rapide",
+    "fastLoadingDesc": "Performance optimisée",
+    "customizable": "Personnalisable",
+    "customizableDesc": "Contrôle des couleurs et du contenu",
+    "seoOptimized": "Optimisé SEO",
+    "seoOptimizedDesc": "Pour les moteurs de recherche"
+  },
+  "proFeatures": {
+    "title": "PortfolYO+",
+    "comingSoon": "Bientôt disponible",
+    "quarter": "T2 2025",
+    "subtitle": "Faites passer votre portfolio au niveau supérieur avec plus de personnalisation, d'analyses et d'outils professionnels",
+    "customThemeTitle": "Éditeur de thème personnalisé",
+    "customThemeDesc": "Personnalisez les couleurs, polices, espacement et composants comme vous le souhaitez. Concevez sans code avec l'éditeur visuel.",
+    "customDomainTitle": "Domaine personnalisé",
+    "customDomainDesc": "Look professionnel avec votrenom.com. Certificat SSL, optimisation CDN et gestion DNS inclus.",
+    "analyticsTitle": "Analyses avancées",
+    "analyticsDesc": "Comportement des visiteurs, sources de trafic, taux de conversion et métriques de performance détaillées.",
+    "supportTitle": "Support prioritaire",
+    "supportDesc": "Garantie de réponse de 24 heures, canal Slack dédié et support d'intégration 1-on-1.",
+    "beta": "Beta"
+  },
+  "pricing": {
+    "devTitle": "Actuellement en développement",
+    "devSubtitle": "Phase bêta - tarifs spéciaux pour les premiers utilisateurs",
+    "perMonth": "/mois",
+    "discount": "50% de réduction pour les premiers utilisateurs",
+    "joinWaitlist": "Rejoindre la liste d'attente"
+  },
+  "developer": {
+    "badge": "Par développeur",
+    "title": "Pour les développeurs,",
+    "titleHighlight": "par les développeurs",
+    "subtitle": "Conçu pour les développeurs qui ont de grands projets mais ont du mal à les présenter",
+    "greetingTitle": "Bonjour, je suis Berke",
+    "greetingDesc": "J'ai construit PortfolYO seul pour les développeurs qui ont de grands projets mais ont du mal à les présenter. Mon objectif est de supprimer l'un des obstacles au début de votre carrière et de vous accélérer.",
+    "realNeedTitle": "Besoin réel",
+    "realNeedDesc": "Développé à partir de mon propre problème de portfolio",
+    "quickSolutionTitle": "Solution rapide",
+    "quickSolutionDesc": "Créez un portfolio professionnel en 5 minutes"
+  },
+  "faq": {
+    "title": "Vos questions",
+    "subtitle": "Réponses courtes et claires. Pas d'exagération.",
+    "badge": "Questions fréquemment posées",
+    "q1": "Un compte GitHub est-il requis ?",
+    "a1": "Oui. Vous devez vous connecter avec GitHub pour extraire vos projets en toute sécurité. De cette façon, nous pouvons accéder à vos dépôts et créer automatiquement un portfolio.",
+    "q2": "Est-ce que ça se met à jour automatiquement ?",
+    "a2": "Vous pouvez régénérer le contenu à tout moment. Nous ne faisons pas de synchronisation continue en arrière-plan - le contrôle est entièrement à vous.",
+    "q3": "Est-ce gratuit ?",
+    "a3": "Actuellement gratuit. Nous annoncerons les plans futurs de manière transparente. Nous offrirons des réductions pour les premiers utilisateurs pour les fonctionnalités Pro.",
+    "q4": "Qu'en est-il de la sécurité des données ?",
+    "a4": "Le contrôle est à vous avec les préférences de cookies et les flux GDPR. Nous ne traitons que les données que vous autorisez. Les jetons GitHub sont stockés en toute sécurité.",
+    "q5": "Puis-je modifier ?",
+    "a5": "Oui, après la création, vous pouvez mettre à jour votre portfolio à nouveau, essayer différents modèles et modifier le contenu.",
+    "q6": "Y a-t-il une démo ?",
+    "a6": "Si le mode démo est activé, vous pouvez essayer en quelques minutes avec des données d'exemple. Vous pouvez tester sans compte GitHub réel."
+  },
+  "finalCta": {
+    "badge": "Commencez maintenant",
+    "title": "Redéfinissez votre",
+    "titleHighlight": "expérience de portfolio",
+    "subtitle": "Transformez vos projets GitHub en un portfolio impressionnant en quelques clics"
+  },
+  "footer": {
+    "allRightsReserved": "Tous droits réservés.",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsOfService": "Conditions d'utilisation"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "success": "Réussi",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "yes": "Oui",
+    "no": "Non"
+  }
+}

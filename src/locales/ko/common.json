@@ -1,0 +1,149 @@
+{
+  "navigation": {
+    "home": "홈",
+    "pricing": "가격",
+    "dashboard": "대시보드",
+    "myPortfolios": "내 포트폴리오",
+    "signIn": "로그인",
+    "signOut": "로그아웃"
+  },
+  "hero": {
+    "title": "GitHub에서",
+    "titleBrand": "portfolYO로",
+    "titleTime": "5분 만에",
+    "subtitle": "코딩 없이 GitHub 프로젝트를 전문적인 포트폴리오 사이트로 변환하세요. 개발자, 디자이너 및 기업을 위한 완전히 맞춤 설정 가능한 솔루션입니다.",
+    "ctaStart": "GitHub로 시작하기",
+    "ctaPricing": "가격",
+    "ctaDashboard": "대시보드로 이동",
+    "noCreditCard": "신용카드 불필요"
+  },
+  "builtOn": {
+    "title": "구축 기반: 신뢰할 수 있는 최신 기술"
+  },
+  "howItWorks": {
+    "title": "어떻게 작동하나요?",
+    "subtitle": "GitHub 프로젝트를 전문적인 포트폴리오 사이트로 변환하는 가장 쉬운 방법",
+    "step1Title": "GitHub 연결",
+    "step1Desc": "한 번의 클릭으로 GitHub 계정을 연결하세요. 모든 공개 저장소가 자동으로 나열됩니다.",
+    "step2Title": "프로젝트 선택",
+    "step2Desc": "포트폴리오에 표시하고 싶은 프로젝트를 선택하세요. README, 기술 및 별이 자동으로 가져와집니다.",
+    "step3Title": "템플릿 선택",
+    "step3Desc": "전문 템플릿에서 스타일에 가장 적합한 템플릿을 선택하세요. 모두 모바일 친화적이고 빠릅니다.",
+    "step4Title": "즉시 게시",
+    "step4Desc": "포트폴리오가 자동으로 생성되고 사용자 정의 도메인으로 게시됩니다. 언제든지 업데이트할 수 있습니다."
+  },
+  "stats": {
+    "trustTitle": "신뢰할 수 있는 속도로",
+    "trustSubtitle": "현대적인 포트폴리오 생성 경험",
+    "setupTime": "5분",
+    "setupLabel": "평균 설정",
+    "cost": "₩0",
+    "costLabel": "초기 요금",
+    "activePortfolios": "50+",
+    "activeLabel": "활성 포트폴리오",
+    "mobileCompatible": "100%",
+    "mobileLabel": "모바일 호환"
+  },
+  "templates": {
+    "title": "전문 템플릿",
+    "subtitle": "모든 스타일에 맞는 현대적이고 모바일 친화적인 템플릿 중에서 선택하세요",
+    "minimalTech": "미니멀 테크",
+    "minimalTechDesc": "깔끔하고 미니멀한 디자인",
+    "professionalTech": "프로페셔널 테크",
+    "professionalTechDesc": "기업 및 전문적",
+    "creativeTech": "크리에이티브 테크",
+    "creativeTechDesc": "창의적이고 현대적",
+    "allInclude": "모든 템플릿에 포함",
+    "allIncludeDesc": "각 템플릿에는 이러한 기능이 함께 제공됩니다",
+    "mobileResponsive": "모바일 반응형",
+    "mobileResponsiveDesc": "모든 장치에서 완벽",
+    "fastLoading": "빠른 로딩",
+    "fastLoadingDesc": "최적화된 성능",
+    "customizable": "사용자 정의 가능",
+    "customizableDesc": "색상 및 콘텐츠 제어",
+    "seoOptimized": "SEO 최적화",
+    "seoOptimizedDesc": "검색 엔진을 위한"
+  },
+  "proFeatures": {
+    "title": "PortfolYO+",
+    "comingSoon": "곧 출시",
+    "quarter": "2025년 2분기",
+    "subtitle": "더 많은 사용자 정의, 분석 및 전문 도구로 포트폴리오를 다음 단계로 끌어올리세요",
+    "customThemeTitle": "사용자 정의 테마 편집기",
+    "customThemeDesc": "원하는 대로 색상, 글꼴, 간격 및 구성 요소를 사용자 정의하세요. 시각적 편집기로 코드 없이 디자인하세요.",
+    "customDomainTitle": "사용자 정의 도메인",
+    "customDomainDesc": "yourname.com으로 전문적인 모습. SSL 인증서, CDN 최적화 및 DNS 관리가 포함되어 있습니다.",
+    "analyticsTitle": "고급 분석",
+    "analyticsDesc": "방문자 행동, 트래픽 소스, 전환율 및 세부 성능 메트릭.",
+    "supportTitle": "우선 지원",
+    "supportDesc": "24시간 응답 보장, 전용 Slack 채널 및 1대1 온보딩 지원.",
+    "beta": "베타"
+  },
+  "pricing": {
+    "devTitle": "현재 개발 중",
+    "devSubtitle": "베타 단계 - 얼리 어답터를 위한 특별 가격",
+    "perMonth": "/월",
+    "discount": "얼리 어답터 50% 할인",
+    "joinWaitlist": "대기자 명단에 참여"
+  },
+  "developer": {
+    "badge": "개발자에 의해",
+    "title": "개발자를 위한,",
+    "titleHighlight": "개발자에 의해",
+    "subtitle": "훌륭한 프로젝트를 가지고 있지만 그것을 보여주는 데 어려움을 겪는 개발자를 위해 설계되었습니다",
+    "greetingTitle": "안녕하세요, 저는 Berke입니다",
+    "greetingDesc": "훌륭한 프로젝트를 가지고 있지만 그것을 보여주는 데 어려움을 겪는 개발자를 위해 혼자서 PortfolYO를 구축했습니다. 제 목표는 경력 시작 시 장애물 중 하나를 제거하고 속도를 높이는 것입니다.",
+    "realNeedTitle": "실제 필요",
+    "realNeedDesc": "제 자신의 포트폴리오 문제에서 개발되었습니다",
+    "quickSolutionTitle": "빠른 솔루션",
+    "quickSolutionDesc": "5분 만에 전문 포트폴리오 만들기"
+  },
+  "faq": {
+    "title": "자주 묻는 질문",
+    "subtitle": "짧고 명확한 답변. 과장 없음.",
+    "badge": "자주 묻는 질문",
+    "q1": "GitHub 계정이 필요한가요?",
+    "a1": "예. 프로젝트를 안전하게 가져오려면 GitHub로 로그인해야 합니다. 이렇게 하면 저장소에 액세스하고 자동으로 포트폴리오를 만들 수 있습니다.",
+    "q2": "자동으로 업데이트되나요?",
+    "a2": "언제든지 콘텐츠를 재생성할 수 있습니다. 백그라운드에서 지속적인 동기화를 수행하지 않습니다. 제어권은 전적으로 귀하에게 있습니다.",
+    "q3": "무료인가요?",
+    "a3": "현재 무료입니다. 향후 계획은 투명하게 발표할 것입니다. Pro 기능에 대한 얼리 어답터 할인을 제공할 것입니다.",
+    "q4": "데이터 보안은 어떻게 되나요?",
+    "a4": "쿠키 기본 설정 및 GDPR 흐름으로 제어권은 귀하에게 있습니다. 허용한 데이터만 처리합니다. GitHub 토큰은 안전하게 저장됩니다.",
+    "q5": "편집할 수 있나요?",
+    "a5": "예, 생성 후 포트폴리오를 다시 업데이트하고 다른 템플릿을 시도하고 콘텐츠를 변경할 수 있습니다.",
+    "q6": "데모가 있나요?",
+    "a6": "데모 모드가 켜져 있으면 샘플 데이터로 몇 분 안에 시도할 수 있습니다. 실제 GitHub 계정 없이 테스트할 수 있습니다."
+  },
+  "finalCta": {
+    "badge": "지금 시작하세요",
+    "title": "포트폴리오 경험을",
+    "titleHighlight": "재정의하세요",
+    "subtitle": "몇 번의 클릭으로 GitHub 프로젝트를 인상적인 포트폴리오로 변환하세요"
+  },
+  "footer": {
+    "allRightsReserved": "모든 권리 보유.",
+    "privacyPolicy": "개인정보 보호정책",
+    "termsOfService": "서비스 약관"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "success": "성공",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "create": "생성",
+    "update": "업데이트",
+    "close": "닫기",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "search": "검색",
+    "filter": "필터",
+    "sort": "정렬",
+    "yes": "예",
+    "no": "아니오"
+  }
+}

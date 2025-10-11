@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { RepositoryGridSkeleton } from '@/components/ui/Skeleton';
 import ModernCard from '@/components/ui/ModernCard';
 import Button from '@/components/ui/Button';
+import { useTranslations } from 'next-intl';
 
 interface GitHubRepo {
   id: number;
@@ -39,6 +40,7 @@ export function RepositorySelection({
   error,
   onRefetch,
 }: RepositorySelectionProps) {
+  const t = useTranslations();
   const [renderKey, setRenderKey] = useState(0);
   const [hasShownRepos, setHasShownRepos] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -70,15 +72,15 @@ export function RepositorySelection({
         {/* Hero Section - Daha geniş boşluklar */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-semibold text-gray-900 mb-2 tracking-tight">
-            Projelerinizi Seçin
+            {t('dashboard.selectRepos')}
           </h1>
           <div className="flex justify-center items-center mb-2">
             <span className="inline-block text-blue-600 bg-blue-50 rounded-full px-4 py-1.5 text-sm font-medium shadow-sm">
-              {selectedRepos.length} seçili
+              {selectedRepos.length} {t('dashboard.selected')}
             </span>
           </div>
           <p className="text-gray-500 text-sm max-w-xl mx-auto leading-normal">
-            Portfolio sitenizde gösterilecek GitHub projelerini seçin
+            {t('dashboard.selectReposDesc')}
           </p>
           {demoMode && (
             <div className="mt-4 inline-flex items-center px-4 py-2 bg-purple-50 text-purple-700 rounded-xl text-xs font-medium border border-purple-200">
@@ -137,7 +139,7 @@ export function RepositorySelection({
           {selectedRepos.length === 0 && (
             <div className="flex items-center gap-2 text-gray-600 text-sm">
               <AlertCircle className="h-4 w-4" />
-              Lütfen en az bir repository seçin
+              {t('dashboard.selectAtLeastOneRepo')}
             </div>
           )}
           <Button
@@ -147,7 +149,7 @@ export function RepositorySelection({
             variant="primary"
             className="w-full max-w-sm"
           >
-            Devam Et ({selectedRepos.length} seçili)
+            {t('dashboard.continue')} ({selectedRepos.length} {t('dashboard.selected')})
           </Button>
         </div>
       </div>
@@ -158,13 +160,15 @@ export function RepositorySelection({
     return (
       <div className="max-w-full mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Projelerinizi Seçin</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            {t('dashboard.selectRepos')}
+          </h1>
           <p className="text-gray-500 text-xl max-w-2xl mx-auto leading-relaxed">
-            Portfolio sitenizde gösterilecek GitHub projelerini seçin
+            {t('dashboard.selectReposDesc')}
           </p>
           <div className="mt-8 inline-flex items-center space-x-3 text-blue-600 bg-blue-50 px-6 py-3 rounded-xl">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="text-base font-medium">GitHub projeleriniz yükleniyor...</span>
+            <span className="text-base font-medium">{t('dashboard.reposLoading')}</span>
           </div>
         </div>
         <RepositoryGridSkeleton count={6} />
@@ -176,8 +180,8 @@ export function RepositorySelection({
     return (
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Projelerinizi Seçin</h1>
-          <p className="text-gray-500">Portfolio sitenizde gösterilecek GitHub projelerini seçin</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('dashboard.selectRepos')}</h1>
+          <p className="text-gray-500">{t('dashboard.selectReposDesc')}</p>
         </div>
         <ModernCard variant="elevated" className="mb-8 border-red-200 bg-red-50">
           <ModernCard.Content>
@@ -244,17 +248,15 @@ export function RepositorySelection({
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Projelerinizi Seçin</h1>
-        <p className="text-gray-500">Portfolio sitenizde gösterilecek GitHub projelerini seçin</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('dashboard.selectRepos')}</h1>
+        <p className="text-gray-500">{t('dashboard.selectReposDesc')}</p>
       </div>
       <ModernCard variant="elevated" className="text-center border-orange-200 bg-orange-50">
         <ModernCard.Content className="p-8">
           <div className="flex flex-col items-center mb-6">
             <Github className="h-10 w-10 text-orange-600 mb-2" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">No Public Repositories Found</h2>
-            <p className="text-gray-500 mb-4">
-              You need at least one public GitHub repository to create a portfolio.
-            </p>
+            <p className="text-gray-500 mb-4">{t('dashboard.noRepos')}</p>
           </div>
           <Button
             onClick={onRefetch}

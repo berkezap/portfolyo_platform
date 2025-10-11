@@ -1,5 +1,8 @@
+'use client';
+
 import { CheckCircle2, ExternalLink, FolderOpen, Share2, Download } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface PortfolioResult {
   success: boolean;
@@ -31,6 +34,8 @@ export function CompletedStep({
   isDevelopment,
   portfolioId,
 }: CompletedStepProps) {
+  const t = useTranslations('dashboard');
+  const locale = useLocale();
   const handleViewPortfolio = () => {
     if (publishedUrl) {
       // Published portfolio veya development preview
@@ -56,7 +61,7 @@ export function CompletedStep({
   };
 
   const handleShare = async () => {
-    const text = 'PortfolYO ile 5 dakikada portfolyo oluşturdum! 🚀';
+    const text = t('shareText');
     const url = 'https://portfolyo.dev';
 
     if (navigator.share) {
@@ -84,9 +89,9 @@ export function CompletedStep({
   const handleManagePortfolios = () => {
     // Eğer portfolioId varsa direkt edit sayfasına git, yoksa portfolio listesine
     if (portfolioId) {
-      window.location.href = `/dashboard/edit/${portfolioId}`;
+      window.location.href = `/${locale}/dashboard/edit/${portfolioId}`;
     } else {
-      window.location.href = '/my-portfolios';
+      window.location.href = `/${locale}/my-portfolios`;
     }
   };
 
@@ -96,26 +101,24 @@ export function CompletedStep({
         <CheckCircle2 className="w-16 h-16 text-green-600 mb-4" />
         {portfolioResult?.success ? (
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Tebrikler!</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('congratulations')}</h2>
             {isDevelopment ? (
               <div className="space-y-2">
-                <p className="text-sm text-gray-500">Portfolio preview hazır!</p>
+                <p className="text-sm text-gray-500">{t('portfolioPreviewReady')}</p>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <span className="text-xs font-medium text-yellow-800">
-                    🔧 Development Mode - Henüz yayınlanmadı
+                    {t('devModeNotPublished')}
                   </span>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-500">Portfolyonuz başarıyla yayınlandı!</p>
+              <p className="text-sm text-gray-500">{t('portfolioPublished')}</p>
             )}
           </div>
         ) : (
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">İşlem tamamlanamadı</h2>
-            <p className="text-sm text-gray-500">
-              Bir şeyler ters gitti. Lütfen geri dönüp yeniden deneyin.
-            </p>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('operationFailed')}</h2>
+            <p className="text-sm text-gray-500">{t('somethingWentWrong')}</p>
           </div>
         )}
 
@@ -128,7 +131,7 @@ export function CompletedStep({
               className="flex items-center justify-center gap-2 px-6 py-3"
             >
               <ExternalLink className="w-4 h-4" />
-              Gör
+              {t('view')}
             </Button>
 
             <Button
@@ -138,7 +141,7 @@ export function CompletedStep({
               className="flex items-center justify-center gap-2 px-6 py-3"
             >
               <FolderOpen className="w-4 h-4" />
-              Düzenle
+              {t('edit')}
             </Button>
 
             <Button
@@ -148,7 +151,7 @@ export function CompletedStep({
               className="flex items-center justify-center gap-2 px-6 py-3"
             >
               <Download className="w-4 h-4" />
-              HTML İndir
+              {t('downloadHTML')}
             </Button>
           </div>
         )}
@@ -161,11 +164,11 @@ export function CompletedStep({
             className="flex items-center gap-2 px-4 py-2"
           >
             <Share2 className="w-4 h-4" />
-            Paylaş
+            {t('share')}
           </Button>
 
           <Button variant="secondary" size="sm" onClick={onNewPortfolio} className="px-4 py-2">
-            Yeni Portfolyo
+            {t('newPortfolio')}
           </Button>
         </div>
       </div>

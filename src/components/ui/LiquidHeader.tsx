@@ -7,6 +7,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Github, Home, FolderOpen, Plus, LogOut, User } from 'lucide-react';
 import { usePortfolioList } from '@/hooks/usePortfolioList';
+import { useTranslations, useLocale } from 'next-intl';
+import LanguageSwitcher from './LanguageSwitcher';
+import type { Locale } from '@/i18n/config';
 
 interface LiquidHeaderProps {
   demoMode?: boolean;
@@ -17,6 +20,8 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('navigation');
+  const locale = useLocale() as Locale;
   const shouldFetchPortfolios = Boolean(session && status === 'authenticated');
   const { portfolios, isLoading } = usePortfolioList(shouldFetchPortfolios);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -125,56 +130,59 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
       <header className={headerClasses}>
         <nav className="flex items-center justify-between px-6 py-3">
           {/* Logo */}
-          <Link href="/" className="liquid-glass-logo group flex items-center gap-3 px-4 py-2">
+          <Link
+            href={`/${locale}`}
+            className="liquid-glass-logo group flex items-center gap-3 px-4 py-2"
+          >
             <span className="text-lg font-bold text-gray-800">PortfolYO</span>
           </Link>
 
           {/* Navigation */}
           {status === 'authenticated' && session && (
             <div className="hidden md:flex items-center gap-2">
-              <Link href="/dashboard">
+              <Link href={`/${locale}/dashboard`}>
                 <div
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    pathname === '/dashboard'
+                    pathname.includes('/dashboard')
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="ml-2">Dashboard</span>
+                  <span className="ml-2">{t('dashboard')}</span>
                 </div>
               </Link>
 
               <Link
-                href={getPortfolioLinkDisabled() ? '#' : '/my-portfolios'}
+                href={getPortfolioLinkDisabled() ? '#' : `/${locale}/my-portfolios`}
                 onClick={(e) => {
                   if (getPortfolioLinkDisabled()) {
                     e.preventDefault();
-                    router.push('/dashboard');
+                    router.push(`/${locale}/dashboard`);
                   }
                 }}
               >
                 <div
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    pathname === '/my-portfolios'
+                    pathname.includes('/my-portfolios')
                       ? 'bg-gray-900 text-white'
                       : getPortfolioLinkDisabled()
                         ? 'text-gray-400 cursor-not-allowed'
                         : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="ml-2">PortfolYO'lar</span>
+                  <span className="ml-2">{t('myPortfolios')}</span>
                 </div>
               </Link>
 
-              <Link href="/pricing">
+              <Link href={`/${locale}/pricing`}>
                 <div
                   className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    pathname === '/pricing'
+                    pathname.includes('/pricing')
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span>Fiyatlandırma</span>
+                  <span>{t('pricing')}</span>
                 </div>
               </Link>
             </div>
@@ -183,10 +191,10 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
           {/* Mobile Navigation */}
           {status === 'authenticated' && session && (
             <div className="flex md:hidden items-center gap-2">
-              <Link href="/dashboard">
+              <Link href={`/${locale}/dashboard`}>
                 <div
                   className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
-                    pathname === '/dashboard'
+                    pathname.includes('/dashboard')
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
@@ -196,17 +204,17 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
               </Link>
 
               <Link
-                href={getPortfolioLinkDisabled() ? '#' : '/my-portfolios'}
+                href={getPortfolioLinkDisabled() ? '#' : `/${locale}/my-portfolios`}
                 onClick={(e) => {
                   if (getPortfolioLinkDisabled()) {
                     e.preventDefault();
-                    router.push('/dashboard');
+                    router.push(`/${locale}/dashboard`);
                   }
                 }}
               >
                 <div
                   className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
-                    pathname === '/my-portfolios'
+                    pathname.includes('/my-portfolios')
                       ? 'bg-gray-900 text-white'
                       : getPortfolioLinkDisabled()
                         ? 'text-gray-400 cursor-not-allowed'
@@ -217,10 +225,10 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
                 </div>
               </Link>
 
-              <Link href="/pricing">
+              <Link href={`/${locale}/pricing`}>
                 <div
                   className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
-                    pathname === '/pricing'
+                    pathname.includes('/pricing')
                       ? 'bg-gray-900 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
@@ -233,6 +241,8 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
 
           {/* User Section */}
           <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <LanguageSwitcher currentLocale={locale} />
             {demoMode ? (
               <>
                 <div className="hidden sm:block px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
@@ -241,7 +251,7 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
                 <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-white text-sm font-bold">
                   DM
                 </div>
-                <Link href="/">
+                <Link href={`/${locale}`}>
                   <div className="flex items-center justify-center w-8 h-8 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
                     <Home className="w-4 h-4" />
                   </div>
@@ -253,7 +263,9 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
                   <div className="text-sm font-medium text-gray-900">
                     {session?.user?.name || 'User'}
                   </div>
-                  <div className="text-xs text-gray-500">{portfolios?.length || 0} portfolio</div>
+                  <div className="text-xs text-gray-500">
+                    {portfolios?.length || 0} {t('myPortfolios').toLowerCase()}
+                  </div>
                 </div>
 
                 {session?.user?.image ? (
@@ -273,14 +285,14 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
                 <button
                   onClick={async () => {
                     await signOut({
-                      callbackUrl: '/',
+                      callbackUrl: `/${locale}`,
                       redirect: true,
                     });
                   }}
                   className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline ml-2">Sign out</span>
+                  <span className="hidden sm:inline ml-2">{t('signOut')}</span>
                 </button>
               </>
             ) : status === 'unauthenticated' ? (
@@ -289,7 +301,7 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
                 className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <Github className="w-4 h-4" />
-                <span className="ml-2">Sign in</span>
+                <span className="ml-2">{t('signIn')}</span>
               </button>
             ) : (
               <div className="flex items-center gap-2">

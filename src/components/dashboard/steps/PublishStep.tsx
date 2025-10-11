@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Loader2, AlertCircle, Check, Globe, ExternalLink } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ModernCard from '@/components/ui/ModernCard';
@@ -11,6 +12,7 @@ interface PublishStepProps {
 }
 
 export function PublishStep({ loading, error, onPublish, onBack }: PublishStepProps) {
+  const t = useTranslations();
   const [slug, setSlug] = useState('');
   const [slugError, setSlugError] = useState('');
   const [checkingSlug, setCheckingSlug] = useState(false);
@@ -26,20 +28,20 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
 
   const validateSlug = (slug: string): boolean => {
     if (!slug || slug.length < 3) {
-      setSlugError('En az 3 karakter olmalıdır');
+      setSlugError(t('dashboard.minChars'));
       return false;
     }
     if (slug.length > 30) {
-      setSlugError('En fazla 30 karakter olabilir');
+      setSlugError(t('dashboard.maxChars'));
       return false;
     }
     const reserved = ['www', 'api', 'app', 'admin', 'static', 'cdn', 'mail', 'blog'];
     if (reserved.includes(slug)) {
-      setSlugError('Bu isim rezerve edilmiştir');
+      setSlugError(t('dashboard.slugReserved'));
       return false;
     }
     if (!/^[a-z0-9-]+$/.test(slug)) {
-      setSlugError('Sadece küçük harf, rakam ve tire (-) kullanılabilir');
+      setSlugError(t('dashboard.onlyLowercase'));
       return false;
     }
     setSlugError('');
@@ -55,12 +57,12 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
       const data = await response.json();
 
       if (!data.available) {
-        setSlugError('Bu isim zaten kullanılıyor');
+        setSlugError(t('dashboard.slugTaken'));
       } else {
         setSlugError('');
       }
     } catch (err) {
-      console.error('Slug kontrolü başarısız:', err);
+      console.error(t('dashboard.slugCheckFailed'), err);
     }
     setCheckingSlug(false);
   }, []);
@@ -96,10 +98,8 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
         <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <Globe className="w-6 h-6 text-white" />
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2">Portfolyonuzu Yayınlayın</h1>
-        <p className="text-sm text-gray-500 max-w-lg mx-auto">
-          Portfolyonuz için bir web adresi seçin ve canlıya alın
-        </p>
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">{t('dashboard.publishTitle')}</h1>
+        <p className="text-sm text-gray-500 max-w-lg mx-auto">{t('dashboard.publishSubtitle')}</p>
       </div>
 
       {/* Slug Selection Form */}
@@ -109,9 +109,9 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
             {/* URL Preview */}
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Portfolio Web Adresiniz
+                {t('dashboard.portfolioWebAddress')}
                 {isDevelopment && (
-                  <span className="text-orange-600 text-xs ml-2">(Development Mode)</span>
+                  <span className="text-orange-600 text-xs ml-2">{t('dashboard.devMode')}</span>
                 )}
               </label>
               <div className="flex items-center text-lg">
@@ -122,7 +122,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                   type="text"
                   value={slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
-                  placeholder="isminiz"
+                  placeholder={t('dashboard.placeholder')}
                   className="bg-transparent border-none outline-none text-blue-600 font-medium placeholder-gray-400 min-w-0 flex-1"
                   maxLength={30}
                   disabled={loading}
@@ -136,7 +136,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
               {checkingSlug && (
                 <div className="flex items-center gap-2 text-blue-600">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Kontrol ediliyor...</span>
+                  <span className="text-sm">{t('dashboard.checking')}</span>
                 </div>
               )}
 
@@ -150,7 +150,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
               {isValid && (
                 <div className="flex items-center gap-2 text-green-600">
                   <Check className="w-4 h-4" />
-                  <span className="text-sm">Bu isim kullanılabilir!</span>
+                  <span className="text-sm">{t('dashboard.slugAvailable')}</span>
                 </div>
               )}
             </div>
@@ -160,7 +160,9 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-blue-700 font-medium">Portfolio URL'iniz:</p>
+                    <p className="text-sm text-blue-700 font-medium">
+                      {t('dashboard.portfolioURL')}
+                    </p>
                     <p className="text-blue-600 font-mono">{previewUrl}</p>
                   </div>
                   <ExternalLink className="w-5 h-5 text-blue-500" />
@@ -188,7 +190,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                 disabled={loading}
                 className="flex-1"
               >
-                Geri
+                {t('common.back')}
               </Button>
 
               <Button
@@ -201,12 +203,12 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Yayınlanıyor...
+                    {t('dashboard.publishing')}
                   </>
                 ) : (
                   <>
                     <Globe className="w-4 h-4" />
-                    Canlıya Al
+                    {t('dashboard.goLive')}
                   </>
                 )}
               </Button>
@@ -217,7 +219,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
 
       {/* Info */}
       <div className="text-center text-sm text-gray-500">
-        <p>✨ Portfolyonuz hemen canlıya alınacak ve herkesle paylaşabileceksiniz!</p>
+        <p>{t('dashboard.publishMessage')}</p>
       </div>
     </div>
   );

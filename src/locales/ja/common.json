@@ -1,0 +1,149 @@
+{
+  "navigation": {
+    "home": "ホーム",
+    "pricing": "価格",
+    "dashboard": "ダッシュボード",
+    "myPortfolios": "マイポートフォリオ",
+    "signIn": "サインイン",
+    "signOut": "サインアウト"
+  },
+  "hero": {
+    "title": "GitHubから",
+    "titleBrand": "portfolYO",
+    "titleTime": "5分で",
+    "subtitle": "コーディングなしでGitHubプロジェクトをプロフェッショナルなポートフォリオサイトに変換します。開発者、デザイナー、企業向けの完全にカスタマイズ可能なソリューション。",
+    "ctaStart": "GitHubで始める",
+    "ctaPricing": "価格",
+    "ctaDashboard": "ダッシュボードへ",
+    "noCreditCard": "クレジットカード不要"
+  },
+  "builtOn": {
+    "title": "構築基盤：信頼できる最新技術"
+  },
+  "howItWorks": {
+    "title": "どのように機能しますか？",
+    "subtitle": "GitHubプロジェクトをプロフェッショナルなポートフォリオサイトに変換する最も簡単な方法",
+    "step1Title": "GitHubを接続",
+    "step1Desc": "ワンクリックでGitHubアカウントを接続します。すべてのパブリックリポジトリが自動的にリストされます。",
+    "step2Title": "プロジェクトを選択",
+    "step2Desc": "ポートフォリオで紹介したいプロジェクトを選択します。README、テクノロジー、スターが自動的に取得されます。",
+    "step3Title": "テンプレートを選択",
+    "step3Desc": "プロフェッショナルなテンプレートから、あなたのスタイルに最も適したものを選択します。すべてモバイルフレンドリーで高速です。",
+    "step4Title": "即座に公開",
+    "step4Desc": "ポートフォリオが自動的に生成され、カスタムドメインで公開されます。いつでも更新できます。"
+  },
+  "stats": {
+    "trustTitle": "信頼できる速度で",
+    "trustSubtitle": "モダンなポートフォリオ作成体験",
+    "setupTime": "5分",
+    "setupLabel": "平均セットアップ",
+    "cost": "¥0",
+    "costLabel": "初期費用",
+    "activePortfolios": "50+",
+    "activeLabel": "アクティブなポートフォリオ",
+    "mobileCompatible": "100%",
+    "mobileLabel": "モバイル対応"
+  },
+  "templates": {
+    "title": "プロフェッショナルテンプレート",
+    "subtitle": "あらゆるスタイルに対応した、モダンでモバイルフレンドリーなテンプレートから選択",
+    "minimalTech": "ミニマルテック",
+    "minimalTechDesc": "クリーンでミニマルなデザイン",
+    "professionalTech": "プロフェッショナルテック",
+    "professionalTechDesc": "企業向けでプロフェッショナル",
+    "creativeTech": "クリエイティブテック",
+    "creativeTechDesc": "クリエイティブでモダン",
+    "allInclude": "すべてのテンプレートに含まれています",
+    "allIncludeDesc": "各テンプレートにはこれらの機能が付属しています",
+    "mobileResponsive": "モバイルレスポンシブ",
+    "mobileResponsiveDesc": "すべてのデバイスで完璧",
+    "fastLoading": "高速読み込み",
+    "fastLoadingDesc": "最適化されたパフォーマンス",
+    "customizable": "カスタマイズ可能",
+    "customizableDesc": "色とコンテンツの制御",
+    "seoOptimized": "SEO最適化",
+    "seoOptimizedDesc": "検索エンジン向け"
+  },
+  "proFeatures": {
+    "title": "PortfolYO+",
+    "comingSoon": "近日公開",
+    "quarter": "2025年第2四半期",
+    "subtitle": "より多くのカスタマイズ、アナリティクス、プロフェッショナルツールでポートフォリオを次のレベルへ",
+    "customThemeTitle": "カスタムテーマエディター",
+    "customThemeDesc": "色、フォント、間隔、コンポーネントを好きなようにカスタマイズできます。ビジュアルエディターでコードなしでデザイン。",
+    "customDomainTitle": "カスタムドメイン",
+    "customDomainDesc": "yourname.comでプロフェッショナルな外観。SSL証明書、CDN最適化、DNS管理が含まれています。",
+    "analyticsTitle": "高度なアナリティクス",
+    "analyticsDesc": "訪問者の行動、トラフィックソース、コンバージョン率、詳細なパフォーマンスメトリクス。",
+    "supportTitle": "優先サポート",
+    "supportDesc": "24時間以内の応答保証、専用Slackチャンネル、1対1のオンボーディングサポート。",
+    "beta": "ベータ"
+  },
+  "pricing": {
+    "devTitle": "現在開発中",
+    "devSubtitle": "ベータ段階 - アーリーアダプター向け特別価格",
+    "perMonth": "/月",
+    "discount": "アーリーアダプター50%割引",
+    "joinWaitlist": "ウェイティングリストに参加"
+  },
+  "developer": {
+    "badge": "開発者による",
+    "title": "開発者のため、",
+    "titleHighlight": "開発者によって",
+    "subtitle": "素晴らしいプロジェクトを持っているが、それを披露するのに苦労している開発者のために設計されました",
+    "greetingTitle": "こんにちは、Berkeです",
+    "greetingDesc": "素晴らしいプロジェクトを持っているが、それを披露するのに苦労している開発者のために、PortfolYOを一人で構築しました。私の目標は、あなたのキャリアの始まりの障害の1つを取り除き、あなたを加速させることです。",
+    "realNeedTitle": "実際のニーズ",
+    "realNeedDesc": "自分自身のポートフォリオ問題から開発しました",
+    "quickSolutionTitle": "迅速な解決策",
+    "quickSolutionDesc": "5分でプロフェッショナルなポートフォリオを作成"
+  },
+  "faq": {
+    "title": "よくある質問",
+    "subtitle": "短く明確な回答。誇張なし。",
+    "badge": "よくある質問",
+    "q1": "GitHubアカウントは必要ですか？",
+    "a1": "はい。プロジェクトを安全に取得するには、GitHubでサインインする必要があります。これにより、リポジトリにアクセスして自動的にポートフォリオを作成できます。",
+    "q2": "自動的に更新されますか？",
+    "a2": "いつでもコンテンツを再生成できます。バックグラウンドで継続的な同期は行いません - 制御は完全にあなたのものです。",
+    "q3": "無料ですか？",
+    "a3": "現在は無料です。将来の計画は透明に発表します。Pro機能のアーリーアダプター割引を提供します。",
+    "q4": "データセキュリティはどうですか？",
+    "a4": "Cookie設定とGDPRフローで制御はあなたにあります。許可したデータのみを処理します。GitHubトークンは安全に保存されます。",
+    "q5": "編集できますか？",
+    "a5": "はい、作成後にポートフォリオを再度更新したり、異なるテンプレートを試したり、コンテンツを変更したりできます。",
+    "q6": "デモはありますか？",
+    "a6": "デモモードがオンの場合、サンプルデータで数分以内に試すことができます。実際のGitHubアカウントなしでテストできます。"
+  },
+  "finalCta": {
+    "badge": "今すぐ始める",
+    "title": "ポートフォリオ体験を",
+    "titleHighlight": "再定義しましょう",
+    "subtitle": "数クリックでGitHubプロジェクトを印象的なポートフォリオに変換"
+  },
+  "footer": {
+    "allRightsReserved": "すべての権利を保有。",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "成功",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "update": "更新",
+    "close": "閉じる",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "search": "検索",
+    "filter": "フィルター",
+    "sort": "並べ替え",
+    "yes": "はい",
+    "no": "いいえ"
+  }
+}

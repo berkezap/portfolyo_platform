@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePortfolioList } from '@/hooks/usePortfolioList';
 import { useSubscription } from '@/hooks/useSubscription';
 import Link from 'next/link';
@@ -21,6 +22,8 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const { data: session } = useSession();
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('navigation');
   const { portfolios } = usePortfolioList();
   const { subscriptionData, loading: subscriptionLoading, currentPlan } = useSubscription();
   const [scrolled, setScrolled] = useState(false);
@@ -36,7 +39,7 @@ export function DashboardHeader({
   }, []);
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: '/' });
+    await signOut({ callbackUrl: `/${locale}` });
   };
 
   const getPlanBadge = () => {
@@ -157,7 +160,10 @@ export function DashboardHeader({
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <Link href="/" className="liquid-glass-logo group flex items-center gap-3 px-4 py-2">
+              <Link
+                href={`/${locale}`}
+                className="liquid-glass-logo group flex items-center gap-3 px-4 py-2"
+              >
                 <span className="text-lg font-bold text-gray-800">PortfolYO</span>
               </Link>
             </div>
@@ -165,13 +171,13 @@ export function DashboardHeader({
             {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               <Link
-                href="/dashboard"
+                href={`/${locale}/dashboard`}
                 className="nav-link text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Dashboard
+                {t('dashboard')}
               </Link>
               <Link
-                href={portfolios.length === 0 ? '#' : '/my-portfolios'}
+                href={portfolios.length === 0 ? '#' : `/${locale}/my-portfolios`}
                 onClick={(e) => {
                   if (portfolios.length === 0) {
                     e.preventDefault();
@@ -181,7 +187,7 @@ export function DashboardHeader({
                   portfolios.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
-                PortfolYO'lar
+                {t('myPortfolios')}
                 {portfolios.length > 0 && (
                   <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-blue-600 bg-blue-100 rounded-full">
                     {portfolios.length}
@@ -189,10 +195,10 @@ export function DashboardHeader({
                 )}
               </Link>
               <Link
-                href="/pricing"
+                href={`/${locale}/pricing`}
                 className="nav-link text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
-                Fiyatlandırma
+                {t('pricing')}
               </Link>
             </nav>
 
@@ -244,14 +250,14 @@ export function DashboardHeader({
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
                     <Link
-                      href="/dashboard"
+                      href={`/${locale}/dashboard`}
                       className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      Dashboard
+                      {t('dashboard')}
                     </Link>
                     <Link
-                      href={portfolios.length === 0 ? '#' : '/my-portfolios'}
+                      href={portfolios.length === 0 ? '#' : `/${locale}/my-portfolios`}
                       onClick={(e) => {
                         if (portfolios.length === 0) {
                           e.preventDefault();
@@ -263,14 +269,14 @@ export function DashboardHeader({
                         portfolios.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
-                      My Portfolios
+                      {t('myPortfolios')}
                     </Link>
                     <Link
-                      href="/billing"
+                      href={`/${locale}/billing`}
                       className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
-                      Billing
+                      {t('billing')}
                     </Link>
                     <div className="border-t border-gray-100 my-1"></div>
                     <button
@@ -280,7 +286,7 @@ export function DashboardHeader({
                       }}
                       className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 transition-colors"
                     >
-                      Sign Out
+                      {t('signOut')}
                     </button>
                   </div>
                 )}
@@ -293,13 +299,13 @@ export function DashboardHeader({
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-3 space-y-1">
             <Link
-              href="/dashboard"
+              href={`/${locale}/dashboard`}
               className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Dashboard
+              {t('dashboard')}
             </Link>
             <Link
-              href={portfolios.length === 0 ? '#' : '/my-portfolios'}
+              href={portfolios.length === 0 ? '#' : `/${locale}/my-portfolios`}
               onClick={(e) => {
                 if (portfolios.length === 0) {
                   e.preventDefault();
@@ -309,7 +315,7 @@ export function DashboardHeader({
                 portfolios.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              PortfolYO'lar
+              {t('myPortfolios')}
               {portfolios.length > 0 && (
                 <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium text-gray-900 bg-gray-100 rounded-full">
                   {portfolios.length}
@@ -317,10 +323,10 @@ export function DashboardHeader({
               )}
             </Link>
             <Link
-              href="/pricing"
+              href={`/${locale}/pricing`}
               className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              Fiyatlandırma
+              {t('pricing')}
             </Link>
           </div>
         </div>

@@ -1,15 +1,20 @@
+'use client';
+
 import { StepType } from '@/types/dashboard';
+import { useTranslations } from 'next-intl';
 
 interface ProgressStepsProps {
   currentStep: StepType;
 }
 
 export function ProgressSteps({ currentStep }: ProgressStepsProps) {
+  const t = useTranslations('dashboard');
+
   const steps = [
-    { id: 'repos', label: 'Proje Seçimi', number: 1 },
-    { id: 'template', label: 'Şablon Seçimi', number: 2 },
-    { id: 'cv', label: 'CV Yükleme', number: 3 },
-    { id: 'publish', label: 'Yayınla', number: 4 },
+    { id: 'repos', label: t('stepRepos'), number: 1 },
+    { id: 'template', label: t('stepTemplate'), number: 2 },
+    { id: 'cv', label: t('stepCV'), number: 3 },
+    { id: 'publish', label: t('stepPublish'), number: 4 },
   ];
 
   const getStepStatus = (stepId: string) => {

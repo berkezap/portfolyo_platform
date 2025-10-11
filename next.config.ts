@@ -1,4 +1,7 @@
 import type { NextConfig } from 'next'
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   // Basit konfigürasyon
@@ -131,6 +134,6 @@ const withPWA = require('next-pwa')({
 const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = isProd
-  ? withPWA(withBundleAnalyzer(nextConfig))
-  : withBundleAnalyzer(nextConfig)
+  ? withNextIntl(withPWA(withBundleAnalyzer(nextConfig)))
+  : withNextIntl(withBundleAnalyzer(nextConfig))
 
