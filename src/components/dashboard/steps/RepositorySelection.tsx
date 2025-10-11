@@ -125,7 +125,7 @@ export function RepositorySelection({
                   </span>
                   {selectedRepos.includes(repo.id) && (
                     <span className="ml-auto text-sm bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full font-medium">
-                      ✓ Seçili
+                      ✓ {t('dashboard.selected')}
                     </span>
                   )}
                 </div>

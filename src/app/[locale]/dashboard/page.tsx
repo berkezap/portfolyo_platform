@@ -835,7 +835,7 @@ function TemplateSelection({
           disabled={!selectedTemplate}
           className="px-6 py-2"
         >
-          {t('dashboard.continueBtn')}
+          {t('dashboard.continue')}
         </Button>
       </div>
     </div>
@@ -930,7 +930,7 @@ function CVUpload({ cvUrl, uploading, error, onUpload, onNext, onBack }: CVUploa
           {t('common.back')}
         </Button>
         <Button variant="primary" onClick={onNext} disabled={!cvUrl} className="px-6 py-2">
-          {t('dashboard.continueBtn')}
+          {t('dashboard.continue')}
         </Button>
       </div>
     </div>
