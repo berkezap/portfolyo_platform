@@ -10,7 +10,6 @@ export const locales = [
   'ja', // 日本語
   'ko', // 한국어
   'zh-CN', // 简体中文
-  'ar', // العربية
   'hi', // हिन्दी
   'pl', // Polski
   'nl', // Nederlands
@@ -33,14 +32,13 @@ export const localeNames: Record<Locale, string> = {
   ja: '日本語',
   ko: '한국어',
   'zh-CN': '简体中文',
-  ar: 'العربية',
   hi: 'हिन्दी',
   pl: 'Polski',
   nl: 'Nederlands',
 };
 
-// RTL languages
-export const rtlLocales: Locale[] = ['ar'];
+// RTL languages (none currently - removed Arabic)
+export const rtlLocales: Locale[] = [];
 
 export function isRtlLocale(locale: Locale): boolean {
   return rtlLocales.includes(locale);
