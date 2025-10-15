@@ -99,11 +99,23 @@ export default function MyPortfoliosPage() {
 
     if (portfolio?.is_published && portfolio?.public_slug) {
       // Published portfolio - environment'a göre URL oluştur
-      const isDevelopment =
+      const isLocalhost =
         window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const portfolioUrl = isDevelopment
-        ? `http://localhost:${window.location.port || 3000}/portfolio/${portfolio.public_slug}`
-        : `https://${portfolio.public_slug}.portfolyo.tech`;
+      const isProduction = window.location.hostname === 'portfolyo.tech';
+
+      let portfolioUrl: string;
+
+      if (isLocalhost) {
+        // Localhost: localhost URL'i kullan
+        portfolioUrl = `http://localhost:${window.location.port || 3000}/portfolio/${portfolio.public_slug}`;
+      } else if (isProduction) {
+        // Production: subdomain kullan
+        portfolioUrl = `https://${portfolio.public_slug}.portfolyo.tech`;
+      } else {
+        // Preview/Vercel: mevcut domain'de /portfolio/slug kullan
+        portfolioUrl = `${window.location.protocol}//${window.location.host}/portfolio/${portfolio.public_slug}`;
+      }
+
       window.open(portfolioUrl, '_blank');
     } else {
       // Draft portfolio - SSR preview with portfolio ID

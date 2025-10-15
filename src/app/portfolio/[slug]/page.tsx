@@ -17,13 +17,13 @@ const ModernDeveloper = dynamic(() => import('@/components/templates/ModernDevel
 // Template ID to component mapping
 const TEMPLATE_MAP: Record<string, React.ComponentType<TemplateProps>> = {
   // Legacy templates (by ID)
-  '1': GitHubNative,        // professional-tech -> github-native
-  '2': BentoGridPro,        // minimalist-professional -> bento-grid-pro  
-  '3': TerminalMaster,      // creative-portfolio -> terminal-master
-  '4': ModernDeveloper,     // modern-developer
-  '5': GitHubNative,        // creative-technologist -> github-native
-  '6': BentoGridPro,        // storyteller -> bento-grid-pro
-  
+  '1': GitHubNative, // professional-tech -> github-native
+  '2': BentoGridPro, // minimalist-professional -> bento-grid-pro
+  '3': TerminalMaster, // creative-portfolio -> terminal-master
+  '4': ModernDeveloper, // modern-developer
+  '5': GitHubNative, // creative-technologist -> github-native
+  '6': BentoGridPro, // storyteller -> bento-grid-pro
+
   // New template names (if any)
   'github-native': GitHubNative,
   'bento-grid-pro': BentoGridPro,
@@ -34,10 +34,13 @@ const TEMPLATE_MAP: Record<string, React.ComponentType<TemplateProps>> = {
 /**
  * Fetch portfolio data from Supabase by slug or ID (for preview)
  */
-async function getPortfolioBySlug(slug: string, portfolioId?: string): Promise<PortfolioData | null> {
+async function getPortfolioBySlug(
+  slug: string,
+  portfolioId?: string,
+): Promise<PortfolioData | null> {
   try {
     console.log('[PortfolioPage] getPortfolioBySlug called with:', { slug, portfolioId });
-    
+
     // Preview mode: Fetch by ID regardless of publish status
     if (portfolioId) {
       console.log('[PortfolioPage] Fetching by ID:', portfolioId);
@@ -89,7 +92,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const { preview, portfolio_id } = await searchParams;
   const isPreview = preview === 'true';
-  
+
   const portfolio = await getPortfolioBySlug(slug, isPreview ? portfolio_id : undefined);
 
   if (!portfolio) {
@@ -100,7 +103,7 @@ export async function generateMetadata({
 
   const data = portfolio.metadata;
   const titleSuffix = isPreview ? ' - Preview' : ' - Portfolio';
-  
+
   return {
     title: `${data.USER_NAME}${titleSuffix}`,
     description: data.USER_BIO || 'Developer Portfolio',
@@ -131,7 +134,7 @@ export default async function PortfolioPage({
 }) {
   const { slug } = await params;
   const { preview, portfolio_id } = await searchParams;
-  
+
   const isPreview = preview === 'true';
   console.log('[PortfolioPage] Rendering portfolio:', { slug, isPreview, portfolio_id });
   console.log('[PortfolioPage] Search params:', await searchParams);
@@ -150,28 +153,46 @@ export default async function PortfolioPage({
   if (!portfolio.metadata) {
     console.error('[PortfolioPage] Portfolio metadata missing:', slug);
     return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh',
-        fontFamily: 'system-ui, sans-serif',
-        background: '#f3f4f6'
-      }}>
-        <div style={{ textAlign: 'center', padding: '32px', background: '#fff', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-          <h1 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>Portfolio Data Missing</h1>
-          <p style={{ color: '#6b7280', marginBottom: '24px' }}>This portfolio needs to be regenerated with the new system.</p>
-          <a href="/dashboard" style={{ 
-            display: 'inline-block',
-            padding: '12px 24px', 
-            background: '#3b82f6', 
-            color: '#fff', 
-            borderRadius: '8px',
-            textDecoration: 'none',
-            fontWeight: '600'
-          }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          fontFamily: 'system-ui, sans-serif',
+          background: '#f3f4f6',
+        }}
+      >
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '32px',
+            background: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          }}
+        >
+          <h1 style={{ fontSize: '24px', marginBottom: '16px', color: '#1f2937' }}>
+            Portfolio Data Missing
+          </h1>
+          <p style={{ color: '#6b7280', marginBottom: '24px' }}>
+            This portfolio needs to be regenerated with the new system.
+          </p>
+          <button
+            onClick={() => (window.location.href = '/dashboard')}
+            style={{
+              display: 'inline-block',
+              padding: '12px 24px',
+              background: '#3b82f6',
+              color: '#fff',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '600',
+            }}
+          >
             Go to Dashboard
-          </a>
+          </button>
         </div>
       </div>
     );
@@ -181,13 +202,15 @@ export default async function PortfolioPage({
   if (!isPreview && !portfolio.is_published) {
     console.log('[PortfolioPage] Portfolio not published:', slug);
     return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh',
-        fontFamily: 'system-ui, sans-serif'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          fontFamily: 'system-ui, sans-serif',
+        }}
+      >
         <div style={{ textAlign: 'center' }}>
           <h1>Portfolio Not Available</h1>
           <p>This portfolio is not published yet.</p>
@@ -200,7 +223,7 @@ export default async function PortfolioPage({
     id: portfolio.id,
     template: portfolio.selected_template,
     hasMetadata: !!portfolio.metadata,
-    metadataKeys: portfolio.metadata ? Object.keys(portfolio.metadata) : []
+    metadataKeys: portfolio.metadata ? Object.keys(portfolio.metadata) : [],
   });
 
   // Get the template component
@@ -210,13 +233,15 @@ export default async function PortfolioPage({
   if (!TemplateComponent) {
     console.error('[PortfolioPage] Unknown template:', portfolio.selected_template);
     return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh',
-        fontFamily: 'system-ui, sans-serif'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          fontFamily: 'system-ui, sans-serif',
+        }}
+      >
         <div style={{ textAlign: 'center' }}>
           <h1>Template Error</h1>
           <p>The selected template is not available.</p>
@@ -232,27 +257,28 @@ export default async function PortfolioPage({
   return (
     <>
       {isPreview && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          background: 'linear-gradient(45deg, #00ff00, #00aaff)',
-          color: '#000',
-          padding: '12px 20px',
-          borderRadius: '8px',
-          fontWeight: 'bold',
-          zIndex: 9999,
-          fontSize: '14px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          animation: 'pulse 2s infinite',
-          fontFamily: 'system-ui, sans-serif'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            background: 'linear-gradient(45deg, #00ff00, #00aaff)',
+            color: '#000',
+            padding: '12px 20px',
+            borderRadius: '8px',
+            fontWeight: 'bold',
+            zIndex: 9999,
+            fontSize: '14px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            animation: 'pulse 2s infinite',
+            fontFamily: 'system-ui, sans-serif',
+          }}
+        >
           🎯 PREVIEW MODE
         </div>
       )}
-      
+
       <TemplateComponent data={portfolio.metadata} />
     </>
   );
 }
-
