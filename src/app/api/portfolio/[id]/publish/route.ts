@@ -67,25 +67,28 @@ async function postHandler(request: NextRequest, context: { params: Promise<{ id
   const p = await PortfolioService.getPortfolio(id);
   if (!p) return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
 
-  if (!p.generated_html) {
+  // Check if portfolio has metadata (SSR - no HTML generation needed)
+  if (!p.metadata) {
     return NextResponse.json({ success: false, error: 'Nothing to publish' }, { status: 400 });
   }
 
+  // Update portfolio status (SSR - no HTML stored)
   const updated = await PortfolioService.updatePortfolio(id, {
-    published_html: p.generated_html,
     is_published: true,
     public_slug: normalized,
     published_at: new Date().toISOString(),
     visibility: 'public',
+    status: 'published',
   } as any);
 
   if (!updated)
     return NextResponse.json({ success: false, error: 'Publish failed' }, { status: 500 });
 
   const isDevelopment = process.env.NODE_ENV === 'development';
+  // SSR: Direct slug access via /portfolio/[slug] route
   const publicUrl = isDevelopment
     ? `http://localhost:3000/portfolio/${normalized}`
-    : `http://${normalized}.portfolyo.tech`; // TODO: Change to HTTPS when SSL is ready
+    : `https://${normalized}.portfolyo.tech`; // Subdomain access (rewritten to /portfolio/slug)
   return NextResponse.json({ success: true, publicUrl, portfolio: updated });
 }
 

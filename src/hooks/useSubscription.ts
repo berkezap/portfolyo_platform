@@ -53,6 +53,12 @@ export function useSubscription() {
   };
 
   const getCurrentPlan = (): 'FREE' | 'PRO' => {
+    // TEST MODE: Enable PRO features for testing
+    if (process.env.NEXT_PUBLIC_TEST_PRO_MODE === 'true') {
+      console.log('🧪 TEST MODE: PRO features enabled');
+      return 'PRO';
+    }
+    
     if (!subscriptionData || subscriptionData.status !== 'active') {
       return 'FREE';
     }

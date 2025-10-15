@@ -86,3 +86,6 @@ docs/TEMPLATE_QUALITY_ASSESSMENT_REPORT.md
 # Allow README.md in root
 !README.md
 .env.local.production-backup
+
+# Archive folder (old code backup)
+_archive/

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { GitHubService } from '@/lib/github';
-import { renderTemplate, formatUserDataForTemplate } from '@/lib/templateEngine';
+import { formatUserDataForTemplate } from '@/lib/portfolioHelpers';
 import { PortfolioService } from '@/lib/portfolioService';
 import { portfolioGenerationSchema, validateRequest, sanitizeString } from '@/lib/validation';
 import * as Sentry from '@sentry/nextjs';
@@ -11,6 +11,7 @@ import type { GitHubUser, GitHubRepo } from '@/types/github';
 import type { TemplateData } from '@/types/templates';
 import type { SessionUser } from '@/types/auth';
 import { withRateLimit } from '@/lib/rateLimit';
+import { isTemplatePremium } from '@/config/templates';
 
 async function postHandler(request: NextRequest) {
   console.log('🚀 Portfolio Generate API çağrıldı!');
@@ -54,6 +55,25 @@ async function postHandler(request: NextRequest) {
     console.log('📂 Template name:', templateName);
     console.log('📋 Selected repos:', selectedRepos);
     console.log('📄 CV URL:', cvUrl);
+
+    // Check if template is premium and user has access
+    if (isTemplatePremium(templateName) && !demoMode) {
+      // Get user's subscription status from Supabase
+      const tempSession = await getServerSession(authOptions);
+      if (!tempSession?.user?.email) {
+        console.error('❌ User not authenticated for premium template');
+        return NextResponse.json(
+          { error: 'Authentication required for premium templates' },
+          { status: 401 },
+        );
+      }
+
+      // TODO: Check subscription status from Supabase
+      // For now, allow all authenticated users (will be restricted later)
+      console.log(
+        '⚠️ Premium template access check - temporarily allowing all authenticated users',
+      );
+    }
 
     let userData: GitHubUser;
     let repos: GitHubRepo[];
@@ -168,37 +188,42 @@ async function postHandler(request: NextRequest) {
 
     // 🧱 Free tier limiti kontrolü (sadece gerçek modda)
     if (!demoMode) {
-      // FORCE FREE TIER LIMIT TO 1
-      const maxFreePortfolios = 1; // Force to 1 regardless of env var
-      const userIdForLimit = user?.email || userData?.login || '';
-      console.log('🔢 Free tier limit kontrolü (FORCED TO 1):', {
-        maxFreePortfolios,
-        userIdForLimit,
-        demoMode,
-        envVar: process.env.FREE_TIER_MAX_PORTFOLIOS,
-      });
-      if (userIdForLimit) {
-        try {
-          const existing = await PortfolioService.getUserPortfolios(userIdForLimit);
-          console.log(
-            '📊 Mevcut portfolyo sayısı:',
-            existing.length,
-            'Max allowed:',
-            maxFreePortfolios,
-          );
-          if (existing.length >= maxFreePortfolios) {
-            console.log('❌ Free tier limit aşıldı!');
-            return NextResponse.json(
-              {
-                error: 'Free tier limit exceeded',
-                details: `Free planda en fazla ${maxFreePortfolios} portfolyo oluşturabilirsiniz. Lütfen mevcut portfolyonuzdan birini silin veya plan yükseltin.`,
-              },
-              { status: 403 },
+      // TEST MODE: Skip limit check if TEST_PRO_MODE is enabled
+      if (process.env.NEXT_PUBLIC_TEST_PRO_MODE === 'true') {
+        console.log('🧪 TEST MODE: Skipping portfolio limit check (PRO features enabled)');
+      } else {
+        // FORCE FREE TIER LIMIT TO 1
+        const maxFreePortfolios = 1; // Force to 1 regardless of env var
+        const userIdForLimit = user?.email || userData?.login || '';
+        console.log('🔢 Free tier limit kontrolü (FORCED TO 1):', {
+          maxFreePortfolios,
+          userIdForLimit,
+          demoMode,
+          envVar: process.env.FREE_TIER_MAX_PORTFOLIOS,
+        });
+        if (userIdForLimit) {
+          try {
+            const existing = await PortfolioService.getUserPortfolios(userIdForLimit);
+            console.log(
+              '📊 Mevcut portfolyo sayısı:',
+              existing.length,
+              'Max allowed:',
+              maxFreePortfolios,
             );
+            if (existing.length >= maxFreePortfolios) {
+              console.log('❌ Free tier limit aşıldı!');
+              return NextResponse.json(
+                {
+                  error: 'Free tier limit exceeded',
+                  details: `Free planda en fazla ${maxFreePortfolios} portfolyo oluşturabilirsiniz. Lütfen mevcut portfolyonuzdan birini silin veya plan yükseltin.`,
+                },
+                { status: 403 },
+              );
+            }
+            console.log('✅ Free tier limit kontrolü geçti');
+          } catch (e) {
+            console.error('Free tier kontrolü hata:', e);
           }
-          console.log('✅ Free tier limit kontrolü geçti');
-        } catch (e) {
-          console.error('Free tier kontrolü hata:', e);
         }
       }
     }
@@ -229,7 +254,7 @@ async function postHandler(request: NextRequest) {
       console.log('✅ Portfolio başarıyla kaydedildi:', savedPortfolio.id);
     }
 
-    // 🎨 2. ADIM: Template data formatla ve HTML oluştur
+    // 🎨 2. ADIM: Template data formatla (SSR - HTML oluşturmuyoruz)
     console.log('🔄 formatUserDataForTemplate çağrılıyor...');
     const templateData: TemplateData = formatUserDataForTemplate(
       userData,
@@ -242,33 +267,26 @@ async function postHandler(request: NextRequest) {
       projectCount: (templateData as any).projects?.length || 0,
     });
 
-    console.log('🎨 renderTemplate çağrılıyor...');
-    const generatedHtml: string = renderTemplate(templateName, templateData);
-
-    if (!generatedHtml) {
-      throw new Error('Generated HTML is empty');
-    }
-
+    // SSR: Sadece metadata'yı kaydediyoruz, HTML render SSR'de olacak
     if (!demoMode) {
-      console.log('💾 Oluşturulan HTML veritabanına kaydediliyor...');
+      console.log('💾 Metadata veritabanına kaydediliyor...');
       const updated = await PortfolioService.updatePortfolio(savedPortfolio!.id, {
-        generated_html: generatedHtml,
-        metadata: PortfolioService.createMetadataFromTemplateData(templateData, templateName),
+        metadata: templateData, // SSR: Only save the data, not HTML
       } as any);
 
       if (!updated) {
-        console.log('❌ Portfolio HTML güncellenemedi!');
+        console.log('❌ Portfolio metadata güncellenemedi!');
         return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 });
       }
-      console.log('✅ Portfolio HTML güncellendi:', updated.id);
+      console.log('✅ Portfolio metadata güncellendi:', updated.id);
     }
 
-    console.log('🎉 Portfolio generation completed successfully');
+    console.log('🎉 Portfolio generation completed successfully (SSR mode)');
 
     return NextResponse.json({
       success: true,
-      generatedHtml,
       portfolioId: savedPortfolio!.id,
+      message: 'Portfolio created successfully. Publish to make it live.',
     });
   } catch (error) {
     console.error('💥 Portfolio generation error:', error);

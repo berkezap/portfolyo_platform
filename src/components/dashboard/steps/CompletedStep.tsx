@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, ExternalLink, FolderOpen, Share2, Download } from 'lucide-react';
+import { CheckCircle2, ExternalLink, FolderOpen, Share2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -37,26 +37,18 @@ export function CompletedStep({
   const t = useTranslations('dashboard');
   const locale = useLocale();
   const handleViewPortfolio = () => {
-    if (publishedUrl) {
-      // Published portfolio veya development preview
+    console.log('🎯 CompletedStep - View clicked, portfolioId:', portfolioId);
+    
+    if (portfolioId) {
+      // SSR: Use legacy route which will redirect to SSR route
+      const previewUrl = `/${locale}/portfolio/${portfolioId}?preview=true&portfolio_id=${portfolioId}`;
+      console.log('🔗 Opening preview URL:', previewUrl);
+      window.open(previewUrl, '_blank');
+    } else if (publishedUrl) {
+      // Fallback: Published URL
       window.open(publishedUrl, '_blank');
-    } else if (portfolioResult?.success && portfolioResult?.html) {
-      // Fallback - blob URL
-      const blob = new Blob([portfolioResult.html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-    }
-  };
-
-  const handleDownloadHTML = () => {
-    if (portfolioResult?.success && portfolioResult?.html) {
-      const blob = new Blob([portfolioResult.html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'portfolio.html';
-      a.click();
-      URL.revokeObjectURL(url);
+    } else {
+      console.error('❌ No portfolioId or publishedUrl available');
     }
   };
 
@@ -123,7 +115,7 @@ export function CompletedStep({
         )}
 
         {portfolioResult?.success && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-2xl mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mt-8">
             <Button
               variant="primary"
               size="md"
@@ -142,16 +134,6 @@ export function CompletedStep({
             >
               <FolderOpen className="w-4 h-4" />
               {t('edit')}
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleDownloadHTML}
-              className="flex items-center justify-center gap-2 px-6 py-3"
-            >
-              <Download className="w-4 h-4" />
-              {t('downloadHTML')}
             </Button>
           </div>
         )}

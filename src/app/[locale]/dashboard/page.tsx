@@ -38,6 +38,7 @@ import {
 // Import step components normally
 import { RepositorySelection } from '@/components/dashboard/steps/RepositorySelection';
 import { CompletedStep } from '@/components/dashboard/steps/CompletedStep';
+import { TEMPLATES } from '@/config/templates';
 
 // Mock GitHub repositories data
 const mockRepos = [
@@ -122,133 +123,14 @@ const mockRepos = [
   },
 ];
 
-const portfolioTemplates: PortfolioTemplate[] = [
-  {
-    id: 1,
-    name: 'Professional Tech',
-    description: 'Modern, clean design with dark/light mode toggle - perfect for developers',
-    previewHtml: `
-      <div style="background: #1C1C1E; height: 100%; padding: 20px; color: #F2F2F7; font-family: Inter, sans-serif; border-radius: 8px;">
-        <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #2C2C2E;">
-          <div style="display: flex; gap: 16px; font-size: 11px; color: #8E8E93;">
-            <span>About</span>
-            <span>Projects</span>
-            <span>Contact</span>
-          </div>
-          <svg style="width: 14px; height: 14px; color: #8E8E93;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-          </svg>
-        </div>
-        <!-- Hero -->
-        <div style="margin-bottom: 16px;">
-          <h1 style="font-size: 20px; margin-bottom: 4px; font-weight: 600;">Alex Johnson</h1>
-          <h2 style="font-size: 12px; color: #8E8E93; margin-bottom: 12px;">Senior Full Stack Developer</h2>
-          <p style="font-size: 10px; color: #8E8E93; margin-bottom: 12px; line-height: 1.4;">Passionate developer with 5+ years of experience building scalable web applications.</p>
-          <div style="display: flex; gap: 12px; font-size: 10px; color: #8E8E93;">
-            <span>GitHub</span>
-            <span>LinkedIn</span>
-            <span style="color: #0A84FF;">View CV</span>
-          </div>
-        </div>
-        <!-- Project Card -->
-        <div style="background: #1C1C1E; border: 1px solid #2C2C2E; border-radius: 6px; padding: 12px;">
-          <h3 style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">AI Dashboard Platform</h3>
-          <p style="font-size: 10px; color: #8E8E93; margin-bottom: 8px; line-height: 1.4;">Modern React dashboard with real-time analytics and AI-powered insights</p>
-          <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-            <span style="background: rgba(142, 142, 147, 0.12); color: #8E8E93; padding: 2px 6px; border-radius: 8px; font-size: 8px;">React</span>
-            <span style="background: rgba(142, 142, 147, 0.12); color: #8E8E93; padding: 2px 6px; border-radius: 8px; font-size: 8px;">TypeScript</span>
-            <span style="background: rgba(142, 142, 147, 0.12); color: #8E8E93; padding: 2px 6px; border-radius: 8px; font-size: 8px;">Node.js</span>
-          </div>
-          <div style="display: flex; gap: 8px; font-size: 9px;">
-            <span style="color: #0A84FF;">View Source</span>
-            <span style="color: #0A84FF;">Live Demo</span>
-          </div>
-        </div>
-      </div>
-    `,
-    features: ['Dark/Light Mode', 'Responsive Design', 'Professional', 'Modern CSS'],
-  },
-  {
-    id: 2,
-    name: 'Minimalist Professional',
-    description: 'Clean, minimal design with perfect typography - ideal for all professions',
-    previewHtml: `
-      <div style="background: #F1F1F1; height: 100%; padding: 20px; color: #111; font-family: Inter, sans-serif; border-radius: 8px;">
-        <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #E5E5E5;">
-          <div style="display: flex; gap: 16px; font-size: 11px; font-weight: 500;">
-            <span style="color: #2563eb;">About</span>
-            <span>Projects</span>
-            <span>Contact</span>
-          </div>
-          <div style="width: 20px; height: 20px; border: 1px solid #E5E5E5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-            <svg style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.95 7.07l-.71-.71M4.05 4.93l-.71-.71"/>
-            </svg>
-          </div>
-        </div>
-        <!-- Hero -->
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">Sarah Chen</h1>
-          <h2 style="font-size: 14px; color: #555; margin-bottom: 12px;">Product Designer & Developer</h2>
-          <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; font-size: 11px;">
-            <span style="color: #2563eb;">GitHub</span>
-            <span style="color: #2563eb;">LinkedIn</span>
-            <span style="color: #2563eb;">CV</span>
-          </div>
-        </div>
-        <!-- Project Card -->
-        <div style="background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-          <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Design System Platform</h3>
-          <p style="font-size: 11px; color: #555; margin-bottom: 8px; line-height: 1.4;">Comprehensive design system with component library and documentation</p>
-          <div style="display: flex; gap: 6px;">
-            <span style="background: #F1F1F1; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-size: 9px; border: 1px solid #E5E5E5;">Figma</span>
-            <span style="background: #F1F1F1; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-size: 9px; border: 1px solid #E5E5E5;">React</span>
-            <span style="background: #F1F1F1; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-size: 9px; border: 1px solid #E5E5E5;">Storybook</span>
-          </div>
-        </div>
-      </div>
-    `,
-    features: ['Dark/Light Mode', 'Minimal Design', 'Perfect Typography', 'Clean Layout'],
-  },
-  {
-    id: 3,
-    name: 'Creative Portfolio',
-    description: 'Dark theme with electric accents - perfect for creative developers and designers',
-    previewHtml: `
-      <div style="background: #1A1A1A; height: 100%; padding: 20px; color: #E0E0E0; font-family: Satoshi, sans-serif; border-radius: 8px; position: relative;">
-        <!-- Hero Section -->
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h1 style="font-size: 24px; font-family: 'JetBrains Mono', monospace; background: linear-gradient(45deg, #F000B8, #32F5C8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">MAYA DEV</h1>
-          <p style="font-size: 11px; color: #32F5C8; margin-bottom: 12px;">Frontend • Designer • Creative Technologist</p>
-          <div style="display: flex; justify-content: center; gap: 12px; font-size: 10px; color: #808080;">
-            <span style="color: #32F5C8;">GitHub</span>
-            <span style="color: #F000B8;">LinkedIn</span>
-            <span style="color: #32F5C8;">Portfolio</span>
-          </div>
-        </div>
-        <!-- Project Card with 3D Effect -->
-        <div style="background: #212121; border: 1px solid #2A2A2A; border-radius: 12px; padding: 12px; transform: perspective(1000px) rotateX(2deg) rotateY(-2deg); transition: transform 0.3s ease;">
-          <h3 style="font-size: 14px; font-family: 'JetBrains Mono', monospace; background: linear-gradient(45deg, #F000B8, #32F5C8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; margin-bottom: 6px; font-weight: 700;">NEON UI KIT</h3>
-          <p style="font-size: 10px; color: #808080; margin-bottom: 8px; line-height: 1.4;">Futuristic UI components with glowing effects and smooth animations</p>
-          <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-            <span style="color: #808080; border: 1px solid #404040; border-radius: 12px; padding: 2px 6px; font-size: 8px;">React</span>
-            <span style="color: #808080; border: 1px solid #404040; border-radius: 12px; padding: 2px 6px; font-size: 8px;">Framer</span>
-            <span style="color: #808080; border: 1px solid #404040; border-radius: 12px; padding: 2px 6px; font-size: 8px;">CSS3</span>
-          </div>
-          <div style="display: flex; gap: 8px; font-size: 9px;">
-            <span style="color: #32F5C8;">View Source</span>
-            <span style="color: #32F5C8;">Live Demo</span>
-          </div>
-        </div>
-        <!-- Subtle glow effect -->
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 20% 50%, rgba(240, 0, 184, 0.05) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(50, 245, 200, 0.05) 0%, transparent 50%); border-radius: 8px; pointer-events: none;"></div>
-      </div>
-    `,
-    features: ['Dark Theme', 'Electric Accents', '3D Effects', 'Creative Design'],
-  },
-];
+// Generate templates from config
+const portfolioTemplates: PortfolioTemplate[] = TEMPLATES.map((template, index) => ({
+  id: index + 1,
+  name: template.name,
+  description: template.description,
+  previewHtml: `<div style="padding: 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); color: white; border-radius: 8px; height: 100%; display: flex; flex-direction: column; justify-content: center;"><h3 style="font-size: 16px; margin-bottom: 8px; font-weight: 700;">${template.name}</h3><p style="font-size: 10px; margin-bottom: 12px; opacity: 0.9;">${template.description}</p><div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">${template.features.map((f) => `<span style="font-size: 8px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">${f}</span>`).join('')}</div></div>`,
+  features: template.features,
+}));
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -283,11 +165,11 @@ export default function DashboardPage() {
   const repos = demoMode ? mockRepos : realRepos || [];
 
   // Template ID'lerini şablon isimlerine çevir
-  const templateIdToName = {
-    1: 'professional-tech',
-    2: 'minimalist-professional',
-    3: 'creative-portfolio',
-  };
+  // Map template IDs to slugs from config
+  const templateIdToName: { [key: number]: string } = {};
+  TEMPLATES.forEach((template, index) => {
+    templateIdToName[index + 1] = template.id;
+  });
 
   const [selectedRepos, setSelectedRepos] = useState<number[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1);
@@ -365,6 +247,12 @@ export default function DashboardPage() {
 
     try {
       const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName];
+      
+      if (!templateName) {
+        console.error('❌ Template name bulunamadı:', selectedTemplate);
+        setCvError('Template not found. Please select a valid template.');
+        return;
+      }
 
       // Selected repo ID'lerini isimlere çevir
       const selectedRepoNames = selectedRepos
@@ -736,6 +624,9 @@ function TemplateSelection({
   onPreview,
 }: TemplateSelectionProps) {
   const t = useTranslations();
+  const router = useRouter();
+  const { currentPlan } = useSubscription();
+
   return (
     <div className="max-w-full mx-auto">
       <div className="text-center mb-8">
@@ -746,81 +637,131 @@ function TemplateSelection({
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {templates.map((template) => (
-          <div
-            key={template.id}
-            className={`
+        {templates.map((template) => {
+          const templateConfig = TEMPLATES.find((t) => t.name === template.name);
+          const isPremium = templateConfig?.isPremium || false;
+          const canUse = !isPremium || currentPlan === 'PRO';
+
+          return (
+            <div
+              key={template.id}
+              className={`
               relative p-6 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col h-full
               ${
                 selectedTemplate === template.id
                   ? 'border-blue-300 bg-blue-50 shadow-md'
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
               }
+              ${!canUse ? 'opacity-75' : ''}
             `}
-            onClick={() => onSelectTemplate(template.id)}
-          >
-            {selectedTemplate === template.id && (
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" />
+              onClick={() => canUse && onSelectTemplate(template.id)}
+            >
+              {/* PRO Badge */}
+              {isPremium && (
+                <div className="absolute -top-2 -left-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-10">
+                  PRO
+                </div>
+              )}
+
+              {selectedTemplate === template.id && canUse && (
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center z-10">
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+              )}
+
+              <div className="aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-4">
+                <iframe
+                  srcDoc={template.previewHtml}
+                  className="w-full h-full border-0 pointer-events-none transform scale-75 origin-top-left"
+                  title={`${template.name} Preview`}
+                  style={{ width: '133.33%', height: '133.33%' }}
+                />
               </div>
-            )}
 
-            <div className="aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden border border-gray-200 mb-4">
-              <iframe
-                srcDoc={template.previewHtml}
-                className="w-full h-full border-0 pointer-events-none transform scale-75 origin-top-left"
-                title={`${template.name} Preview`}
-                style={{ width: '133.33%', height: '133.33%' }}
-              />
-            </div>
+              {/* Lock Overlay for PRO templates without access */}
+              {isPremium && !canUse && (
+                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm rounded-xl flex items-center justify-center z-20">
+                  <div className="text-center text-white px-6">
+                    <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <p className="font-semibold mb-2">Premium Template</p>
+                    <p className="text-sm text-gray-200 mb-3">Upgrade to PRO to unlock</p>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push('/pricing');
+                      }}
+                      className="bg-white text-gray-900 hover:bg-gray-100"
+                    >
+                      Upgrade Now
+                    </Button>
+                  </div>
+                </div>
+              )}
 
-            <div className="space-y-3 flex-1 flex flex-col">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{template.name}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{template.description}</p>
-              </div>
+              <div className="space-y-3 flex-1 flex flex-col">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{template.name}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{template.description}</p>
+                </div>
 
-              <div className="h-16 flex flex-wrap gap-2 content-start">
-                {template.features.slice(0, 3).map((feature) => (
-                  <span
-                    key={feature}
-                    className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md h-fit"
+                <div className="h-16 flex flex-wrap gap-2 content-start">
+                  {template.features.slice(0, 3).map((feature) => (
+                    <span
+                      key={feature}
+                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md h-fit"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 pt-2 mt-auto">
+                  <Button
+                    variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
+                    size="sm"
+                    className="flex-1 text-sm"
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onSelectTemplate(template.id);
+                    }}
                   >
-                    {feature}
-                  </span>
-                ))}
-              </div>
+                    {selectedTemplate === template.id
+                      ? t('dashboard.selected')
+                      : t('dashboard.select')}
+                  </Button>
 
-              <div className="flex gap-2 pt-2 mt-auto">
-                <Button
-                  variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
-                  size="sm"
-                  className="flex-1 text-sm"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    onSelectTemplate(template.id);
-                  }}
-                >
-                  {selectedTemplate === template.id
-                    ? t('dashboard.selected')
-                    : t('dashboard.select')}
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    onPreview(template.id);
-                  }}
-                  className="!px-3"
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      onPreview(template.id);
+                    }}
+                    className="!px-3"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-between items-center">
