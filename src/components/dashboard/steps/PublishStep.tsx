@@ -86,10 +86,29 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
   };
 
   const isValid = slug.length >= 3 && !slugError && !checkingSlug;
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  const previewUrl = isDevelopment
-    ? `http://localhost:3000/portfolio/${slug}`
-    : `https://${slug}.portfolyo.tech`;
+
+  // Client-side environment detection
+  const getEnvironmentUrl = () => {
+    if (typeof window === 'undefined') return ''; // SSR guard
+
+    const isLocalhost =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isProduction = window.location.hostname === 'portfolyo.tech';
+
+    if (isLocalhost) {
+      return `http://localhost:${window.location.port || 3000}/portfolio/${slug}`;
+    } else if (isProduction) {
+      return `https://${slug}.portfolyo.tech`;
+    } else {
+      // Preview/Vercel environment
+      return `${window.location.protocol}//${window.location.host}/portfolio/${slug}`;
+    }
+  };
+
+  const isDevelopment =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const previewUrl = getEnvironmentUrl();
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -113,10 +132,19 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                 {isDevelopment && (
                   <span className="text-orange-600 text-xs ml-2">{t('dashboard.devMode')}</span>
                 )}
+                {!isDevelopment &&
+                  typeof window !== 'undefined' &&
+                  window.location.hostname !== 'portfolyo.tech' && (
+                    <span className="text-blue-600 text-xs ml-2">Preview Mode</span>
+                  )}
               </label>
               <div className="flex items-center text-lg">
                 <span className="text-gray-600">
-                  {isDevelopment ? 'http://localhost:3000/portfolio/' : 'https://'}
+                  {isDevelopment
+                    ? 'http://localhost:3000/portfolio/'
+                    : typeof window !== 'undefined' && window.location.hostname === 'portfolyo.tech'
+                      ? 'https://'
+                      : `${typeof window !== 'undefined' ? window.location.protocol : 'https:'}//${typeof window !== 'undefined' ? window.location.host : ''}/portfolio/`}
                 </span>
                 <input
                   type="text"
@@ -127,7 +155,13 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                   maxLength={30}
                   disabled={loading}
                 />
-                <span className="text-gray-600">{isDevelopment ? '' : '.portfolyo.tech'}</span>
+                <span className="text-gray-600">
+                  {isDevelopment
+                    ? ''
+                    : typeof window !== 'undefined' && window.location.hostname === 'portfolyo.tech'
+                      ? '.portfolyo.tech'
+                      : ''}
+                </span>
               </div>
             </div>
 
