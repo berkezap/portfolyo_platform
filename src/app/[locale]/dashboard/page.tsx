@@ -165,11 +165,11 @@ export default function DashboardPage() {
   const repos = demoMode ? mockRepos : realRepos || [];
 
   // Template ID'lerini şablon isimlerine çevir
-  const templateIdToName = {
-    1: 'professional-tech',
-    2: 'minimalist-professional',
-    3: 'creative-portfolio',
-  };
+  // Map template IDs to slugs from config
+  const templateIdToName: { [key: number]: string } = {};
+  TEMPLATES.forEach((template, index) => {
+    templateIdToName[index + 1] = template.id;
+  });
 
   const [selectedRepos, setSelectedRepos] = useState<number[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<number>(1);
@@ -247,6 +247,12 @@ export default function DashboardPage() {
 
     try {
       const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName];
+      
+      if (!templateName) {
+        console.error('❌ Template name bulunamadı:', selectedTemplate);
+        setCvError('Template not found. Please select a valid template.');
+        return;
+      }
 
       // Selected repo ID'lerini isimlere çevir
       const selectedRepoNames = selectedRepos

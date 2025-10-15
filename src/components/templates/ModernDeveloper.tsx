@@ -4,11 +4,13 @@
  * @returns {JSX.Element} Modern developer portfolio UI.
  */
 
+'use client';
+
 import React from 'react'
 import Image from 'next/image'
 import { TemplateProps } from '@/types/templates'
 
-export function ModernDeveloper({ data }: TemplateProps) {
+export default function ModernDeveloper({ data }: TemplateProps) {
   return (
     <>
       <style jsx>{`

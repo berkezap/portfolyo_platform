@@ -1,250 +1,89 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import { AlertCircle, FileWarning, Loader2, CheckCircle2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
-interface Portfolio {
-  id: string;
-  selected_template: string;
-  selected_repos: string[];
-  cv_url?: string;
-  generated_html?: string;
-  published_html?: string;
-  metadata?: {
-    user?: string;
-    repoCount?: number;
-    user_bio?: string;
-    user_avatar?: string;
-    user_email?: string;
-    github_url?: string;
-    total_repos?: number;
-    total_stars?: number;
-    years_experience?: number;
-    generated_at?: string;
-  };
-}
-
-export default function PortfolioViewPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
+/**
+ * Legacy portfolio preview route
+ * Redirects to new SSR portfolio route
+ */
+export default function LegacyPortfolioPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string; locale: string }> 
+}) {
   const { id } = use(params);
-  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [notFoundError, setNotFoundError] = useState(false);
-  const [mode, setMode] = useState<'loading' | 'preview' | 'normal'>('loading');
+  const router = useRouter();
 
-  // 1. Adım: Component ilk yüklendiğinde MOD'a karar ver. Sadece BİR KEZ çalışır.
   useEffect(() => {
+    console.log('🔄 Legacy route detected, redirecting to SSR route:', id);
+    
+    // Check if this is a preview request
     const urlParams = new URLSearchParams(window.location.search);
-    const previewParam = urlParams.get('preview');
-    console.log(`Component Mount: Preview modu kontrol ediliyor... Değer: ${previewParam}`);
-    if (previewParam === 'true') {
-      setMode('preview');
-    } else {
-      setMode('normal');
-    }
-  }, []); // Boş dependency array sayesinde sadece bir kez çalışır.
-
-  // 2. Adım: MOD'a göre ilgili fonksiyonu çağır.
-  useEffect(() => {
-    if (mode === 'loading') {
-      console.log('Bekleniyor: Mod henüz belirlenmedi.');
+    const isPreview = urlParams.get('preview') === 'true';
+    
+    // Check if ID is already a preview slug (starts with 'preview-')
+    if (id.startsWith('preview-')) {
+      // Extract the actual UUID from the preview slug or from URL params
+      const actualPortfolioId = urlParams.get('portfolio_id');
+      
+      if (actualPortfolioId) {
+        // We have the full UUID from params, use that for SSR
+        const previewSlug = `preview-${actualPortfolioId.slice(0, 8)}`;
+        const redirectUrl = `/portfolio/${previewSlug}?preview=true&portfolio_id=${actualPortfolioId}`;
+        console.log('🎯 Preview slug with full UUID, redirecting:', redirectUrl);
+        console.log('🔍 Portfolio ID being passed:', actualPortfolioId);
+        window.location.href = redirectUrl;
+      } else {
+        console.error('❌ Preview slug without portfolio_id param, redirecting to dashboard');
+        window.location.href = '/dashboard';
+      }
       return;
     }
-
-    if (mode === 'preview') {
-      console.log('Yönlendirme: handlePreviewMode() çağrılıyor.');
-      handlePreviewMode();
+    
+    if (isPreview) {
+      // Preview mode: redirect to SSR preview with temporary slug
+      const previewSlug = `preview-${id.slice(0, 8)}`;
+      const redirectUrl = `/portfolio/${previewSlug}?preview=true&portfolio_id=${id}`;
+      console.log('🎯 Redirecting to preview:', redirectUrl);
+      window.location.href = redirectUrl;
     } else {
-      console.log('Yönlendirme: handleNormalMode() çağrılıyor.');
-      handleNormalMode();
-    }
-  }, [mode, id]); // mode veya id değiştiğinde çalışır.
-
-  const handlePreviewMode = useCallback(async () => {
-    console.log('🎯 handlePreviewMode çalıştı - Gerçek API kullanılacak');
-    try {
-      setLoading(true);
-      setError(null);
-
-      // API'den portfolio'yu çek - bu sayede gerçek rendered HTML'i alıyoruz
-      const response = await fetch(`/api/portfolio/${id}`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      if (data.success && data.portfolio) {
-        // Preview modda SADECE generated_html kullan (published_html değil)
-        const htmlToShow = data.portfolio.generated_html;
-
-        if (htmlToShow) {
-          // Preview indicator'ı ekle
-          const previewIndicator = `
-            <div style="position: fixed; top: 20px; right: 20px; background: linear-gradient(45deg, #00ff00, #00aaff); color: #000; padding: 12px 20px; border-radius: 8px; font-weight: bold; z-index: 9999; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: pulse 2s infinite;">
-              🎯 ${data.portfolio.selected_template?.toUpperCase() || 'TEMPLATE'} PREVIEW
-            </div>
-            <style>
-              @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } }
-            </style>
-          `;
-
-          const htmlWithIndicator = htmlToShow.replace('</body>', `${previewIndicator}</body>`);
-
-          setPortfolio({
-            ...data.portfolio,
-            generated_html: htmlWithIndicator,
-          });
-          setLoading(false);
-          return;
-        } else {
-          throw new Error('Portfolio HTML bulunamadı');
+      // Normal mode: try to fetch portfolio and redirect to its public URL
+      const fetchAndRedirect = async () => {
+        try {
+          const response = await fetch(`/api/portfolio/${id}`);
+          const data = await response.json();
+          
+          if (data.success && data.portfolio) {
+            if (data.portfolio.is_published && data.portfolio.public_slug) {
+              // Published: redirect to public slug
+              window.location.href = `/portfolio/${data.portfolio.public_slug}`;
+            } else {
+              // Draft: redirect to preview
+              const previewSlug = `preview-${id.slice(0, 8)}`;
+              window.location.href = `/portfolio/${previewSlug}?preview=true&portfolio_id=${id}`;
+            }
+          } else {
+            // Not found: redirect to dashboard
+            window.location.href = '/dashboard';
+          }
+        } catch (error) {
+          console.error('Error fetching portfolio:', error);
+          window.location.href = '/dashboard';
         }
-      } else {
-        throw new Error(data.error || 'Portfolio yüklenemedi');
-      }
-    } catch (error) {
-      console.error('❌ Preview hatası:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-      setError(`Preview hatası: ${errorMessage}`);
-      setLoading(false);
+      };
+      
+      fetchAndRedirect();
     }
-  }, [id]);
-
-  const handleNormalMode = useCallback(async () => {
-    console.log('🌐 handleNormalMode çalıştı');
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`/api/portfolio/${id}`);
-      if (response.status === 404) {
-        setNotFoundError(true);
-        setLoading(false);
-        return;
-      }
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
-      if (data.success && data.portfolio) {
-        // Önce published_html'i kontrol et (yayınlanmış portfolio için), yoksa generated_html kullan
-        const htmlToShow = data.portfolio.published_html || data.portfolio.generated_html;
-        if (htmlToShow) {
-          setPortfolio({
-            ...data.portfolio,
-            generated_html: htmlToShow,
-          });
-        } else {
-          setError('Portfolio HTML bulunamadı.');
-        }
-      } else {
-        setError(data.error || 'Portfolio could not be loaded.');
-      }
-    } catch (err) {
-      console.error('❌ Normal mode hata:', err);
-      setError(err instanceof Error ? err.message : 'Portfolio yüklenirken hata oluştu');
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  if (notFoundError) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <Card className="max-w-md mx-auto text-center p-8">
-          <div className="flex items-center justify-center mb-6">
-            <FileWarning className="h-10 w-10 text-gray-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Portfolyo Bulunamadı</h1>
-          <p className="text-gray-600 mb-8">
-            Aradığınız portfolyo mevcut değil veya kaldırılmış olabilir.
-          </p>
-          <div className="space-y-4">
-            <Button onClick={() => router.push('/')} size="lg" className="w-full">
-              Ana Sayfaya Dön
-            </Button>
-            <Button variant="secondary" onClick={() => router.back()} size="lg" className="w-full">
-              Geri Dön
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <Card className="max-w-md mx-auto text-center p-8">
-          <div className="flex items-center justify-center mb-6">
-            <AlertCircle className="h-10 w-10 text-red-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Bir Hata Oluştu</h1>
-          <p className="text-red-600 mb-8">{error}</p>
-          <div className="space-y-4">
-            <Button
-              onClick={() => (mode === 'preview' ? handlePreviewMode() : handleNormalMode())}
-              size="lg"
-              className="w-full"
-            >
-              Tekrar Dene
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => router.push('/')}
-              size="lg"
-              className="w-full"
-            >
-              Ana Sayfaya Dön
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="text-center p-8 max-w-md mx-auto">
-          <div className="flex items-center justify-center mb-4">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-          </div>
-          <p className="text-gray-600">Portfolio yükleniyor...</p>
-        </Card>
-      </div>
-    );
-  }
-
-  if (portfolio?.generated_html) {
-    return (
-      <div className="min-h-screen bg-white">
-        <div
-          className="w-full h-screen"
-          dangerouslySetInnerHTML={{ __html: portfolio.generated_html }}
-        />
-      </div>
-    );
-  }
+  }, [id, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <Card className="max-w-md mx-auto text-center p-8">
-        <div className="flex items-center justify-center mb-6">
-          <CheckCircle2 className="h-10 w-10 text-yellow-600" />
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Portfolio Hazırlanıyor</h1>
-        <p className="text-gray-600 mb-8">
-          Bu portfolio henüz hazırlanma aşamasında. Lütfen daha sonra tekrar deneyin.
-        </p>
-        <Button onClick={() => router.push('/')} size="lg" className="w-full">
-          Ana Sayfaya Dön
-        </Button>
-      </Card>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="h-8 w-8 text-blue-600 animate-spin mx-auto mb-4" />
+        <p className="text-gray-600">Redirecting to portfolio...</p>
+      </div>
     </div>
   );
 }

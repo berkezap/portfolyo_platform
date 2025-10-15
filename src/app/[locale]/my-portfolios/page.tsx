@@ -106,8 +106,9 @@ export default function MyPortfoliosPage() {
         : `https://${portfolio.public_slug}.portfolyo.tech`;
       window.open(portfolioUrl, '_blank');
     } else {
-      // Draft portfolio - internal preview
-      window.open(`/portfolio/${portfolioId}`, '_blank');
+      // Draft portfolio - SSR preview with portfolio ID
+      const previewSlug = `preview-${portfolioId.slice(0, 8)}`;
+      window.open(`/portfolio/${previewSlug}?preview=true&portfolio_id=${portfolioId}`, '_blank');
     }
   };
 

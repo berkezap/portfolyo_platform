@@ -323,70 +323,31 @@ export default function EditPortfolioPage({ params }: EditPortfolioPageProps) {
 
   const handleViewPortfolio = useCallback(() => {
     if (portfolio?.is_published && portfolio?.public_slug) {
-      // Published portfolio - subdomain'e yönlendir
-      window.open(`http://${portfolio.public_slug}.portfolyo.tech`, '_blank');
+      // Published portfolio - SSR route with public slug
+      window.open(`/portfolio/${portfolio.public_slug}`, '_blank');
     } else {
-      // Draft portfolio - internal preview
-      window.open(`/portfolio/${portfolioId}`, '_blank');
+      // Draft portfolio - SSR preview with portfolio ID
+      const previewSlug = `preview-${portfolioId.slice(0, 8)}`;
+      window.open(`/portfolio/${previewSlug}?preview=true&portfolio_id=${portfolioId}`, '_blank');
     }
   }, [portfolioId, portfolio]);
 
   // Preview fonksiyonu - ZENGİN VERİ ile
   const handlePreview = useCallback(() => {
+    console.log('🎯 handlePreview çağrıldı, portfolioId:', portfolioId);
+    console.log('🔍 Portfolio data:', { id: portfolio?.id, public_slug: portfolio?.public_slug });
+    
     if (!allRepos || !session) {
       console.warn('⚠️ Preview için repolar ve kullanıcı oturumu gerekli');
       return;
     }
 
-    // Seçilen repoların tüm verilerini al
-    const selectedRepoDetails = selectedRepos
-      .map((repoId) => allRepos.find((repo) => repo.id === repoId))
-      .filter((repo): repo is GitHubRepo => !!repo);
-
-    // Güvenli kullanıcı verisi oluşturma
-    const userData = session.user
-      ? {
-          name: session.user.name || 'Kullanıcı Adı',
-          bio: userBio || 'Harika bir bio burada yer alacak.',
-          avatar_url: session.user.image || '',
-          github_url: `https://github.com/${session.user.name}`,
-          linkedin_url: '#',
-          cv_url: portfolio?.cv_url || '#',
-        }
-      : {
-          name: 'Demo Kullanıcı',
-          bio: 'Bu bir demo bio açıklamasıdır.',
-          avatar_url: '/portfolyo-logo.svg',
-          github_url: '#',
-          linkedin_url: '#',
-          cv_url: '#',
-        };
-
-    // Preview için zengin veri objesi oluştur
-    const previewData = {
-      portfolioId,
-      template: templateIdToName[selectedTemplate],
-      user: userData,
-      repos: selectedRepoDetails.map((repo) => ({
-        name: repo.name,
-        description: repo.description || 'Açıklama yok.',
-        html_url: repo.html_url,
-        language: repo.language,
-        stargazers_count: repo.stargazers_count,
-        forks_count: repo.forks_count,
-      })),
-      timestamp: Date.now(),
-    };
-
-    console.log("💾 Zengin preview verisi localStorage'a kaydediliyor:", previewData);
-    localStorage.setItem('portfolio-preview', JSON.stringify(previewData));
-
-    const cacheParam = `preview=true&t=${Date.now()}`;
-    const previewUrl = `/portfolio/${portfolioId}?${cacheParam}`;
-    console.log('🔗 Yeni preview URL açılıyor:', previewUrl);
+    // SSR: Use legacy route with UUID, it will redirect to SSR
+    const previewUrl = `/${locale}/portfolio/${portfolioId}?preview=true`;
+    console.log('🔗 Legacy preview URL açılıyor (SSR redirect edilecek):', previewUrl);
 
     window.open(previewUrl, '_blank');
-  }, [allRepos, selectedRepos, selectedTemplate, portfolioId, session, userBio, portfolio?.cv_url]);
+  }, [allRepos, portfolioId, session, portfolio, locale]);
 
   // Preview fonksiyonu kaldırıldı
 

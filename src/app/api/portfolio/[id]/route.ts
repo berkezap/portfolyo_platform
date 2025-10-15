@@ -5,7 +5,7 @@ import { PortfolioService } from '@/lib/portfolioService';
 import { portfolioUpdateSchema, validateRequest } from '@/lib/validation';
 import * as Sentry from '@sentry/nextjs';
 import { GitHubService } from '@/lib/github';
-import { formatUserDataForTemplate, renderTemplate } from '@/lib/templateEngine';
+import { formatUserDataForTemplate } from '@/lib/portfolioHelpers';
 import type { GitHubUser, GitHubRepo } from '@/types/github'; // tipler buradan import edildi
 import { withRateLimit } from '@/lib/rateLimit';
 import { createErrorResponse } from '@/lib/errorHandler';
@@ -166,41 +166,14 @@ async function patchHandler(request: NextRequest, context: { params: Promise<{ i
           userBio: finalUserBio,
         });
 
-        const templateData = formatUserDataForTemplate(userData, allRepos, finalSelectedRepos);
+        const templateData = formatUserDataForTemplate(userData, allRepos, finalSelectedRepos, finalCvUrl);
 
-        if (finalCvUrl) templateData.CV_URL = finalCvUrl;
         if (finalUserBio && typeof finalUserBio === 'string') templateData.USER_BIO = finalUserBio;
 
-        console.log('🎨 Template render ediliyor...');
-        const newGeneratedHtml = renderTemplate(finalTemplateName, templateData);
+        console.log('✅ Template data hazırlandı (SSR mode)');
 
-        if (!newGeneratedHtml) {
-          throw new Error('Generated HTML is empty');
-        }
-
-        console.log('✅ Template başarıyla render edildi, HTML uzunluğu:', newGeneratedHtml.length);
-
-        updatePayload.generated_html = newGeneratedHtml;
-        // Free v1 kuralı: yayınlıysa canlı HTML de güncellensin
-        console.log('🔄 Portfolio publish status kontrolü:', {
-          status: existingPortfolio.status,
-          is_published: existingPortfolio.is_published,
-        });
-        // Portfolio published ise veya public_slug varsa (development preview için)
-        const isPublished =
-          existingPortfolio.is_published === true || existingPortfolio.status === 'published';
-        const hasPublicSlug = !!existingPortfolio.public_slug;
-
-        if (isPublished || hasPublicSlug) {
-          console.log('✅ Published/Preview portfolio - canlı HTML güncellenecek');
-          (updatePayload as any).published_html = newGeneratedHtml;
-        } else {
-          console.log('📝 Draft portfolio - sadece generated_html güncellenecek');
-        }
-        updatePayload.metadata = PortfolioService.createMetadataFromTemplateData(
-          templateData,
-          finalTemplateName,
-        );
+        // SSR: Sadece metadata'yı güncelle, HTML render SSR'de olacak
+        updatePayload.metadata = templateData as any;
       } catch (error) {
         console.error('❌ Template render hatası:', error);
         return NextResponse.json(

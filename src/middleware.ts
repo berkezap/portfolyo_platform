@@ -15,21 +15,29 @@ export function middleware(request: NextRequest) {
   const host: string = request.headers.get('host') ?? '';
   const pathname: string = request.nextUrl.pathname ?? '';
 
-  // Subdomain-based publishing: rewrite *.portfolyo.tech to internal public route
+  // Subdomain-based publishing: rewrite *.portfolyo.tech to dynamic portfolio route
   try {
     if (host.endsWith('portfolyo.tech') && host.split('.').length >= 3) {
       const sub: string = host.split('.')[0] || '';
-      const reserved: string[] = ['www', 'api', 'app', 'admin', 'static', 'cdn'];
+      const reserved: string[] = ['www', 'api', 'app', 'admin', 'static', 'cdn', 'portfolyo'];
       if (!reserved.includes(sub)) {
         const url = request.nextUrl.clone();
-        url.pathname = '/pub';
-        url.searchParams.set('slug', sub);
+        // Rewrite to SSR portfolio route: subdomain.portfolyo.tech -> /portfolio/subdomain
+        url.pathname = `/portfolio/${sub}${pathname === '/' ? '' : pathname}`;
+        console.log(`[Middleware] Subdomain rewrite: ${host} -> ${url.pathname}`);
         return NextResponse.rewrite(url);
       }
     }
-  } catch (_) {}
+  } catch (error) {
+    console.error('[Middleware] Subdomain error:', error);
+  }
 
-  // Apply i18n routing
+  // Skip i18n routing for portfolio routes (SSR routes)
+  if (pathname.startsWith('/portfolio/')) {
+    return NextResponse.next();
+  }
+
+  // Apply i18n routing for other routes
   const i18nResponse = intlMiddleware(request);
   const response = i18nResponse || NextResponse.next();
 
@@ -77,9 +85,9 @@ export function middleware(request: NextRequest) {
     const csp = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://browser.sentry-cdn.com https://vercel.live",
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https:",
-      "font-src 'self' data:",
+      "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://api.stripe.com https://*.sentry.io https://*.ingest.de.sentry.io https://vercel.live",
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -106,9 +114,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - pub (public portfolio routes - no i18n)
      * - sw.js, manifest.json, workbox files (PWA files)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|pub|sw.js|manifest.json|workbox-.*\\.js).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sw.js|manifest.json|workbox-.*\\.js).*)',
   ],
 };
