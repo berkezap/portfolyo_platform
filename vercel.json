@@ -5,18 +5,11 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["fra1"],
-  "rewrites": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "(?<subdomain>[^.]+)\\.portfolyo\\.tech"
-        }
-      ],
-      "destination": "/portfolio/:subdomain/:path*"
+  "functions": {
+    "app/portfolio/[slug]/page.tsx": {
+      "maxDuration": 30
     }
-  ],
+  },
   "headers": [
     {
       "source": "/(.*)",
@@ -26,12 +19,17 @@
           "value": "on"
         },
         {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/portfolio/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, s-maxage=600"
         }
       ]
     }

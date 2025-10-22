@@ -7,10 +7,47 @@ const nextConfig: NextConfig = {
   // Basit konfigürasyon
   compress: true,
   poweredByHeader: false,
+  
+  // Output file tracing root to fix workspace warnings
+  output: 'standalone',
+  outputFileTracingRoot: __dirname,
 
   // Güvenlik headers'ları
   async headers() {
     return [
+      // Template preview routes - allow framing for previews
+      {
+        source: '/templates/preview/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://browser.sentry-cdn.com https://vercel.live",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://api.stripe.com https://*.sentry.io https://*.ingest.de.sentry.io https://vercel.live",
+              "frame-ancestors 'self'", // Allow same-origin framing for previews
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; ')
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          }
+        ]
+      },
+      // All other routes - strict security
       {
         source: '/(.*)',
         headers: [

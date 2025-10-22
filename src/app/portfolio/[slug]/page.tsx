@@ -40,6 +40,11 @@ async function getPortfolioBySlug(
 ): Promise<PortfolioData | null> {
   try {
     console.log('[PortfolioPage] getPortfolioBySlug called with:', { slug, portfolioId });
+    console.log('[PortfolioPage] Environment check:', {
+      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      nodeEnv: process.env.NODE_ENV,
+    });
 
     // Preview mode: Fetch by ID regardless of publish status
     if (portfolioId) {
@@ -59,6 +64,8 @@ async function getPortfolioBySlug(
       return data as PortfolioData | null;
     }
 
+    console.log('[PortfolioPage] Fetching published portfolio by slug:', slug);
+
     // Normal mode: Fetch by slug and check if published
     const { data, error } = await supabaseAdmin
       .from('portfolios')
@@ -69,8 +76,21 @@ async function getPortfolioBySlug(
 
     if (error) {
       console.error('[PortfolioPage] Error fetching portfolio:', error);
+      console.error('[PortfolioPage] Error details:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
       return null;
     }
+
+    console.log('[PortfolioPage] Database query result:', {
+      found: !!data,
+      slug: slug,
+      hasMetadata: data?.metadata ? 'YES' : 'NO',
+      isPublished: data?.is_published ? 'YES' : 'NO',
+    });
 
     return data as PortfolioData | null;
   } catch (error) {

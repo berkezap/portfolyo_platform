@@ -15,6 +15,7 @@
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"

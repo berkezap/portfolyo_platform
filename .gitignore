@@ -89,3 +89,6 @@ docs/TEMPLATE_QUALITY_ASSESSMENT_REPORT.md
 
 # Archive folder (old code backup)
 _archive/
+
+# Cursor IDE files (plans, notes, etc.)
+.cursor/

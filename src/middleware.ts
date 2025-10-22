@@ -37,11 +37,38 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Skip i18n routing for template preview routes and allow framing
+  if (pathname.startsWith('/templates/preview/')) {
+    const response = NextResponse.next();
+    // Allow framing for template previews
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    response.headers.set('X-DNS-Prefetch-Control', 'on');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'origin-when-cross-origin');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+
+    // Set CSP to allow same-origin framing for template previews
+    const previewCSP = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "img-src 'self' data: https:",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "connect-src 'self' https://api.github.com https://*.supabase.co",
+      "frame-ancestors 'self'", // Allow same-origin framing
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join('; ');
+    response.headers.set('Content-Security-Policy', previewCSP);
+
+    return response;
+  }
+
   // Apply i18n routing for other routes
   const i18nResponse = intlMiddleware(request);
   const response = i18nResponse || NextResponse.next();
 
-  // Performance headers
+  // Performance headers for all other routes
   response.headers.set('X-DNS-Prefetch-Control', 'on');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');

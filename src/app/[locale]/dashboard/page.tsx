@@ -247,7 +247,7 @@ export default function DashboardPage() {
 
     try {
       const templateName = templateIdToName[selectedTemplate as keyof typeof templateIdToName];
-      
+
       if (!templateName) {
         console.error('❌ Template name bulunamadı:', selectedTemplate);
         setCvError('Template not found. Please select a valid template.');
@@ -368,10 +368,29 @@ export default function DashboardPage() {
     setPreviewLoading(true);
 
     try {
-      const response = await fetch(`/api/templates/preview/${templateId}`);
+      // Template ID'yi slug'a çevir
+      const templateSlug = templateIdToName[templateId];
+      if (!templateSlug) {
+        setPreviewHtml('<div class="p-8 text-center text-red-600">Template bulunamadı</div>');
+        return;
+      }
+
+      const response = await fetch(`/api/templates/preview?template=${templateSlug}`);
       if (response.ok) {
-        const html = await response.text();
-        setPreviewHtml(html);
+        const data = await response.json();
+        if (data.success && data.previewUrl) {
+          // Preview URL'ini iframe olarak göster
+          const iframeHtml = `
+            <iframe 
+              src="${data.previewUrl}" 
+              style="width: 100%; height: 100%; border: none; background: white;" 
+              title="Template Preview"
+            ></iframe>
+          `;
+          setPreviewHtml(iframeHtml);
+        } else {
+          setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>');
+        }
       } else {
         setPreviewHtml('<div class="p-8 text-center text-red-600">Template yüklenemedi</div>');
       }
