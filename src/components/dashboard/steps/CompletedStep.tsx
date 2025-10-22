@@ -37,18 +37,24 @@ export function CompletedStep({
   const t = useTranslations('dashboard');
   const locale = useLocale();
   const handleViewPortfolio = () => {
-    console.log('🎯 CompletedStep - View clicked, portfolioId:', portfolioId);
-    
-    if (portfolioId) {
-      // SSR: Use legacy route which will redirect to SSR route
+    console.log(
+      '🎯 CompletedStep - View clicked, portfolioId:',
+      portfolioId,
+      'publishedUrl:',
+      publishedUrl,
+    );
+
+    if (publishedUrl) {
+      // Prioritize published URL if available
+      console.log('🔗 Opening published URL:', publishedUrl);
+      window.open(publishedUrl, '_blank');
+    } else if (portfolioId) {
+      // Fallback: Preview URL for drafts
       const previewUrl = `/${locale}/portfolio/${portfolioId}?preview=true&portfolio_id=${portfolioId}`;
       console.log('🔗 Opening preview URL:', previewUrl);
       window.open(previewUrl, '_blank');
-    } else if (publishedUrl) {
-      // Fallback: Published URL
-      window.open(publishedUrl, '_blank');
     } else {
-      console.error('❌ No portfolioId or publishedUrl available');
+      console.error('❌ No publishedUrl or portfolioId available');
     }
   };
 
