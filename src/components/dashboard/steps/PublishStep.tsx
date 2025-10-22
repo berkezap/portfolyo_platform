@@ -93,15 +93,12 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
 
     const isLocalhost =
       window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isProduction = window.location.hostname === 'portfolyo.tech';
 
     if (isLocalhost) {
       return `http://localhost:${window.location.port || 3000}/portfolio/${slug}`;
-    } else if (isProduction) {
-      return `https://${slug}.portfolyo.tech`;
     } else {
-      // Preview/Vercel environment
-      return `${window.location.protocol}//${window.location.host}/portfolio/${slug}`;
+      // Always show production URL for preview
+      return `https://${slug}.portfolyo.tech`;
     }
   };
 
@@ -140,11 +137,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
               </label>
               <div className="flex items-center text-lg">
                 <span className="text-gray-600">
-                  {isDevelopment
-                    ? 'http://localhost:3000/portfolio/'
-                    : typeof window !== 'undefined' && window.location.hostname === 'portfolyo.tech'
-                      ? 'https://'
-                      : `${typeof window !== 'undefined' ? window.location.protocol : 'https:'}//${typeof window !== 'undefined' ? window.location.host : ''}/portfolio/`}
+                  {isDevelopment ? 'http://localhost:3000/portfolio/' : 'https://'}
                 </span>
                 <input
                   type="text"
@@ -155,13 +148,7 @@ export function PublishStep({ loading, error, onPublish, onBack }: PublishStepPr
                   maxLength={30}
                   disabled={loading}
                 />
-                <span className="text-gray-600">
-                  {isDevelopment
-                    ? ''
-                    : typeof window !== 'undefined' && window.location.hostname === 'portfolyo.tech'
-                      ? '.portfolyo.tech'
-                      : ''}
-                </span>
+                <span className="text-gray-600">{isDevelopment ? '' : '.portfolyo.tech'}</span>
               </div>
             </div>
 
