@@ -164,7 +164,7 @@ export function DashboardHeader({
                 href={`/${locale}`}
                 className="liquid-glass-logo group flex items-center gap-3 px-4 py-2"
               >
-                <Image src="/yo.svg" alt="YO" width={40} height={40} className="w-10 h-10" />
+                <Image src="/YO.svg" alt="YO" width={40} height={40} className="w-10 h-10" />
               </Link>
             </div>
 

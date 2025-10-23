@@ -69,6 +69,7 @@ export function middleware(request: NextRequest) {
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://api.github.com https://*.supabase.co",
+      "frame-src 'self'", // Allow same-origin framing for template previews
       "frame-ancestors 'self'", // Allow same-origin framing
       "base-uri 'self'",
       "form-action 'self'",
@@ -130,6 +131,7 @@ export function middleware(request: NextRequest) {
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://api.stripe.com https://*.sentry.io https://*.ingest.de.sentry.io https://vercel.live",
+      "frame-src 'self' https://vercel.live", // Allow same-origin frames and Vercel Live
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
