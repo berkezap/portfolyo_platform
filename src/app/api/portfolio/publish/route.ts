@@ -373,12 +373,20 @@ async function postHandler(request: NextRequest) {
       );
     }
 
-    // URL oluşturma - Preview ve Production'da subdomain
-    const baseUrl = isDevelopment
-      ? `http://localhost:${process.env.PORT || 3000}`
-      : `https://${slug}.portfolyo.tech`;
+    // URL oluşturma - Environment'a göre URL formatı
+    let portfolioUrl: string;
 
-    const portfolioUrl = isDevelopment ? `${baseUrl}/portfolio/${slug}` : baseUrl;
+    if (isDevelopment) {
+      // Development: local preview route
+      portfolioUrl = `http://localhost:${process.env.PORT || 3000}/portfolio/${slug}`;
+    } else if (isPreview) {
+      // Preview: Vercel preview domain'de subdomain olarak
+      portfolioUrl = `https://${slug}.portfolyo.tech`;
+      console.log('⚠️ Preview ortamında subdomain test ediliyor:', portfolioUrl);
+    } else {
+      // Production: Gerçek subdomain
+      portfolioUrl = `https://${slug}.portfolyo.tech`;
+    }
 
     console.log(
       isDevelopment

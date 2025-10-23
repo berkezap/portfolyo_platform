@@ -1,8 +1,18 @@
 -- Fix: PRO kullanıcılar birden fazla portfolio yayınlayabilsin
 -- FREE kullanıcılar için constraint uygulama seviyesinde kontrol edilecek
 
--- Mevcut constraint'i kaldır
+-- Mevcut tüm unique constraint'leri kaldır
 DROP INDEX IF EXISTS uniq_published_per_user;
+DROP INDEX IF EXISTS idx_portfolios_user_single_published;
+
+-- Benzer isimdeki constraint'leri de kontrol et ve kaldır
+DROP INDEX IF EXISTS portfolios_user_id_published_unique;
+DROP INDEX IF EXISTS unique_published_portfolio_per_user;
+DROP INDEX IF EXISTS idx_portfolios_user_id_is_published;
+
+-- Mevcut tüm constraint'leri listele ve kontrol et
+-- Supabase'de bu komutu çalıştırarak mevcut index'leri görebilirsin:
+-- SELECT indexname FROM pg_indexes WHERE tablename = 'portfolios' AND indexdef LIKE '%is_published%';
 
 -- PRO plan limits tablosu ekle (opsiyonel - gelecek için)
 CREATE TABLE IF NOT EXISTS subscription_limits (
