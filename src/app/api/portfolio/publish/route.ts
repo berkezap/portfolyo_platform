@@ -197,6 +197,8 @@ async function postHandler(request: NextRequest) {
     }
 
     // Portfolio'nun kullanıcıya ait olduğunu kontrol et
+    console.log('📋 Portfolio kontrolü başlıyor:', { portfolioId, userEmail: session.user.email });
+
     const { data: portfolio, error: portfolioError } = await supabaseAdmin
       .from('portfolios')
       .select(
@@ -206,12 +208,15 @@ async function postHandler(request: NextRequest) {
       .eq('user_id', session.user.email)
       .single();
 
+    console.log('📋 Portfolio query sonucu:', { portfolio, portfolioError });
+
     if (portfolioError || !portfolio) {
       console.log('❌ Portfolio bulunamadı:', portfolioError);
       return NextResponse.json(
         {
           success: false,
           error: 'Portfolio bulunamadı',
+          debug: { portfolioError, portfolioId, userEmail: session.user.email },
         },
         { status: 404 },
       );
@@ -278,6 +283,8 @@ async function postHandler(request: NextRequest) {
       ...(shouldPublish ? { published_at: new Date().toISOString() } : {}),
     };
 
+    console.log('📤 Portfolio güncelleme başlıyor:', { updateData, portfolioId });
+
     const { data: updatedPortfolio, error: updateError } = await supabaseAdmin
       .from('portfolios')
       .update(updateData)
@@ -285,12 +292,15 @@ async function postHandler(request: NextRequest) {
       .select('id, public_slug, is_published, published_at')
       .single();
 
+    console.log('📤 Portfolio güncelleme sonucu:', { updatedPortfolio, updateError });
+
     if (updateError || !updatedPortfolio) {
       console.log('❌ Publish güncelleme hatası:', updateError);
       return NextResponse.json(
         {
           success: false,
           error: 'Yayınlama sırasında bir hata oluştu',
+          debug: { updateError, updateData, portfolioId },
         },
         { status: 500 },
       );
@@ -326,6 +336,10 @@ async function postHandler(request: NextRequest) {
       {
         success: false,
         error: 'Sunucu hatası',
+        debug: {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        },
       },
       { status: 500 },
     );
