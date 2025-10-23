@@ -20,7 +20,16 @@ async function postHandler(request: NextRequest) {
 
     // Environment kontrolü
     const isDevelopment = process.env.NODE_ENV === 'development';
+    const isPreview = process.env.VERCEL_ENV === 'preview';
     const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
+    console.log('🔍 Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      isDevelopment,
+      isPreview,
+      demoMode,
+    });
 
     if (demoMode) {
       const body = await request.json();
@@ -258,13 +267,15 @@ async function postHandler(request: NextRequest) {
       );
     }
 
-    // Portfolio yayınlama - Development modunda gerçekten yayınlama
+    // Portfolio yayınlama - Preview ve Production'da gerçekten yayınla
+    const shouldPublish = !isDevelopment; // Sadece local development'ta yayınlama
+
     const updateData = {
       public_slug: slug,
-      is_published: !isDevelopment, // Development'ta false, production'da true
-      visibility: isDevelopment ? 'unlisted' : 'public', // Development'ta unlisted
+      is_published: shouldPublish,
+      visibility: shouldPublish ? 'public' : 'unlisted',
       published_html: portfolio.generated_html,
-      ...(isDevelopment ? {} : { published_at: new Date().toISOString() }), // Development'ta published_at güncelleme
+      ...(shouldPublish ? { published_at: new Date().toISOString() } : {}),
     };
 
     const { data: updatedPortfolio, error: updateError } = await supabaseAdmin
@@ -285,7 +296,7 @@ async function postHandler(request: NextRequest) {
       );
     }
 
-    // Development modunda local preview URL, production'da subdomain
+    // URL oluşturma - Preview ve Production'da subdomain
     const baseUrl = isDevelopment
       ? `http://localhost:${process.env.PORT || 3000}`
       : `https://${slug}.portfolyo.tech`;
@@ -295,7 +306,7 @@ async function postHandler(request: NextRequest) {
     console.log(
       isDevelopment
         ? `🔧 Development mode: Portfolio preview hazır (yayınlanmadı): ${portfolioUrl}`
-        : `✅ Production mode: Portfolio yayınlandı: ${portfolioUrl}`,
+        : `✅ ${isPreview ? 'Preview' : 'Production'} mode: Portfolio yayınlandı: ${portfolioUrl}`,
     );
 
     return NextResponse.json({
@@ -305,8 +316,9 @@ async function postHandler(request: NextRequest) {
       url: portfolioUrl,
       message: isDevelopment
         ? 'Portfolio preview hazır! (Development modunda - henüz yayınlanmadı)'
-        : 'Portfolio başarıyla yayınlandı!',
+        : `Portfolio başarıyla yayınlandı! ${isPreview ? '(Preview ortamında)' : ''}`,
       isDevelopment,
+      isPreview,
     });
   } catch (error) {
     console.error('❌ Portfolio publish hatası:', error);

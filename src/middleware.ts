@@ -126,12 +126,12 @@ export function middleware(request: NextRequest) {
     // Content Security Policy - Updated to allow Supabase storage and Vercel Live
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://browser.sentry-cdn.com https://vercel.live",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://browser.sentry-cdn.com https://vercel.live https://*.vercel.live",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://api.stripe.com https://*.sentry.io https://*.ingest.de.sentry.io https://vercel.live",
-      "frame-src 'self' https://vercel.live", // Allow same-origin frames and Vercel Live
+      "connect-src 'self' https://api.github.com https://*.supabase.co https://srgvpcwbcjsuostcexmn.supabase.co https://api.stripe.com https://*.sentry.io https://*.ingest.de.sentry.io https://vercel.live https://*.vercel.live",
+      "frame-src 'self' https://vercel.live https://*.vercel.live", // Allow same-origin frames and Vercel Live
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

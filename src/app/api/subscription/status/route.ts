@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    console.log('🔍 Checking subscription for:', session.user.email);
+
     // Check user subscription in database
     const { data, error } = await supabaseAdmin
       .from('user_subscriptions')
