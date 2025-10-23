@@ -53,7 +53,7 @@ function generatePreviewData(templateSlug: string) {
     USER_BIO:
       'This is a preview of how your portfolio will look with real data from your GitHub profile.',
     USER_MISSION_STATEMENT: 'Building amazing web applications that make a difference.',
-    USER_AVATAR: '/portfolyo-icon.svg',
+    USER_AVATAR: '/YO.svg',
     USER_EMAIL: 'demo@example.com',
     GITHUB_URL: 'https://github.com/demouser',
     LINKEDIN_URL: 'https://linkedin.com/in/demouser',

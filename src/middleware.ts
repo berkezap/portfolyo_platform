@@ -37,6 +37,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Skip i18n routing for static assets (images, icons, etc.)
+  if (
+    pathname.includes('.png') ||
+    pathname.includes('.jpg') ||
+    pathname.includes('.jpeg') ||
+    pathname.includes('.gif') ||
+    pathname.includes('.ico') ||
+    pathname.includes('.svg') ||
+    pathname.includes('.css') ||
+    pathname.includes('.js')
+  ) {
+    return NextResponse.next();
+  }
+
   // Skip i18n routing for template preview routes and allow framing
   if (pathname.startsWith('/templates/preview/')) {
     const response = NextResponse.next();

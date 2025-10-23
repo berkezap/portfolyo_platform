@@ -55,9 +55,17 @@ export function usePortfolioGenerator(): UsePortfolioGeneratorReturn {
       const data = await response.json();
 
       if (!response.ok) {
-        // 403 ise limit mesajını surface et
-        const message = data?.error || 'Failed to generate portfolio';
-        throw new Error(message);
+        // Handle different error responses with better messaging
+        if (response.status === 403 && data?.code === 'PORTFOLIO_LIMIT_REACHED') {
+          const detailedMessage = data?.message || data?.error || 'Portfolio limit reached';
+          throw new Error(detailedMessage);
+        } else if (response.status === 403 && data?.code === 'PREMIUM_REQUIRED') {
+          const premiumMessage = data?.error || 'Premium template requires PRO subscription';
+          throw new Error(premiumMessage);
+        } else {
+          const message = data?.error || 'Failed to generate portfolio';
+          throw new Error(message);
+        }
       }
 
       setResult(data);

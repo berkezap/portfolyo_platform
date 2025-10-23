@@ -4,8 +4,8 @@ import { locales } from '@/i18n/config';
 export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
-    icon: '/portfolyo-logo.svg',
-    apple: '/portfolyo-logo.svg',
+    icon: '/YO.svg',
+    apple: '/YO.svg',
   },
   other: {
     'theme-color': '#2563EB',

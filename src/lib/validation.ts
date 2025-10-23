@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TEMPLATES } from '@/config/templates';
 
 // Gelişmiş sanitization helpers
 export const sanitizeString = (str: string): string => {
@@ -70,11 +71,7 @@ const validateSecureString = (str: string) => {
 
 // Portfolio Generation Schema
 export const portfolioGenerationSchema = z.object({
-  template: z.enum([
-    'github-native',
-    'bento-grid-pro',
-    'terminal-master',
-  ]),
+  template: z.enum(TEMPLATES.map((t) => t.slug) as [string, ...string[]]),
   selectedRepos: z
     .array(
       z

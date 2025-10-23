@@ -18,9 +18,7 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="md:col-span-1">
             <div className="flex items-center mb-6 mt-12">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-sm">P</span>
-              </div>
+              <img src="/YO.svg" alt="PortfolYO" className="w-8 h-8 mr-3" />
               <span className="text-xl font-bold text-white">PortfolYO</span>
             </div>
             <p className="text-gray-400 mb-6 max-w-sm leading-relaxed">{t('description')}</p>

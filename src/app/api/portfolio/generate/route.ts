@@ -68,11 +68,105 @@ async function postHandler(request: NextRequest) {
         );
       }
 
-      // TODO: Check subscription status from Supabase
-      // For now, allow all authenticated users (will be restricted later)
-      console.log(
-        '⚠️ Premium template access check - temporarily allowing all authenticated users',
-      );
+      // Check subscription status from Supabase
+      console.log('🔒 Checking premium template access for:', tempSession.user.email);
+
+      try {
+        const { PortfolioService } = await import('@/lib/portfolioService');
+        const portfolioService = new PortfolioService();
+
+        // Get user subscription from database
+        const subscription = await portfolioService.getUserSubscription(tempSession.user.email);
+
+        const hasPremiumAccess = subscription?.plan === 'PRO' && subscription?.status === 'active';
+
+        if (!hasPremiumAccess) {
+          console.error('❌ Premium template access denied for user:', tempSession.user.email);
+          console.error('📊 User subscription:', subscription);
+          return NextResponse.json(
+            {
+              error: 'Premium template requires PRO subscription',
+              code: 'PREMIUM_REQUIRED',
+              userPlan: subscription?.plan || 'FREE',
+            },
+            { status: 403 },
+          );
+        }
+
+        console.log('✅ Premium template access granted for:', tempSession.user.email);
+      } catch (subscriptionError) {
+        console.error('❌ Subscription check failed:', subscriptionError);
+        return NextResponse.json(
+          {
+            error: 'Failed to verify subscription status',
+            code: 'SUBSCRIPTION_CHECK_FAILED',
+          },
+          { status: 500 },
+        );
+      }
+    }
+
+    // Check portfolio limits for all users (not demo mode)
+    if (!demoMode) {
+      const tempSession = await getServerSession(authOptions);
+      if (!tempSession?.user?.email) {
+        console.error('❌ User not authenticated');
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      }
+
+      try {
+        const { PortfolioService } = await import('@/lib/portfolioService');
+        const portfolioService = new PortfolioService();
+
+        // Get user subscription and current portfolio count
+        const subscription = await portfolioService.getUserSubscription(tempSession.user.email);
+        const userPortfolios = await PortfolioService.getUserPortfolios(tempSession.user.email);
+
+        const isPro = subscription?.plan === 'PRO' && subscription?.status === 'active';
+        const maxPortfolios = isPro ? 5 : 1; // PRO: 5 portfolios, FREE: 1 portfolio
+        const currentCount = userPortfolios.length;
+
+        console.log('📊 Portfolio limit check:', {
+          userEmail: tempSession.user.email,
+          plan: subscription?.plan || 'FREE',
+          currentCount,
+          maxPortfolios,
+          canCreate: currentCount < maxPortfolios,
+        });
+
+        if (currentCount >= maxPortfolios) {
+          console.error('❌ Portfolio limit exceeded for user:', tempSession.user.email);
+
+          const planName = isPro ? 'PRO' : 'FREE';
+          const upgradeMessage = isPro
+            ? 'Please delete an existing portfolio to create a new one.'
+            : 'Upgrade to PRO to create up to 5 portfolios.';
+
+          return NextResponse.json(
+            {
+              error: `Portfolio limit reached`,
+              message: `${planName} plan allows ${maxPortfolios} portfolio${maxPortfolios > 1 ? 's' : ''}. ${upgradeMessage}`,
+              code: 'PORTFOLIO_LIMIT_REACHED',
+              userPlan: subscription?.plan || 'FREE',
+              currentCount,
+              maxPortfolios,
+              upgradeRequired: !isPro,
+            },
+            { status: 403 },
+          );
+        }
+
+        console.log('✅ Portfolio limit check passed');
+      } catch (limitError) {
+        console.error('❌ Portfolio limit check failed:', limitError);
+        return NextResponse.json(
+          {
+            error: 'Failed to verify portfolio limits',
+            code: 'LIMIT_CHECK_FAILED',
+          },
+          { status: 500 },
+        );
+      }
     }
 
     let userData: GitHubUser;
@@ -186,47 +280,7 @@ async function postHandler(request: NextRequest) {
       repos = reposResult;
     }
 
-    // 🧱 Free tier limiti kontrolü (sadece gerçek modda)
-    if (!demoMode) {
-      // TEST MODE: Skip limit check if TEST_PRO_MODE is enabled
-      if (process.env.NEXT_PUBLIC_TEST_PRO_MODE === 'true') {
-        console.log('🧪 TEST MODE: Skipping portfolio limit check (PRO features enabled)');
-      } else {
-        // FORCE FREE TIER LIMIT TO 1
-        const maxFreePortfolios = 1; // Force to 1 regardless of env var
-        const userIdForLimit = user?.email || userData?.login || '';
-        console.log('🔢 Free tier limit kontrolü (FORCED TO 1):', {
-          maxFreePortfolios,
-          userIdForLimit,
-          demoMode,
-          envVar: process.env.FREE_TIER_MAX_PORTFOLIOS,
-        });
-        if (userIdForLimit) {
-          try {
-            const existing = await PortfolioService.getUserPortfolios(userIdForLimit);
-            console.log(
-              '📊 Mevcut portfolyo sayısı:',
-              existing.length,
-              'Max allowed:',
-              maxFreePortfolios,
-            );
-            if (existing.length >= maxFreePortfolios) {
-              console.log('❌ Free tier limit aşıldı!');
-              return NextResponse.json(
-                {
-                  error: 'Free tier limit exceeded',
-                  details: `Free planda en fazla ${maxFreePortfolios} portfolyo oluşturabilirsiniz. Lütfen mevcut portfolyonuzdan birini silin veya plan yükseltin.`,
-                },
-                { status: 403 },
-              );
-            }
-            console.log('✅ Free tier limit kontrolü geçti');
-          } catch (e) {
-            console.error('Free tier kontrolü hata:', e);
-          }
-        }
-      }
-    }
+    // Note: Portfolio limit check already done above with subscription-based logic
 
     // 🗃️ 1. ADIM: Portfolio kaydını database'e kaydet
     let savedPortfolio: { id: string; created_at?: string } | undefined;

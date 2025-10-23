@@ -60,9 +60,7 @@ export function DashboardHeader({ demoMode, variant = 'default' }: DashboardHead
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group focus:outline-none hover-lift">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300">
-              PortfolYO
-            </span>
+            <Image src="/YO.svg" alt="PortfolYO Logo" width={32} height={32} className="h-8 w-8" />
           </Link>
 
           {/* Navigation Links - Only show for authenticated users */}

@@ -220,4 +220,41 @@ export class PortfolioService {
       generated_at: new Date().toISOString(),
     };
   }
+
+  /**
+   * Kullanıcının subscription bilgisini getir
+   */
+  async getUserSubscription(userEmail: string): Promise<{
+    plan: 'FREE' | 'PRO';
+    status: 'active' | 'cancelled' | 'expired';
+    start_date?: string;
+    end_date?: string;
+  } | null> {
+    try {
+      const { data: subscription, error } = await supabaseAdmin
+        .from('user_subscriptions')
+        .select('plan, status, start_date, end_date')
+        .eq('user_email', userEmail)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No subscription found - return FREE
+          console.log('📝 No subscription found for user:', userEmail, '- defaulting to FREE');
+          return {
+            plan: 'FREE',
+            status: 'active',
+          };
+        }
+        console.error('❌ Subscription query error:', error);
+        return null;
+      }
+
+      console.log('✅ Subscription found for user:', userEmail, '- plan:', subscription.plan);
+      return subscription;
+    } catch (error) {
+      console.error('❌ getUserSubscription exception:', error);
+      return null;
+    }
+  }
 }

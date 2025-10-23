@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Code2, Sparkles, Github } from 'lucide-react';
+import Image from 'next/image';
 import Button from './Button';
 
 interface AppHeaderProps {
@@ -28,14 +29,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   }, []);
 
   const getLogoIcon = () => {
-    switch (variant) {
-      case 'dashboard':
-        return <Github className="h-6 w-6 text-white" />;
-      case 'portfolio':
-        return <Code2 className="h-6 w-6 text-white" />;
-      default:
-        return <Code2 className="h-7 w-7 text-white" />;
-    }
+    return <Image src="/YO.svg" alt="PortfolYO Logo" width={24} height={24} className="h-6 w-6" />;
   };
 
   const getLogoSize = () => {
@@ -92,14 +86,19 @@ const AppHeader: React.FC<AppHeaderProps> = ({
               </div>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
             </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300 tracking-tight ${getLogoSize()}`}
-              >
-                PortfolYO
-              </span>
-              <Sparkles className="h-4 w-4 text-blue-500 animate-pulse" />
-            </div>
+            {(pathname === '/' ||
+              pathname === '/en' ||
+              pathname === '/tr' ||
+              pathname === '/es') && (
+              <div className="flex items-center gap-2">
+                <span
+                  className={`font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-purple-700 transition-all duration-300 tracking-tight ${getLogoSize()}`}
+                >
+                  PortfolYO
+                </span>
+                <Sparkles className="h-4 w-4 text-blue-500 animate-pulse" />
+              </div>
+            )}
           </Link>
 
           {/* Navigation */}

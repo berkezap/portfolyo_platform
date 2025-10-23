@@ -92,3 +92,10 @@ _archive/
 
 # Cursor IDE files (plans, notes, etc.)
 .cursor/
+
+# Debug and test scripts (contain sensitive data)
+debug-portfolio.js
+publish-new-portfolio.js
+publish-portfolio.js
+test-portfolio-limits.js
+scripts/setup-subscriptions-db.js

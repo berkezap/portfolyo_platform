@@ -671,14 +671,17 @@ function TemplateSelection({
                   ? 'border-blue-300 bg-blue-50 shadow-md'
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
               }
-              ${!canUse ? 'opacity-75' : ''}
             `}
-              onClick={() => canUse && onSelectTemplate(template.id)}
+              onClick={() => {
+                // Preview için tıklama, button'dan handle ediliyor
+              }}
             >
               {/* PRO Badge */}
               {isPremium && (
-                <div className="absolute -top-2 -left-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-10">
-                  PRO
+                <div className="absolute top-3 left-3 z-10">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-800 text-white">
+                    PRO
+                  </span>
                 </div>
               )}
 
@@ -696,42 +699,6 @@ function TemplateSelection({
                   style={{ width: '133.33%', height: '133.33%' }}
                 />
               </div>
-
-              {/* Lock Overlay for PRO templates without access */}
-              {isPremium && !canUse && (
-                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm rounded-xl flex items-center justify-center z-20">
-                  <div className="text-center text-white px-6">
-                    <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                      </svg>
-                    </div>
-                    <p className="font-semibold mb-2">Premium Template</p>
-                    <p className="text-sm text-gray-200 mb-3">Upgrade to PRO to unlock</p>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push('/pricing');
-                      }}
-                      className="bg-white text-gray-900 hover:bg-gray-100"
-                    >
-                      Upgrade Now
-                    </Button>
-                  </div>
-                </div>
-              )}
 
               <div className="space-y-3 flex-1 flex flex-col">
                 <div>
@@ -754,15 +721,21 @@ function TemplateSelection({
                   <Button
                     variant={selectedTemplate === template.id ? 'primary' : 'secondary'}
                     size="sm"
-                    className="flex-1 text-sm"
+                    className={`flex-1 text-sm ${isPremium && !canUse ? 'border-gray-300 text-gray-600 hover:bg-gray-50' : ''}`}
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
-                      onSelectTemplate(template.id);
+                      if (!isPremium || canUse) {
+                        onSelectTemplate(template.id);
+                      } else {
+                        router.push('/pricing');
+                      }
                     }}
                   >
                     {selectedTemplate === template.id
                       ? t('dashboard.selected')
-                      : t('dashboard.select')}
+                      : isPremium && !canUse
+                        ? 'Upgrade to PRO'
+                        : t('dashboard.select')}
                   </Button>
 
                   <Button

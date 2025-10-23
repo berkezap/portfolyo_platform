@@ -134,6 +134,7 @@ export function LiquidHeader({ demoMode = false, variant = 'transparent' }: Liqu
             href={`/${locale}`}
             className="liquid-glass-logo group flex items-center gap-3 px-4 py-2"
           >
+            <Image src="/YO.svg" alt="PortfolYO Logo" width={32} height={32} className="h-8 w-8" />
             <span className="text-lg font-bold text-gray-800">PortfolYO</span>
           </Link>
 
