@@ -224,6 +224,73 @@ async function postHandler(request: NextRequest) {
 
     console.log('✅ Portfolio bulundu:', portfolio.id);
 
+    // Subscription kontrolü ve limit kontrolü
+    const { data: subscription, error: subError } = await supabaseAdmin
+      .from('user_subscriptions')
+      .select('plan, status')
+      .eq('user_email', session.user.email)
+      .single();
+
+    const isPro = subscription?.plan === 'PRO' && subscription?.status === 'active';
+    console.log('🎯 Subscription check:', { isPro, subscription });
+
+    // Kullanıcının yayınlanmış portfolyolarını kontrol et
+    const { data: publishedPortfolios, error: publishedError } = await supabaseAdmin
+      .from('portfolios')
+      .select('id, public_slug')
+      .eq('user_id', session.user.email)
+      .eq('is_published', true);
+
+    console.log('📊 Published portfolios:', { publishedPortfolios, publishedError });
+
+    // Bu portfolio zaten yayınlanmış mı?
+    const isCurrentPortfolioPublished = publishedPortfolios?.some((p) => p.id === portfolioId);
+
+    // Plan limitleri
+    const maxPublishedPortfolios = isPro ? 5 : 1;
+    const currentPublishedCount = publishedPortfolios?.length || 0;
+
+    // Yeni portfolio yayınlanacaksa ve limit aşılacaksa
+    if (!isCurrentPortfolioPublished && currentPublishedCount >= maxPublishedPortfolios) {
+      if (isPro) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `PRO planında en fazla ${maxPublishedPortfolios} portfolio yayınlayabilirsiniz. Önce mevcut portfolyolardan birini kaldırın.`,
+          },
+          { status: 403 },
+        );
+      } else {
+        // FREE kullanıcılar için otomatik unpublish
+        console.log('🔄 FREE user publishing new portfolio, unpublishing old ones...');
+
+        const { error: unpublishError } = await supabaseAdmin
+          .from('portfolios')
+          .update({
+            is_published: false,
+            visibility: 'unlisted',
+            public_slug: null,
+          })
+          .eq('user_id', session.user.email)
+          .eq('is_published', true)
+          .neq('id', portfolioId);
+
+        if (unpublishError) {
+          console.log('❌ Eski portfolio unpublish hatası:', unpublishError);
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'Önceki portfolio kaldırılırken hata oluştu',
+              debug: { unpublishError },
+            },
+            { status: 500 },
+          );
+        }
+
+        console.log('✅ Eski portfolios unpublished for FREE user');
+      }
+    }
+
     // Eğer slug değiştiriliyorsa ve freemium kullanıcısıysa limit kontrolü yap
     const isSlugChange = portfolio.slug && portfolio.slug !== slug;
     if (isSlugChange && portfolio.slug_last_changed_at) {
