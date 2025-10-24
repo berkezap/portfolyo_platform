@@ -1,68 +1,146 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TemplateProps } from '@/types/templates';
 
-export default function TerminalMaster({ data }: TemplateProps) {
+export default function TerminalMaster({ 
+  data, 
+  themeId = 'terminal-green',
+  darkMode: initialDarkMode = true 
+}: TemplateProps) {
+  const [darkMode, setDarkMode] = useState(initialDarkMode);
+  const [typingText, setTypingText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+  
+  const welcomeText = `Welcome to ${data.USER_NAME}'s portfolio terminal...`;
+  
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Typing animation effect
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < welcomeText.length) {
+        setTypingText(welcomeText.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, [welcomeText]);
+
+  // Cursor blinking effect
+  useEffect(() => {
+    const cursor = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 500);
+
+    return () => clearInterval(cursor);
+  }, []);
+
+  // Theme colors
+  const colors = {
+    background: darkMode ? '#0c0c0c' : '#f8f8f8',
+    terminalBg: darkMode ? 'rgba(12, 12, 12, 0.95)' : 'rgba(248, 248, 248, 0.95)',
+    primary: darkMode ? '#00ff41' : '#006600',
+    secondary: darkMode ? '#00dd36' : '#004400', 
+    accent: darkMode ? '#ffaa00' : '#cc8800',
+    muted: darkMode ? '#008822' : '#666666',
+    border: darkMode ? 'rgba(0, 255, 65, 0.2)' : 'rgba(0, 102, 0, 0.2)',
+    red: '#ff5f56',
+    yellow: '#ffbd2e', 
+    green: '#27c93f'
+  };
   return (
     <div style={{ 
-      background: '#0c0c0c', 
-      color: '#00ff41', 
+      background: colors.background, 
+      color: colors.primary, 
       minHeight: '100vh', 
       padding: '40px 16px',
-      fontFamily: '"SF Mono", Monaco, "Courier New", monospace'
+      fontFamily: '"SF Mono", Monaco, "Courier New", monospace',
+      position: 'relative'
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', background: 'rgba(12, 12, 12, 0.95)', borderRadius: '8px', padding: '24px' }}>
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        style={{
+          position: 'fixed',
+          top: '24px',
+          right: '24px',
+          width: '48px',
+          height: '48px',
+          borderRadius: '4px',
+          background: colors.terminalBg,
+          border: `1px solid ${colors.border}`,
+          color: colors.primary,
+          cursor: 'pointer',
+          fontSize: '20px',
+          zIndex: 1000,
+          fontFamily: 'monospace'
+        }}
+      >
+        {darkMode ? '☀' : '🌙'}
+      </button>
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto', background: colors.terminalBg, borderRadius: '8px', padding: '24px' }}>
         {/* Terminal Header */}
-        <div style={{ borderBottom: '1px solid rgba(0, 255, 65, 0.2)', paddingBottom: '12px', marginBottom: '24px' }}>
+        <div style={{ borderBottom: `1px solid ${colors.border}`, paddingBottom: '12px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ff5f56' }}></span>
-            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ffbd2e' }}></span>
-            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27c93f' }}></span>
+            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: colors.red }}></span>
+            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: colors.yellow }}></span>
+            <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: colors.green }}></span>
           </div>
-          <div style={{ color: '#00dd36' }}>{data.USER_NAME}@portfolio:~$</div>
+          <div style={{ color: colors.secondary }}>
+            {typingText}
+            {showCursor && <span style={{ opacity: showCursor ? 1 : 0 }}>|</span>}
+          </div>
+          <div style={{ color: colors.secondary, marginTop: '8px' }}>{data.USER_NAME}@portfolio:~$</div>
         </div>
 
         {/* Terminal Content */}
         <div style={{ fontSize: '14px', lineHeight: '1.6' }}>
           {/* About */}
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ color: '#ffaa00', marginBottom: '8px' }}>
-              <span style={{ color: '#00dd36' }}>visitor@portfolio</span>
-              <span style={{ color: '#008822' }}> ~ </span>
-              <span style={{ color: '#00ff41' }}>$</span> cat about.txt
+            <div style={{ color: colors.accent, marginBottom: '8px' }}>
+              <span style={{ color: colors.secondary }}>visitor@portfolio</span>
+              <span style={{ color: colors.muted }}> ~ </span>
+              <span style={{ color: colors.primary }}>$</span> cat about.txt
             </div>
-            <div style={{ marginLeft: '16px', color: '#00dd36' }}>
-              <div style={{ border: '1px solid #00ff41', padding: '16px', marginBottom: '12px' }}>
+            <div style={{ marginLeft: '16px', color: colors.secondary }}>
+              <div style={{ border: `1px solid ${colors.primary}`, padding: '16px', marginBottom: '12px' }}>
                 <div style={{ fontSize: '16px', marginBottom: '8px' }}>{data.USER_NAME}</div>
                 <div>{data.USER_TITLE}</div>
               </div>
-              <div><span style={{ color: '#ffaa00' }}>BIO:</span> {data.USER_BIO}</div>
+              <div><span style={{ color: colors.accent }}>BIO:</span> {data.USER_BIO}</div>
               {data.USER_MISSION_STATEMENT && (
-                <div><span style={{ color: '#ffaa00' }}>MISSION:</span> {data.USER_MISSION_STATEMENT}</div>
+                <div><span style={{ color: colors.accent }}>MISSION:</span> {data.USER_MISSION_STATEMENT}</div>
               )}
             </div>
           </div>
 
           {/* Stats */}
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ color: '#ffaa00', marginBottom: '8px' }}>
-              <span style={{ color: '#00dd36' }}>visitor@portfolio</span>
-              <span style={{ color: '#008822' }}> ~ </span>
-              <span style={{ color: '#00ff41' }}>$</span> ./github-stats.sh
+            <div style={{ color: colors.accent, marginBottom: '8px' }}>
+              <span style={{ color: colors.secondary }}>visitor@portfolio</span>
+              <span style={{ color: colors.muted }}> ~ </span>
+              <span style={{ color: colors.primary }}>$</span> ./github-stats.sh
             </div>
             <div style={{ marginLeft: '16px', display: 'flex', gap: '32px' }}>
               <div>
-                <div style={{ color: '#008822' }}>[REPOS]</div>
+                <div style={{ color: colors.muted }}>[REPOS]</div>
                 <div style={{ fontSize: '24px' }}>{data.TOTAL_REPOS}</div>
               </div>
               <div>
-                <div style={{ color: '#008822' }}>[STARS]</div>
+                <div style={{ color: colors.muted }}>[STARS]</div>
                 <div style={{ fontSize: '24px' }}>{data.TOTAL_STARS}</div>
               </div>
               {data.YEARS_EXPERIENCE && (
                 <div>
-                  <div style={{ color: '#008822' }}>[EXPERIENCE]</div>
+                  <div style={{ color: colors.muted }}>[EXPERIENCE]</div>
                   <div style={{ fontSize: '24px' }}>{data.YEARS_EXPERIENCE}y</div>
                 </div>
               )}
@@ -71,31 +149,31 @@ export default function TerminalMaster({ data }: TemplateProps) {
 
           {/* Projects */}
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ color: '#ffaa00', marginBottom: '8px' }}>
-              <span style={{ color: '#00dd36' }}>visitor@portfolio</span>
-              <span style={{ color: '#008822' }}> ~ </span>
-              <span style={{ color: '#00ff41' }}>$</span> ls -la projects/
+            <div style={{ color: colors.accent, marginBottom: '8px' }}>
+              <span style={{ color: colors.secondary }}>visitor@portfolio</span>
+              <span style={{ color: colors.muted }}> ~ </span>
+              <span style={{ color: colors.primary }}>$</span> ls -la projects/
             </div>
             <div style={{ marginLeft: '16px' }}>
               {data.projects.map((project) => (
                 <div key={project.PROJECT_NAME} style={{ marginBottom: '16px' }}>
                   <div>
-                    <span style={{ color: '#008822' }}>drwxr-xr-x </span>
-                    <span style={{ color: '#008822' }}>{data.USER_NAME} </span>
-                    <span style={{ color: '#ffaa00' }}>{project.PROJECT_STARS}★ </span>
+                    <span style={{ color: colors.muted }}>drwxr-xr-x </span>
+                    <span style={{ color: colors.muted }}>{data.USER_NAME} </span>
+                    <span style={{ color: colors.accent }}>{project.PROJECT_STARS}★ </span>
                     <a 
                       href={project.PROJECT_URL} 
-                      style={{ color: '#00ff41', textDecoration: 'none' }}
+                      style={{ color: colors.primary, textDecoration: 'none' }}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {project.PROJECT_NAME}/
                     </a>
                   </div>
-                  <div style={{ color: '#00dd36', fontSize: '12px', marginLeft: '24px' }}>
+                  <div style={{ color: colors.secondary, fontSize: '12px', marginLeft: '24px' }}>
                     // {project.PROJECT_DESCRIPTION}
                   </div>
-                  <div style={{ color: '#008822', fontSize: '12px', marginLeft: '24px' }}>
+                  <div style={{ color: colors.muted, fontSize: '12px', marginLeft: '24px' }}>
                     [{project.PROJECT_LANGUAGE}] {project.PROJECT_FORKS} forks
                   </div>
                 </div>
@@ -105,31 +183,31 @@ export default function TerminalMaster({ data }: TemplateProps) {
 
           {/* Links */}
           <div>
-            <div style={{ color: '#ffaa00', marginBottom: '8px' }}>
-              <span style={{ color: '#00dd36' }}>visitor@portfolio</span>
-              <span style={{ color: '#008822' }}> ~ </span>
-              <span style={{ color: '#00ff41' }}>$</span> cat links.json
+            <div style={{ color: colors.accent, marginBottom: '8px' }}>
+              <span style={{ color: colors.secondary }}>visitor@portfolio</span>
+              <span style={{ color: colors.muted }}> ~ </span>
+              <span style={{ color: colors.primary }}>$</span> cat links.json
             </div>
             <div style={{ marginLeft: '16px' }}>
               {'{'}<br />
               {data.GITHUB_URL && (
                 <>
-                  {'  '}"github": "<a href={data.GITHUB_URL} style={{ color: '#00ff41', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.GITHUB_URL}</a>",<br />
+                  {'  '}"github": "<a href={data.GITHUB_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.GITHUB_URL}</a>",<br />
                 </>
               )}
               {data.LINKEDIN_URL && data.LINKEDIN_URL !== '#' && (
                 <>
-                  {'  '}"linkedin": "<a href={data.LINKEDIN_URL} style={{ color: '#00ff41', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.LINKEDIN_URL}</a>",<br />
+                  {'  '}"linkedin": "<a href={data.LINKEDIN_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.LINKEDIN_URL}</a>",<br />
                 </>
               )}
               {data.USER_EMAIL && (
                 <>
-                  {'  '}"email": "<a href={`mailto:${data.USER_EMAIL}`} style={{ color: '#00ff41', textDecoration: 'none' }}>{data.USER_EMAIL}</a>",<br />
+                  {'  '}"email": "<a href={`mailto:${data.USER_EMAIL}`} style={{ color: colors.primary, textDecoration: 'none' }}>{data.USER_EMAIL}</a>",<br />
                 </>
               )}
               {data.CV_URL && (
                 <>
-                  {'  '}"resume": "<a href={data.CV_URL} style={{ color: '#00ff41', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Download CV</a>"<br />
+                  {'  '}"resume": "<a href={data.CV_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Download CV</a>"<br />
                 </>
               )}
               {'}'}
@@ -138,10 +216,10 @@ export default function TerminalMaster({ data }: TemplateProps) {
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop: '48px', paddingTop: '16px', borderTop: '1px solid rgba(0, 255, 65, 0.2)', textAlign: 'center', color: '#008822' }}>
+        <div style={{ marginTop: '48px', paddingTop: '16px', borderTop: `1px solid ${colors.border}`, textAlign: 'center', color: colors.muted }}>
           <span>© {new Date().getFullYear()} {data.USER_NAME}</span>
           <span style={{ margin: '0 8px' }}>|</span>
-          <span>Powered by <a href="https://portfolyo.dev" style={{ color: '#00ff41', textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Portfolyo</a></span>
+          <span>Powered by <a href="https://portfolyo.tech" style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Portfolyo</a></span>
         </div>
       </div>
     </div>

@@ -28,5 +28,7 @@ export interface TemplateData {
 }
 
 export interface TemplateProps {
-  data: TemplateData
+  data: TemplateData;
+  themeId?: string;
+  darkMode?: boolean;
 } 
