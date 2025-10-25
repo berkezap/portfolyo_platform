@@ -11,11 +11,18 @@ export default function GitHubNative({ data }: TemplateProps) {
 
   return (
     <div style={{ 
-      maxWidth: '1280px', 
-      margin: '0 auto', 
-      padding: '32px 16px',
+      background: '#ffffff',
+      minHeight: '100vh',
+      width: '100%',
+      margin: 0,
+      padding: 0,
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
     }}>
+      <div style={{
+        maxWidth: '1280px', 
+        margin: '0 auto', 
+        padding: '32px 16px'
+      }}>
       {/* Header */}
       <header style={{ marginBottom: '40px', paddingBottom: '32px', borderBottom: '1px solid #d0d7de' }}>
         {data.USER_AVATAR && (
@@ -103,6 +110,7 @@ export default function GitHubNative({ data }: TemplateProps) {
       <footer style={{ marginTop: '64px', paddingTop: '32px', borderTop: '1px solid #d0d7de', textAlign: 'center', color: '#656d76' }}>
         <p>© {new Date().getFullYear()} {data.USER_NAME}. Built with Portfolyo</p>
       </footer>
+      </div>
     </div>
   );
 }

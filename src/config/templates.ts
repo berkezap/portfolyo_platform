@@ -87,9 +87,7 @@ export const TEMPLATES: TemplateConfig[] = [
     features: [
       'Terminal UI',
       'Typing Animation',
-      'Command Navigation',
-      'CRT Effects',
-      'Monospace Beauty',
+      'Hacker Aesthetic',
     ],
     capabilities: {
       darkMode: true,

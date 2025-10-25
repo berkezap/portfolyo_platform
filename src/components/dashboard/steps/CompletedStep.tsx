@@ -94,72 +94,119 @@ export function CompletedStep({
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex flex-col items-center text-center space-y-6 py-6">
-        <CheckCircle2 className="w-16 h-16 text-green-600 mb-4" />
-        {portfolioResult?.success ? (
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('congratulations')}</h2>
-            {isDevelopment ? (
-              <div className="space-y-2">
-                <p className="text-sm text-gray-500">{t('portfolioPreviewReady')}</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <span className="text-xs font-medium text-yellow-800">
-                    {t('devModeNotPublished')}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">{t('portfolioPublished')}</p>
-            )}
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">{t('operationFailed')}</h2>
-            <p className="text-sm text-gray-500">{t('somethingWentWrong')}</p>
-          </div>
-        )}
-
-        {portfolioResult?.success && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mt-8">
-            <Button
-              variant="primary"
-              size="md"
-              onClick={handleViewPortfolio}
-              className="flex items-center justify-center gap-2 px-6 py-3"
-            >
-              <ExternalLink className="w-4 h-4" />
-              {t('view')}
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleManagePortfolios}
-              className="flex items-center justify-center gap-2 px-6 py-3"
-            >
-              <FolderOpen className="w-4 h-4" />
-              {t('edit')}
-            </Button>
-          </div>
-        )}
-
-        <div className="flex gap-4 mt-6">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleShare}
-            className="flex items-center gap-2 px-4 py-2"
-          >
-            <Share2 className="w-4 h-4" />
-            {t('share')}
-          </Button>
-
-          <Button variant="secondary" size="sm" onClick={onNewPortfolio} className="px-4 py-2">
-            {t('newPortfolio')}
-          </Button>
+    <div className="max-w-full mx-auto">
+      {/* Header Section */}
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-900">
+            {portfolioResult?.success ? 'Portfolio Live' : t('operationFailed')}
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {portfolioResult?.success 
+              ? isDevelopment 
+                ? t('portfolioPreviewReady')
+                : 'Your portfolio is now live and ready to share'
+              : t('somethingWentWrong')
+            }
+          </p>
         </div>
       </div>
+
+      {portfolioResult?.success && (
+        <div className="space-y-6">
+          {/* Success Card with URL */}
+          <div className="p-6 rounded-xl border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Your Portfolio is Live
+                </h3>
+                {publishedUrl && (
+                  <div className="flex items-center gap-2 p-3 bg-white rounded-lg border border-green-200 mb-3">
+                    <ExternalLink className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <code className="text-sm font-mono text-green-900 flex-1 break-all">
+                      {publishedUrl}
+                    </code>
+                  </div>
+                )}
+                {isDevelopment && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <span className="text-xs font-medium text-yellow-800">
+                      {t('devModeNotPublished')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Cards */}
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* View Portfolio */}
+            <button
+              onClick={handleViewPortfolio}
+              className="p-6 rounded-xl border-2 border-gray-200 bg-white hover:border-gray-900 hover:shadow-lg transition-all text-left group"
+            >
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
+                <ExternalLink className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-1">View Portfolio</h3>
+              <p className="text-sm text-gray-600">See your live portfolio</p>
+            </button>
+
+            {/* Edit Portfolio */}
+            <button
+              onClick={handleManagePortfolios}
+              className="p-6 rounded-xl border-2 border-gray-200 bg-white hover:border-gray-900 hover:shadow-lg transition-all text-left group"
+            >
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors">
+                <FolderOpen className="w-5 h-5 text-purple-600 group-hover:text-white transition-colors" />
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Edit Portfolio</h3>
+              <p className="text-sm text-gray-600">Customize and update</p>
+            </button>
+
+            {/* Share Portfolio */}
+            <button
+              onClick={handleShare}
+              className="p-6 rounded-xl border-2 border-gray-200 bg-white hover:border-gray-900 hover:shadow-lg transition-all text-left group"
+            >
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors">
+                <Share2 className="w-5 h-5 text-green-600 group-hover:text-white transition-colors" />
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Share Portfolio</h3>
+              <p className="text-sm text-gray-600">Tell the world about it</p>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error State */}
+      {!portfolioResult?.success && (
+        <div className="p-6 rounded-xl border-2 border-red-200 bg-red-50">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 className="w-6 h-6 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-red-900 mb-2">
+                {t('operationFailed')}
+              </h3>
+              <p className="text-sm text-red-700 mb-4">{t('somethingWentWrong')}</p>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={onNewPortfolio}
+              >
+                Try Again
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

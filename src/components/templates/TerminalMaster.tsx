@@ -5,7 +5,6 @@ import type { TemplateProps } from '@/types/templates';
 
 export default function TerminalMaster({ 
   data, 
-  themeId = 'terminal-green',
   darkMode: initialDarkMode = true 
 }: TemplateProps) {
   const [darkMode, setDarkMode] = useState(initialDarkMode);
@@ -59,8 +58,10 @@ export default function TerminalMaster({
     <div style={{ 
       background: colors.background, 
       color: colors.primary, 
-      minHeight: '100vh', 
-      padding: '40px 16px',
+      minHeight: '100vh',
+      width: '100%',
+      margin: 0,
+      padding: 0,
       fontFamily: '"SF Mono", Monaco, "Courier New", monospace',
       position: 'relative'
     }}>
@@ -86,7 +87,7 @@ export default function TerminalMaster({
         {darkMode ? '☀' : '🌙'}
       </button>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', background: colors.terminalBg, borderRadius: '8px', padding: '24px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', background: colors.terminalBg, borderRadius: '8px', padding: '24px', marginTop: '40px', marginLeft: '16px', marginRight: '16px' }}>
         {/* Terminal Header */}
         <div style={{ borderBottom: `1px solid ${colors.border}`, paddingBottom: '12px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
@@ -192,22 +193,22 @@ export default function TerminalMaster({
               {'{'}<br />
               {data.GITHUB_URL && (
                 <>
-                  {'  '}"github": "<a href={data.GITHUB_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.GITHUB_URL}</a>",<br />
+                  {'  '}&quot;github&quot;: &quot;<a href={data.GITHUB_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.GITHUB_URL}</a>&quot;,<br />
                 </>
               )}
               {data.LINKEDIN_URL && data.LINKEDIN_URL !== '#' && (
                 <>
-                  {'  '}"linkedin": "<a href={data.LINKEDIN_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.LINKEDIN_URL}</a>",<br />
+                  {'  '}&quot;linkedin&quot;: &quot;<a href={data.LINKEDIN_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">{data.LINKEDIN_URL}</a>&quot;,<br />
                 </>
               )}
               {data.USER_EMAIL && (
                 <>
-                  {'  '}"email": "<a href={`mailto:${data.USER_EMAIL}`} style={{ color: colors.primary, textDecoration: 'none' }}>{data.USER_EMAIL}</a>",<br />
+                  {'  '}&quot;email&quot;: &quot;<a href={`mailto:${data.USER_EMAIL}`} style={{ color: colors.primary, textDecoration: 'none' }}>{data.USER_EMAIL}</a>&quot;,<br />
                 </>
               )}
               {data.CV_URL && (
                 <>
-                  {'  '}"resume": "<a href={data.CV_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Download CV</a>"<br />
+                  {'  '}&quot;resume&quot;: &quot;<a href={data.CV_URL} style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Download CV</a>&quot;<br />
                 </>
               )}
               {'}'}
@@ -220,6 +221,7 @@ export default function TerminalMaster({
           <span>© {new Date().getFullYear()} {data.USER_NAME}</span>
           <span style={{ margin: '0 8px' }}>|</span>
           <span>Powered by <a href="https://portfolyo.tech" style={{ color: colors.primary, textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">Portfolyo</a></span>
+          {/* Footer comment */}
         </div>
       </div>
     </div>

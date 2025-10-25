@@ -31,44 +31,53 @@ export function ProgressSteps({ currentStep }: ProgressStepsProps) {
   };
 
   return (
-    <div className="py-2 mt-2" style={{ backgroundColor: '#F7F8FA' }}>
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center">
-          {steps.map((step, index) => {
-            const status = getStepStatus(step.id);
-            const isCompleted = status === 'completed';
-            const isCurrent = status === 'current';
-            return (
-              <div key={step.id} className="flex items-center">
-                {/* Step Circle */}
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                      isCurrent || isCompleted
-                        ? 'bg-blue-500 border-blue-500 text-white'
-                        : 'bg-white border-gray-300 text-gray-400'
-                    }`}
-                  >
-                    <span className="font-semibold text-sm">{step.number}</span>
-                  </div>
-                  <p
-                    className={`mt-2 text-sm font-medium ${
-                      isCurrent || isCompleted ? 'text-blue-600' : 'text-gray-400'
-                    }`}
-                  >
-                    {step.label}
-                  </p>
-                </div>
-                {/* Connector Line */}
-                {index < steps.length - 1 && (
-                  <div className="w-24 h-px bg-gray-200 mx-8 mt-[-12px]" />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+    <div className="flex lg:flex-col items-center lg:space-y-4 space-x-4 lg:space-x-0 py-2 lg:pt-0 lg:pb-4 overflow-x-auto lg:overflow-x-visible">
+      {steps.map((step, index) => {
+        const status = getStepStatus(step.id);
+        const isCompleted = status === 'completed';
+        const isCurrent = status === 'current';
+        return (
+          <div key={step.id} className="flex flex-col items-center">
+            {/* Step Circle */}
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-500 ease-out flex-shrink-0 ${
+                isCurrent || isCompleted
+                  ? 'bg-gray-900 border-gray-900 text-white shadow-lg scale-110'
+                  : 'bg-white border-gray-300 text-gray-400 hover:border-gray-400'
+              }`}
+              style={{
+                transform: isCurrent ? 'scale(1.1)' : 'scale(1)',
+              }}
+            >
+              {isCompleted ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <span className="font-semibold text-sm">{step.number}</span>
+              )}
+            </div>
+            
+            {/* Step Label */}
+            <p
+              className={`text-xs font-medium mt-2 transition-all duration-300 text-center ${
+                isCurrent || isCompleted ? 'text-gray-900' : 'text-gray-400'
+              }`}
+            >
+              {step.label}
+            </p>
+            
+            {/* Connector Line - Horizontal on mobile, Vertical on desktop */}
+            {index < steps.length - 1 && (
+              <div 
+                className={`lg:w-px lg:h-8 w-8 h-px my-0 lg:my-3 mx-3 lg:mx-0 transition-all duration-500 ${
+                  isCompleted ? 'bg-gray-900' : 'bg-gray-200'
+                }`}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

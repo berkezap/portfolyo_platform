@@ -29,6 +29,18 @@ export function useSubscription() {
       setLoading(true);
       setError(null);
 
+      // Check cache first (1 minute TTL)
+      const cached = localStorage.getItem('subscription_cache');
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const age = Date.now() - timestamp;
+        if (age < 1 * 60 * 1000) { // 1 minute
+          setSubscriptionData(data);
+          setLoading(false);
+          return;
+        }
+      }
+
       const response = await fetch('/api/subscription/status');
 
       if (!response.ok) {
@@ -37,6 +49,12 @@ export function useSubscription() {
 
       const data = await response.json();
       setSubscriptionData(data);
+
+      // Cache the result
+      localStorage.setItem('subscription_cache', JSON.stringify({
+        data,
+        timestamp: Date.now()
+      }));
     } catch (err) {
       console.error('Subscription fetch error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -84,11 +102,17 @@ export function useSubscription() {
     return currentPlan === 'FREE' ? 1 : 5;
   };
 
+  const clearCache = () => {
+    localStorage.removeItem('subscription_cache');
+    fetchSubscriptionStatus();
+  };
+
   return {
     subscriptionData,
     loading,
     error,
     refetch: fetchSubscriptionStatus,
+    clearCache,
     currentPlan: getCurrentPlan(),
     isPro: isPro(),
     hasFeature,

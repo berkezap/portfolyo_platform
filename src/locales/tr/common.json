@@ -63,7 +63,24 @@
     "customizable": "Özelleştirilebilir",
     "customizableDesc": "Renk ve içerik kontrolü",
     "seoOptimized": "SEO Optimized",
-    "seoOptimizedDesc": "Arama motorları için"
+    "seoOptimizedDesc": "Arama motorları için",
+    "premium": "Premium",
+    "free": "Ücretsiz",
+    "locked": "Kilitli",
+    "upgradeToPro": "PRO'ya Yükselt",
+    "proRequired": "PRO aboneliği gerekli",
+    "selectTemplate": "Şablon Seç",
+    "previewTemplate": "Şablonu Önizle",
+    "features": {
+      "darkMode": "Karanlık Mod",
+      "animations": "Akıcı Animasyonlar",
+      "seo": "SEO Optimize",
+      "customization": "Tam Özelleştirme",
+      "glassmorphism": "Cam Efekti",
+      "terminalUI": "Terminal Arayüzü",
+      "typingAnimation": "Yazma Animasyonu",
+      "accessibility": "Erişilebilir"
+    }
   },
   "proFeatures": {
     "title": "PortfolYO+",
